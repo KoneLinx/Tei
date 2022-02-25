@@ -12,12 +12,15 @@
 **/*recipe
 **/*pdb
 **/debug
+/x64
+/Win32
 
 # Temporary and local files
 
 **/*.tmp
 **/_*
 **/.*
+**/test*
 
 # Setting and local data
 
