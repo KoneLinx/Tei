@@ -15,6 +15,7 @@ int main(int argc, char*[])
 		(void)TTF_CloseFont(nullptr);
 		(void)IMG_LoadTGA_RW(nullptr);
 		(void)ImGui_ImplSDL2_InitForSDLRenderer(nullptr, nullptr);
+		(void)ImGui::Render();
 	}
 
 	return 0;
