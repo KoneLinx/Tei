@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+		<OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+		<IntDir>$(Platform)\$(Configuration)\</IntDir>
+		<IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+		<ExternalIncludePath>$(SolutionDir)libs;$(ExternalIncludePath)</ExternalIncludePath>
+		<LibraryPath>$(SolutionDir)$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<LibraryPath>$(SolutionDir)libs\$(Platform);$(LibraryPath)</LibraryPath>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<LibraryPath>$(SolutionDir)libs\$(Platform)\$(Configuration);$(LibraryPath)</LibraryPath>
+	</PropertyGroup>
+	
+	<ItemDefinitionGroup>
+		<ClCompile>
+			<WarningLevel>Level4</WarningLevel>
+			<TreatWarningAsError>true</TreatWarningAsError>
+			<ConformanceMode>true</ConformanceMode>
+			<LanguageStandard>stdcpplatest</LanguageStandard>
+			<UseStandardPreprocessor>true</UseStandardPreprocessor>
+		</ClCompile>
+	</ItemDefinitionGroup>
+	
+</Project>
