@@ -76,23 +76,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>$(SolutionDir)libs\SDL2\lib\x86\;$(SolutionDir)libs\SDL2_image\lib\x86\;$(SolutionDir)libs\SDL2_ttf\lib\x86\;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>$(SolutionDir)libs\SDL2\lib\x86\;$(SolutionDir)libs\SDL2_image\lib\x86\;$(SolutionDir)libs\SDL2_ttf\lib\x86\;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>$(SolutionDir)libs\SDL2\lib\x64\;$(SolutionDir)libs\SDL2_image\lib\x64\;$(SolutionDir)libs\SDL2_ttf\lib\x64\;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>$(SolutionDir)libs\SDL2\lib\x64\;$(SolutionDir)libs\SDL2_image\lib\x64\;$(SolutionDir)libs\SDL2_ttf\lib\x64\;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
