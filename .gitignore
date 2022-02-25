@@ -1,0 +1,25 @@
+
+.git
+!.gitignore
+
+# Visual Studio
+.vs
+**/*.aps
+
+# Build data
+**/*log
+**/*obj
+**/*recipe
+**/*pdb
+**/debug
+
+# Temporary and local files
+
+**/*.tmp
+**/_*
+**/.*
+
+# Setting and local data
+
+**/*.ini
+**/$*
