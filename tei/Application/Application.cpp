@@ -1,5 +1,6 @@
 #include "Application.h"
-//#include "../Renderer/Renderer.h"
+
+#include <tei/render.h>
 //#include "../Core/Core.h"
 #include <tei/time.h>
 #include <SDL.h>
@@ -38,8 +39,15 @@ Application::Application(int argc, char const* const* argv)
 Application::~Application()
 {
 	METRICS_TIMEBLOCK;
-	//renderer::Renderer.Register(nullptr);
+	render::Renderer.Register(nullptr);
 	SDL_Quit();
+}
+
+void Application::SetFullscreen(bool state, bool fake) const
+{
+	METRICS_TIMEBLOCK;
+	SDL_SetWindowFullscreen(m_SDLWindow, state ? (fake ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_FULLSCREEN) : 0);
+	tei::internal::render::Renderer->Update();
 }
 
 void Application::Quit() const
@@ -63,7 +71,7 @@ void Application::OpenWindow()
 	if (m_SDLWindow == nullptr)
 		throw utility::TeiRuntimeError{ "Could not create SDL Window: "s + SDL_GetError() };
 
-	//renderer::Renderer.Register(new renderer::RendererClass{ m_Window });
+	render::Renderer.Register(new render::RendererClass{ m_Window });
 }
 
 void Application::CloseWindow()

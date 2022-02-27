@@ -10,13 +10,7 @@
 #include <tei/time.h>
 #include <tei/unit.h>
 #include <tei/application.h>
-
-using namespace tei::internal::time;
-using namespace tei::internal::unit;
-using namespace tei::internal::time::literals;
-
-void t1(std::chrono::steady_clock::time_point) {}
-void t2(std::chrono::high_resolution_clock::time_point) {}
+#include <tei/render.h>
 
 int main(int argc, char* argv[])
 {
@@ -25,7 +19,28 @@ int main(int argc, char* argv[])
 
 	tei::internal::application::StartApplication(argc, argv);
 
-	(void)tei::external::Application->Args()[0];
+	std::cout << tei::external::Application->Args()[0];
+
+	tei::internal::resource::Resources.Register(new tei::internal::resource::ResourceManager{});
+	tei::internal::resource::Resources->AddLoader(new tei::internal::resource::prefab::TextureLoader{});
+	//auto& texture = tei::external::Resources->Load<tei::external::resource::Texture>("_test.jpg");
+
+	bool running{ true };
+	while (running)
+	{
+		SDL_Event e{};
+		while (SDL_PollEvent(&e))
+			if (e.type == SDL_EventType::SDL_QUIT)
+				running = false;
+			else if (e.type == SDL_EventType::SDL_KEYUP && e.key.keysym.scancode == SDL_Scancode::SDL_SCANCODE_F11)
+				tei::external::Application->SetFullscreen(true);
+
+		tei::internal::time::Time->frame.now = tei::external::Clock::now();
+		tei::internal::render::Renderer->Update();
+		tei::internal::render::Renderer->Clear();
+		//tei::external::Renderer->DrawTexture(texture, tei::external::unit::Transform{ {}, { .5f, .5f } });
+		tei::internal::render::Renderer->Present();
+	}
 
 	return 0;
 }

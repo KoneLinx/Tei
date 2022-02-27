@@ -64,8 +64,8 @@ namespace tei::internal::unit
 
 		Transform(
 			Position const& = {},
-			Rotation const& = {},
-			Scale    const& = { 1, 1 }
+			Scale    const& = { 1, 1 },
+			Rotation const& = {}
 		) noexcept;
 
 		Transform(Scale              const&) noexcept;
@@ -96,18 +96,18 @@ namespace tei::external
 namespace tei::internal::unit
 {
 
-	inline Transform::Transform(Position const& t, Rotation const& r, Scale const& s) noexcept
+	inline Transform::Transform(Position const& t, Scale const& s, Rotation const& r) noexcept
 		: position{ t }
 		, scale{ s }
 		, rotation{ r }
 	{}
 
 	inline Transform::Transform(Scale const& s) noexcept
-		: Transform{ {}, {}, s }
+		: Transform{ {}, s, {} }
 	{}
 
 	inline Transform::Transform(Rotation const& r) noexcept
-		: Transform{ {}, r, {} }
+		: Transform{ {}, {}, r }
 	{}
 
 	inline Transform::Transform(RotationMatrix const& m) noexcept

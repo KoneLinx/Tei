@@ -31,6 +31,8 @@ namespace tei::internal::application
 		inline Window const& Window() const
 		{ return m_Window; }
 
+		void SetFullscreen(bool state, bool fake = false) const;
+
 		inline std::span<std::string_view const> Args() const
 		{ return m_Args; }
 
