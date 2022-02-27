@@ -214,6 +214,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application\Application.cpp" />
+    <ClCompile Include="Audio\AudioHandler.cpp" />
+    <ClCompile Include="Audio\DebugAudio.cpp" />
+    <ClCompile Include="Audio\SDLAudio.cpp" />
     <ClCompile Include="Components\Object.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
     <ClCompile Include="Resources\Audio.cpp" />
@@ -226,6 +229,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Application.h" />
+    <ClInclude Include="Audio\AudioHandler.h" />
+    <ClInclude Include="Audio\DebugAudio.h" />
+    <ClInclude Include="Audio\SDLAudio.h" />
     <ClInclude Include="Components\Component.h" />
     <ClInclude Include="Components\Components.h" />
     <ClInclude Include="Components\Object.h" />

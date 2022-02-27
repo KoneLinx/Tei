@@ -11,7 +11,7 @@ namespace tei::internal::utility
 
 	struct Registerer
 	{
-		void operator () (auto&, auto&) {}
+		void operator () (auto*, auto*) {}
 	};
 
 	template <typename Served, typename Registerer = Registerer>
@@ -106,7 +106,7 @@ namespace tei::internal::utility
 	template<typename Served, typename Registerer>
 	inline Service<Served, Registerer>::Mutable& Service<Served, Registerer>::Register(Mutable* service)
 	{
-		Registerer{}(*m_Service, *service);
+		Registerer{}(std::to_address(m_Service), service);
 		m_Service.reset(service);
 		return *service;
 	}
