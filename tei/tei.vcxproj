@@ -213,7 +213,20 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Time\Clock.cpp" />
     <ClCompile Include="test.cpp" />
+    <ClCompile Include="Time\Time.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tei\time.h" />
+    <ClInclude Include="Time\Chrono.h" />
+    <ClInclude Include="Time\Clock.h" />
+    <ClInclude Include="Time\Clock.impl.h" />
+    <ClInclude Include="Time\Time.h" />
+    <ClInclude Include="Utility\Error.h" />
+    <ClInclude Include="Utility\Helpers.h" />
+    <ClInclude Include="Utility\Service.h" />
+    <ClInclude Include="tei\utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
