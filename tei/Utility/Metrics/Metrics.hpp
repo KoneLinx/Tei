@@ -60,19 +60,22 @@ namespace metrics
 	template <typename T>
 	inline MetricLog<T>::BlockTimer::~BlockTimer()
 	{
-		m_ThreadLog->push_back(End{Clock::now(), std::this_thread::get_id()});
+		if (m_Stream)
+			m_ThreadLog->push_back(End{Clock::now(), std::this_thread::get_id()});
 	}
 
 	template <typename T>
 	inline void MetricLog<T>::Register(source_location src)
 	{
-		m_ThreadLog->push_back(Event{ Clock::now(), std::this_thread::get_id(), src });
+		if (m_Stream)
+			m_ThreadLog->push_back(Event{ Clock::now(), std::this_thread::get_id(), src });
 	}
 
 	template <typename T>
 	MetricLog<T>::BlockTimer MetricLog<T>::TimeBlock(source_location src)
 	{
-		m_ThreadLog->push_back(Begin{ Clock::now(), std::this_thread::get_id(), src });
+		if (m_Stream)
+			m_ThreadLog->push_back(Begin{ Clock::now(), std::this_thread::get_id(), src });
 		return {};
 	}
 

@@ -2,7 +2,7 @@
 
 #include "glm.h"
 
-namespace tei::internal::units
+namespace tei::internal::unit
 {
 
 	namespace detail
@@ -18,6 +18,8 @@ namespace tei::internal::units
 				using T::T;
 				using T::operator=;
 
+				constexpr type() = default;
+
 				template <std::same_as<T> Val>
 				constexpr type(Val&& val) noexcept
 					: T{ std::forward<Val>(val) }
@@ -27,6 +29,7 @@ namespace tei::internal::units
 	}
 
 	using Unit = float;
+
 	constexpr static auto PRECISION = glm::precision::packed_highp;
 
 	using Vec1              = glm::tvec1<Unit, PRECISION>;
@@ -50,7 +53,7 @@ namespace tei::internal::units
 
 	using Colour            = detail::Unique_t<__LINE__>::type<Vec3>;
 
-	static_assert(!std::convertible_to<Position, Scale>, "Shouldn't be possible"); // May fail with intelisense, actual build succeeds
+	static_assert(!std::convertible_to<Position, Scale>, "Shouldn't be possible"); // May fail with intellisense, build succeeds
 	static_assert(!std::convertible_to<RotationMatrix, ScaleMatrix>, "Shouldn't be possible");
 
 	struct Transform
@@ -85,7 +88,12 @@ namespace tei::internal::units
 
 }
 
-namespace tei::internal::units
+namespace tei::external
+{
+	namespace unit = tei::internal::unit;
+}
+
+namespace tei::internal::unit
 {
 
 	inline Transform::Transform(Position const& t, Rotation const& r, Scale const& s) noexcept

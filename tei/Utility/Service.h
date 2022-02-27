@@ -9,7 +9,12 @@ namespace tei::internal::utility
 	//concept ServiceRegisterer = std::invocable<Registerer, std::remove_const_t<Served>*, std::remove_const_t<Served>*> && std::is_default_constructible_v<Registerer>;
 	//ServiceRegisterer<Served>
 
-	template <typename Served, typename Registerer = decltype([](auto&,auto&){})>
+	struct Registerer
+	{
+		void operator () (auto&, auto&) {}
+	};
+
+	template <typename Served, typename Registerer = Registerer>
 	class Service final
 	{
 		using Mutable = std::remove_const_t<Served>;

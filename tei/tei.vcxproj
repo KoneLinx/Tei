@@ -213,13 +213,21 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application\Application.cpp" />
+    <ClCompile Include="Components\Object.cpp" />
     <ClCompile Include="Time\Clock.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="Time\Time.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application\Application.h" />
+    <ClInclude Include="Components\Component.h" />
+    <ClInclude Include="Components\Components.h" />
+    <ClInclude Include="Components\Object.h" />
+    <ClInclude Include="tei\application.h" />
+    <ClInclude Include="tei\ecs.h" />
     <ClInclude Include="tei\time.h" />
-    <ClInclude Include="tei\units.h" />
+    <ClInclude Include="tei\unit.h" />
     <ClInclude Include="Time\Chrono.h" />
     <ClInclude Include="Time\Clock.h" />
     <ClInclude Include="Time\Clock.impl.h" />

@@ -8,54 +8,24 @@
 #include <thread>
 
 #include <tei/time.h>
-#include <tei/units.h>
+#include <tei/unit.h>
+#include <tei/application.h>
 
 using namespace tei::internal::time;
-using namespace tei::internal::units;
+using namespace tei::internal::unit;
 using namespace tei::internal::time::literals;
 
 void t1(std::chrono::steady_clock::time_point) {}
 void t2(std::chrono::high_resolution_clock::time_point) {}
 
-int main(int argc, char*[])
+int main(int argc, char* argv[])
 {
 	METRICS_INITLOG("_log.json");
+	METRICS_TIMEBLOCK;
 
-	if (argc == 0)
-	// Always false, build and link test only
-	{
-		(void)SDL_getenv(nullptr);
-		(void)TTF_CloseFont(nullptr);
-		(void)IMG_LoadTGA_RW(nullptr);
-		(void)ImGui_ImplSDL2_InitForSDLRenderer(nullptr, nullptr);
-		(void)ImGui::Render();
-	}
+	tei::internal::application::StartApplication(argc, argv);
 
-	{
-		METRICS_TIMEBLOCK;
-		std::this_thread::sleep_for(3_s);
+	(void)tei::external::Application->Args()[0];
 
-		{
-			METRICS_TIMEBLOCK;
-			std::this_thread::sleep_for(3_s);
-		}
-		
-		std::jthread thread{ []
-			{
-				METRICS_TIMEBLOCK;
-				std::this_thread::sleep_for(3_s);
-			}
-		};
-		
-	}
-
-	Scale scale{};
-
-	auto now = Clock::now();
-
-	std::cout << std::chrono::system_clock::now();
-	std::this_thread::sleep_until(now + 3_s);
-
-	std::cout << std::chrono::system_clock::now();
 	return 0;
 }
