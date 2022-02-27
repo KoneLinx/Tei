@@ -59,5 +59,14 @@
     <ClInclude Include="Utility\Metrics\Metrics.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Units\Units.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tei\units.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Units\glm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

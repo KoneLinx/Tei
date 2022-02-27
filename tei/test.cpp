@@ -8,8 +8,10 @@
 #include <thread>
 
 #include <tei/time.h>
+#include <tei/units.h>
 
 using namespace tei::internal::time;
+using namespace tei::internal::units;
 using namespace tei::internal::time::literals;
 
 void t1(std::chrono::steady_clock::time_point) {}
@@ -38,7 +40,7 @@ int main(int argc, char*[])
 			std::this_thread::sleep_for(3_s);
 		}
 		
-		std::jthread{ []
+		std::jthread thread{ []
 			{
 				METRICS_TIMEBLOCK;
 				std::this_thread::sleep_for(3_s);
@@ -46,6 +48,8 @@ int main(int argc, char*[])
 		};
 		
 	}
+
+	Scale scale{};
 
 	auto now = Clock::now();
 
