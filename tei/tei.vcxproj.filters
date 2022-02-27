@@ -53,5 +53,11 @@
     <ClInclude Include="Time\Clock.impl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\Metrics\Metrics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Metrics\Metrics.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

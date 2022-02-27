@@ -17,6 +17,8 @@ void t2(std::chrono::high_resolution_clock::time_point) {}
 
 int main(int argc, char*[])
 {
+	METRICS_INITLOG("_log.json");
+
 	if (argc == 0)
 	// Always false, build and link test only
 	{
@@ -27,13 +29,28 @@ int main(int argc, char*[])
 		(void)ImGui::Render();
 	}
 
+	{
+		METRICS_TIMEBLOCK;
+		std::this_thread::sleep_for(3_s);
+
+		{
+			METRICS_TIMEBLOCK;
+			std::this_thread::sleep_for(3_s);
+		}
+		
+		std::jthread{ []
+			{
+				METRICS_TIMEBLOCK;
+				std::this_thread::sleep_for(3_s);
+			}
+		};
+		
+	}
+
 	auto now = Clock::now();
 
 	std::cout << std::chrono::system_clock::now();
 	std::this_thread::sleep_until(now + 3_s);
-
-	std::cout << std::chrono::system_clock::now();
-	std::this_thread::sleep_for(3_s);
 
 	std::cout << std::chrono::system_clock::now();
 	return 0;

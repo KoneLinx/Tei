@@ -101,6 +101,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,6 +132,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,6 +162,7 @@
       <ConformanceMode>true</ConformanceMode>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -189,6 +192,7 @@
       <ConformanceMode>true</ConformanceMode>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -225,6 +229,8 @@
     <ClInclude Include="Time\Time.h" />
     <ClInclude Include="Utility\Error.h" />
     <ClInclude Include="Utility\Helpers.h" />
+    <ClInclude Include="Utility\Metrics\Metrics.h" />
+    <ClInclude Include="Utility\Metrics\Metrics.hpp" />
     <ClInclude Include="Utility\Service.h" />
     <ClInclude Include="tei\utility.h" />
   </ItemGroup>
