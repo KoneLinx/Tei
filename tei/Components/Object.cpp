@@ -14,7 +14,9 @@ Object::Object(bool active)
 {}
 
 Object::~Object()
-{}
+{
+	Do(Message::FREE);
+}
 
 void Object::Activate(bool state) noexcept
 {

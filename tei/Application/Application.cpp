@@ -53,7 +53,8 @@ void Application::SetFullscreen(bool state, bool fake) const
 void Application::Quit() const
 {
 	METRICS_TIMEBLOCK;
-	//core::Core::Stop();
+	SDL_Event quit{ .quit = {} };
+	SDL_PushEvent(&quit);
 }
 
 void Application::OpenWindow()
