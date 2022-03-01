@@ -24,22 +24,28 @@ namespace tei::internal::utility
 			struct {};
 #endif
 
-		inline TeiRuntimeError(std::string_view message, source_location loc = {}) :
+		inline TeiRuntimeError(std::string_view message, source_location loc = {})
+			: TeiRuntimeError{ message, char{}, loc }
+		{}
+
+		inline TeiRuntimeError(std::string_view message, auto data, source_location loc = {}) :
 			std::runtime_error{
 #if defined(__cpp_lib_format)
 				std::format(
 #if defined(DEBUG) || defined(_DEBUG)
 					// Debug
-					"[Error] {} ({}) {}(): {}",
+					"[Error] {} ({}) {}(): {}\nData: {}",
 					loc.file_name(),
 					loc.line(),
 					loc.function_name(),
-					message
+					message,
+					data
 #else
 					// Release
-					"[Error] {}(): {}",
+					"[Error] {}(): {}\nData: {}",
 					loc.function_name(),
-					message
+					message,
+					data
 #endif
 				)
 #else
@@ -51,9 +57,11 @@ namespace tei::internal::utility
 #else
 				+ loc.function_name() + "(): "
 				+ std::string{ message }
+				+ std::to_string( data )
 #endif
 #else
 				+ std::string{ (loc, message) }
+				+ std::to_string( data )
 #endif
 #endif
 			}

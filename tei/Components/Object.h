@@ -3,76 +3,137 @@
 #include <vector>
 #include <memory>
 #include <ranges>
+#include <array>
+#include <span>
+
+#include <tei/utility.h>
 
 namespace tei::internal::ecs
 {
 
-	class Component;
+	enum struct Message
+	{
+		INIT,
+		FREE,
+		ENABLE,
+		DISABLE,
+		UPDATE,
+		RENDER,
+		_COUNT
+	};
+	
+	template <Message, typename Data>
+	void On(Data&)
+	{}
 
 	class Object final
 	{
 	public:
 
-		Object();
+		Object(bool active);
+
 		~Object();
 
 		Object(const Object & other) = delete;
-		Object(Object && other) = delete;
-
 		Object& operator = (const Object & other) = delete;
-		Object& operator = (Object && other) = delete;
 
-		template <std::derived_from<Component> Component>
-		Component& AddComponent(Component = {});
-		template <std::derived_from<Component> Component>
-		Component& GetComponent() const;
-		template <std::derived_from<Component> Component>
-		void RemoveComponent();
+		Object(Object && other) = default;
+		Object& operator = (Object && other) = default;
 
-		Object& AddChild();
-		auto GetChildren() const;
-		void RemoveChild(Object&);
+		operator bool() const noexcept;
 
-		void Update();
-		void Render() const;
+		void Activate(bool state) noexcept;
+
+		template <typename Data>
+		Data& AddComponent(Data data = {});
+
+		template <typename Data>
+		Data& GetComponent() const noexcept;
+
+		Object& AddChild(bool active = true);
+
+		auto AllChildren() const noexcept;
+		auto ActiveChildren() const noexcept;
+		auto InactiveChildren() const noexcept;
+
+		void Do(Message);
 
 	private:
 
-		std::vector<std::pair<std::type_info const*, std::unique_ptr<Component>>> m_Components;
-		std::vector<std::unique_ptr<Object>> m_Children;
+		template <typename Data = void>
+		struct Component final : Component<>
+		{
+			Data data;
 
-		Component& AddComponent(std::type_info const*, Component*);
-		decltype(m_Components)::const_iterator GetComponent(std::type_info const*) const;
-		void RemoveComponent(std::type_info const*);
+			Component(Data data)
+				: data{ std::move(data) }
+			{}
+
+			static void Handle(Component<>& data, Message message)
+			{
+				[] <size_t ... MESSAGE> (Component& data, Message message, std::index_sequence<MESSAGE...>)
+				{
+					((message == static_cast<Message>(MESSAGE) && (On<static_cast<Message>(MESSAGE)>(data.data), true)) || ...);
+				}
+				(static_cast<Component&>(data), message, std::make_index_sequence<static_cast<size_t>(Message::_COUNT)>{});
+			}
+		};
+		
+		template <>
+		struct Component<void>
+		{
+			virtual ~Component() = default;
+		};
+
+		using Handler = void(*)(Component<>&, Message);
+		
+		void AddComponent(Component<>*, Handler);
+		Component<>& GetComponent(Handler) const;
+
+		std::vector<std::pair<std::unique_ptr<Component<>>, void(*)(Component<>&, Message)>> m_Components;
+
+		std::vector<Object> m_Children;
+
+		bool m_Active;
+		bool m_SetActive;
+		bool m_Initialised;
 
 	};
 
-	template<std::derived_from<Component> Component>
-	inline Component& Object::AddComponent(Component component)
+	inline Object::operator bool() const noexcept
 	{
-		return static_cast<Component&>(Object::AddComponent(&typeid(Component), new Component{ std::move(component) }));
+		return m_Active;
 	}
 
-	template<std::derived_from<Component> Component>
-	inline Component& Object::GetComponent() const
+	template<typename Data>
+	inline Data& Object::AddComponent(Data data)
 	{
-		return static_cast<Component&>(*Object::GetComponent(&typeid(Component))->second);
+		Component<Data>* pComponent{ new Component<Data>{ std::move(data) } };
+		this->AddComponent(pComponent, &Component<Data>::Handle);
+		return pComponent->data;
 	}
 
-	template<std::derived_from<Component> Component>
-	inline void Object::RemoveComponent()
+	template<typename Data>
+	inline Data& Object::GetComponent() const noexcept
 	{
-		Object::RemoveComponent(&typeid(Component));
+		return static_cast<Component<Data>&>(*std::get<0>(*std::ranges::find(m_Components, &Component<Data>::Handle, utility::tuple_index_projector<1>{}))).data;
 	}
-
-	inline auto Object::GetChildren() const
+	
+	inline auto Object::AllChildren() const noexcept
 	{
-		return std::views::transform(m_Children, [] (auto const& uptr) -> auto& { return *uptr; });
+		return std::span{ m_Children };
+	}
+	
+	inline auto Object::ActiveChildren() const noexcept
+	{
+		return std::views::filter(this->AllChildren(), std::identity{});
+	}
+	
+	inline auto Object::InactiveChildren() const noexcept
+	{
+		return std::views::filter(this->AllChildren(), std::logical_not{});
 	}
 
 }
 
-namespace tei::external::ecs
-{
-	using Object = tei::internal::ecs::Object;
-}
+using tei::internal::ecs::On;

@@ -226,13 +226,13 @@
     <ClCompile Include="Time\Clock.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="Time\Time.cpp" />
+    <ClCompile Include="Utility\Helpers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Application.h" />
     <ClInclude Include="Audio\AudioHandler.h" />
     <ClInclude Include="Audio\DebugAudio.h" />
     <ClInclude Include="Audio\SDLAudio.h" />
-    <ClInclude Include="Components\Component.h" />
     <ClInclude Include="Components\Components.h" />
     <ClInclude Include="Components\Object.h" />
     <ClInclude Include="Renderer\Renderer.h" />

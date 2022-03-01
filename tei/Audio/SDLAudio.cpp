@@ -26,7 +26,7 @@ namespace tei::internal::audio
             auto chunk = static_cast<Mix_Chunk*>(sound.pData);
             Mix_VolumeChunk(chunk, int(sound.volume * MIX_MAX_VOLUME));
             if (int c = Mix_PlayChannel(-1, chunk, sound.loop); c == -1)
-                puts("[WARNING] playing too many audio chunks, skipping current call"); //throw utility::TeiRuntimeError{ "Sound could not be played on any channel: "s + SDL_GetError() };
+                puts("[WARNING] playing too many audio chunks, skipping current call"); //throw utility::TeiRuntimeError{ "Sound could not be played on any channel", SDL_GetError() };
         }
     }
 

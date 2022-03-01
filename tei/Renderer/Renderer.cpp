@@ -30,7 +30,7 @@ RendererClass::RendererClass(application::Window const& window)
 		SDL_RENDERER_PRESENTVSYNC
 	);
 	if (m_SDLRenderer == nullptr)
-		throw utility::TeiRuntimeError{ "Could not load SDL Renerer" };
+		throw utility::TeiRuntimeError{ "Could not load SDL Renerer", SDL_GetError() };
 
 	SDL_GetRendererOutputSize(m_SDLRenderer, &m_RenderTarget.w, &m_RenderTarget.h);
 }

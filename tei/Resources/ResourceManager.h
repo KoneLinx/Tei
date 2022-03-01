@@ -121,7 +121,7 @@ namespace tei::internal::resource
 			m_Resources.push_back(resource);
 			return *resource;
 		}
-		else throw utility::TeiRuntimeError{ std::string{ "No loader for type " } + typeid(T).name() };
+		else throw utility::TeiRuntimeError{ "No loader for resource", typeid(T).name() };
 	}
 
 	template<typename T>

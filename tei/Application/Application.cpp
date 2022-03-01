@@ -69,7 +69,7 @@ void Application::OpenWindow()
 	);
 
 	if (m_SDLWindow == nullptr)
-		throw utility::TeiRuntimeError{ "Could not create SDL Window: "s + SDL_GetError() };
+		throw utility::TeiRuntimeError{ "Could not create SDL Window", SDL_GetError() };
 
 	render::Renderer.Register(new render::RendererClass{ m_Window });
 }

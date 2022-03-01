@@ -26,7 +26,7 @@ namespace tei::internal::resource
 		else if (auto newpath = m_DefaultPath / path; std::filesystem::exists(newpath))
 			return newpath;
 
-		else throw utility::TeiRuntimeError{ "Could not find valid path: " + path.string() };
+		else throw utility::TeiRuntimeError{ "Could not find valid path", path.string() };
 	}
 
 }

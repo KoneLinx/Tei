@@ -40,7 +40,7 @@ namespace metrics
 		~MetricLog();
 		
 		static void Register(source_location src);
-		static BlockTimer TimeBlock (source_location src);
+		static BlockTimer TimeBlock (source_location src, std::string_view pretty_fn);
 
 	private:
 
@@ -55,6 +55,7 @@ namespace metrics
 			Clock::time_point time;
 			std::thread::id id;
 			source_location src;
+			std::string_view extra{};
 		};
 		struct Begin : Event
 		{};
@@ -96,7 +97,7 @@ namespace metrics
 	};
 
 #define METRICS_REGISTER     metrics::MetricLog<>::Register(METRICS_SOURCE_LOCATION);
-#define METRICS_TIMEBLOCK    auto _blocktimer = metrics::MetricLog<>::TimeBlock(std::source_location::current());
+#define METRICS_TIMEBLOCK    auto _blocktimer = metrics::MetricLog<>::TimeBlock(std::source_location::current(), __FUNCSIG__);
 #define METRICS_INITLOG(...) metrics::MetricLog<> _metriclog{ new std::ofstream{ __VA_ARGS__ } };
 
 }

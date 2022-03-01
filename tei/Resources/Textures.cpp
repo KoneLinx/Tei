@@ -14,7 +14,7 @@ prefab::TextureLoader::TextureLoader()
 		bool(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) 
 	};
 	if (!init)
-		throw utility::TeiRuntimeError{ "Could not properly initialize SDL_image" };
+		throw utility::TeiRuntimeError{ "Could not properly initialize SDL_image", SDL_GetError() };
 }
 
 Texture* prefab::TextureLoader::OnLoad(std::filesystem::path const& path, ResourceManager const& resources, std::optional<Texture> init) const
@@ -42,7 +42,7 @@ Texture* prefab::TextureLoader::OnLoad(std::filesystem::path const& path, Resour
 			&init->h
 		) != 0
 	)
-		throw utility::TeiRuntimeError{ "Could not load texture: " + pathStr + ": " + SDL_GetError() };
+		throw utility::TeiRuntimeError{ "Could not load texture: " + pathStr, SDL_GetError() };
 
 	return new Texture{ *std::move(init) };
 }

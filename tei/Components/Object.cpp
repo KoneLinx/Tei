@@ -1,70 +1,115 @@
 
 #include "Object.h"
-#include "Component.h"
 
-#include <cassert>
+#include <algorithm>
 
-namespace tei::internal::ecs
+using namespace tei::internal::ecs;
+
+Object::Object(bool active)
+	: m_Components{}
+	, m_Children{}
+	, m_Active{ false }
+	, m_SetActive{ active }
+	, m_Initialised{}
+{}
+
+Object::~Object()
+{}
+
+void Object::Activate(bool state) noexcept
 {
+	m_SetActive = state;
+}
 
-	constexpr static auto getFirst =
-	[] (auto const& pair)
-	{ 
-		return pair.first; 
-	};
+Object& Object::AddChild(bool active)
+{
+	METRICS_TIMEBLOCK;
 
-	Component& Object::AddComponent(std::type_info const* pId, Component* pComponent)
+	return m_Children.emplace_back(active);
+}
+
+void Object::AddComponent(Component<>* pComp, Handler pHandler)
+{
+	
+	METRICS_TIMEBLOCK;
+
+	m_Components.push_back({
+		std::unique_ptr<Component<>>{ pComp },
+		pHandler
+	});
+}
+
+Object::Component<>& Object::GetComponent(Handler handler) const
+{
+	METRICS_TIMEBLOCK;
+
+	auto const it{ std::ranges::find(m_Components, handler, utility::tuple_index_projector<1>{}) };
+	if (it == m_Components.end())
+		throw utility::TeiRuntimeError{ "No such component", typeid(std::to_address(it)).name() };
+	return *it->first;
+}
+
+void Object::Do(Message message)
+{
+	METRICS_TIMEBLOCK;
+
+	using enum Message;
+	switch (message)
 	{
-		pComponent->SetParent(*this);
-		return *m_Components.emplace_back(pId, static_cast<Component*>(pComponent)).second;
+	case FREE:
+	{
+		if (!m_Initialised)
+			return;
+		if (m_Active)
+			Do(DISABLE);
+	}
+	break;
+	case ENABLE:
+	{
+		if (!m_SetActive)
+			return;
+		if (!m_Initialised)
+			Do(INIT);
+		m_Active = true;
+	}
+	break;
+	case UPDATE:
+	{
+		if (m_Active != m_SetActive)
+			Do(m_SetActive ? ENABLE : DISABLE);
+		if (!m_Active)
+			return;
+	}
+	break;
 	}
 
-	decltype(Object::m_Components)::const_iterator Object::GetComponent(std::type_info const* pId) const
+	for (auto& [pComp, pHandle] : m_Components)
+		pHandle(*pComp, message);
+
+	for (auto& child : m_Children)
+		if (child.m_Active || message == ENABLE || message == FREE || message == UPDATE)
+			child.Do(message);
+
+	switch (message)
 	{
-		auto const it{ std::ranges::find(m_Components, pId, getFirst) };
-		assert(it != m_Components.end() && "No such component");
-		return it;
-	}
-
-	void Object::RemoveComponent(std::type_info const* pId)
+	case INIT:
 	{
-		m_Components.erase(GetComponent(pId));
+		m_Initialised = true;
 	}
-
-	Object::Object()
-		: m_Components{}
-		, m_Children{}
-	{}
-
-	Object::~Object()
-	{}
-
-	Object& Object::AddChild()
+	break;
+	case FREE:
 	{
-		return *m_Children.emplace_back(std::make_unique<Object>());
+		m_Active = false;
+		m_SetActive = false;
+		m_Initialised = false;
+		m_Children.clear();
+		m_Components.clear();
 	}
-
-	void Object::RemoveChild(Object& object)
+	break;
+	case DISABLE:
 	{
-		auto const it{ std::ranges::find(m_Children, &object, [](auto const& uptr) { return std::to_address(uptr); }) };
-		assert(it != m_Children.end() && "No such child");
-		m_Children.erase(it);
+		m_Active = false;
 	}
-
-	void Object::Update()
-	{
-		for (auto& [pId, pComponent] : m_Components)
-			pComponent->Update();
-		for (auto& pChild : m_Children)
-			pChild->Update();
+	break;
 	}
-
-	void Object::Render() const
-	{
-		for (auto& pChild : m_Children)
-			pChild->Render();
-		for (auto& [pId, pComponent] : m_Components)
-			pComponent->Render();
-	}
-
 }

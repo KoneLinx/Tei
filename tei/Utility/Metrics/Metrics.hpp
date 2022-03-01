@@ -72,10 +72,10 @@ namespace metrics
 	}
 
 	template <typename T>
-	MetricLog<T>::BlockTimer MetricLog<T>::TimeBlock(source_location src)
+	MetricLog<T>::BlockTimer MetricLog<T>::TimeBlock(source_location src, std::string_view pretty_fn)
 	{
 		if (m_Stream)
-			m_ThreadLog->push_back(Begin{ Clock::now(), std::this_thread::get_id(), src });
+			m_ThreadLog->push_back(Begin{ Clock::now(), std::this_thread::get_id(), src, pretty_fn });
 		return {};
 	}
 
@@ -95,7 +95,7 @@ namespace metrics
 		pos += sprintf_s(
 			buffer,
 R"({ 
-	"name":"%s - %s",
+	"name":"%s",
 	"ph":"X",
 	"ts":%lld,
 	"dur":1,
@@ -108,8 +108,7 @@ R"({
 		"line":%d
 	}
 },)",
-			filename,
-			data.src.function_name(),
+			data.extra.empty() ? data.src.function_name() : data.extra.data(),
 			time,
 			std::bit_cast<uint32_t>(data.id),
 			filename,
@@ -129,7 +128,7 @@ R"({
 		pos += sprintf_s(
 			buffer,
 R"({
-	"name":"%s - %s",
+	"name":"%s",
 	"cat":"",
 	"ph":"B",
 	"ts":"%lld",
@@ -142,8 +141,7 @@ R"({
 		"line":%u
 	}
 },)",
-			filename,
-			data.src.function_name(),
+			data.extra.empty() ? data.src.function_name() : data.extra.data(),
 			time,
 			std::bit_cast<uint32_t>(data.id),
 			filename,

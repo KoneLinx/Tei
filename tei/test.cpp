@@ -1,4 +1,6 @@
 
+#define METRICS
+
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
@@ -12,39 +14,100 @@
 #include <tei/application.h>
 #include <tei/render.h>
 #include <tei/audio.h>
+#include <tei/ecs.h>
 
-int main(int argc, char* argv[])
+using enum tei::internal::ecs::Message;
+using namespace tei::internal::ecs;
+
+int g_Int{};
+
+template <>
+void On<INIT>(float& f)
+{
+	METRICS_TIMEBLOCK;
+	g_Int + f;
+}
+
+template <>
+void On<FREE>(float& f)
+{
+	METRICS_TIMEBLOCK;
+	g_Int + f;
+}
+
+template <>
+void On<ENABLE>(float& f)
+{
+	METRICS_TIMEBLOCK;
+	g_Int + f;
+}
+template <>
+void On<DISABLE>(float& f)
+{
+	METRICS_TIMEBLOCK;
+	g_Int + f;
+}
+template <>
+void On<UPDATE>(float& f)
+{
+	METRICS_TIMEBLOCK;
+	g_Int + f;
+}
+template <>
+void On<RENDER>(float& f)
+{
+	METRICS_TIMEBLOCK;
+	g_Int + f;
+}
+
+int main(int, char*[])
 {
 	METRICS_INITLOG("_log.json");
 	METRICS_TIMEBLOCK;
 
-	tei::internal::application::StartApplication(argc, argv);
+	Object object{ true };
 
-	tei::internal::resource::Resources.Register(new tei::internal::resource::ResourceManager{});
-	tei::internal::resource::Resources->AddLoader(new tei::internal::resource::prefab::TextureLoader{});
-	//auto& texture = tei::external::Resources->Load<tei::external::resource::Texture>("_test.jpg");
+	auto& c1 = object.AddChild();
 
-	tei::internal::audio::Audio.Register(new tei::internal::audio::DebugAudio{});
+	c1.AddComponent(3.f);
+	c1.AddComponent(5.f);
 
-	bool running{ true };
-	while (running)
-	{
-		SDL_Event e{};
-		while (SDL_PollEvent(&e))
-			if (e.type == SDL_EventType::SDL_QUIT)
-				running = false;
-			else if (e.type == SDL_EventType::SDL_KEYUP && e.key.keysym.scancode == SDL_Scancode::SDL_SCANCODE_F11)
-				tei::external::Application->SetFullscreen(true);
+	auto& c2 = c1.AddChild(false);
+	c2.AddComponent(7.f);
 
-		tei::external::Audio->Play(tei::internal::resource::Sound{ nullptr, "TestAudio" });
-		tei::internal::audio::Audio->Update();
+	auto& c3 = object.AddChild();
+	c3.AddComponent(11.f);
 
-		tei::internal::time::Time->frame.now = tei::external::Clock::now();
-		tei::internal::render::Renderer->Update();
-		tei::internal::render::Renderer->Clear();
-		//tei::external::Renderer->DrawTexture(texture, tei::external::unit::Transform{ {}, { .5f, .5f } });
-		tei::internal::render::Renderer->Present();
-	}
+	object.Do(ENABLE);
+
+	object.Do(UPDATE);
+	object.Do(RENDER);
+
+	object.Do(UPDATE);
+	object.Do(RENDER);
+
+	object.Do(UPDATE);
+	object.Do(RENDER);
+
+	object.Do(UPDATE);
+	object.Do(RENDER);
+
+	c2.Activate(true);
+	c3.Activate(false);
+
+	object.Do(UPDATE);
+	object.Do(RENDER);
+
+	object.Do(UPDATE);
+	object.Do(RENDER);
+
+	object.Do(UPDATE);
+	object.Do(RENDER);
+
+	object.Do(UPDATE);
+	object.Do(RENDER);
+
+	object.Do(FREE);
 
 	return 0;
 }
