@@ -81,10 +81,8 @@ namespace tei::external
 {
     using Clock = tei::internal::time::Clock;
 
-    namespace time_literals = tei::internal::time::literals;
-
     namespace literals
     {
-        using namespace time_literals;
+        using namespace tei::internal::time::literals;
     }
 }

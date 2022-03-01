@@ -54,7 +54,7 @@
     <ClCompile Include="Utility\Helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Components\Object.cpp">
+    <ClCompile Include="ECS\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Scenes\SceneManager.cpp">
@@ -158,7 +158,7 @@
     <ClInclude Include="Audio\SDLAudio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Components\Object.h">
+    <ClInclude Include="ECS\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Scenes\SceneManager.h">
@@ -168,6 +168,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tei\tei.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

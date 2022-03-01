@@ -21,9 +21,9 @@ namespace tei::internal::ecs
 		RENDER,
 		_COUNT
 	};
-	
+
 	template <Message, typename Data>
-	void On(Data&)
+	void On(Data)
 	{}
 
 	class Object final
@@ -34,11 +34,11 @@ namespace tei::internal::ecs
 
 		~Object();
 
-		Object(const Object & other) = delete;
-		Object& operator = (const Object & other) = delete;
+		Object(const Object& other) = delete;
+		Object& operator = (const Object& other) = delete;
 
-		Object(Object && other) = default;
-		Object& operator = (Object && other) = default;
+		Object(Object&& other) = default;
+		Object& operator = (Object&& other) = default;
 
 		operator bool() const noexcept;
 
@@ -65,32 +65,24 @@ namespace tei::internal::ecs
 		{
 			Data data;
 
-			Component(Data data)
-				: data{ std::move(data) }
-			{}
+			Component(Data data);
 
-			static void Handle(Component<>& data, Message message)
-			{
-				[] <size_t ... MESSAGE> (Component& data, Message message, std::index_sequence<MESSAGE...>)
-				{
-					((message == static_cast<Message>(MESSAGE) && (On<static_cast<Message>(MESSAGE)>(data.data), true)) || ...);
-				}
-				(static_cast<Component&>(data), message, std::make_index_sequence<static_cast<size_t>(Message::_COUNT)>{});
-			}
+			static void Handle(Component<>& data, Message message);
 		};
-		
+
 		template <>
 		struct Component<void>
 		{
 			virtual ~Component() = default;
+
+			using Handle = void(*)(Component<>&, Message);
 		};
 
-		using Handler = void(*)(Component<>&, Message);
-		
-		void AddComponent(Component<>*, Handler);
-		Component<>& GetComponent(Handler) const;
 
-		std::vector<std::pair<std::unique_ptr<Component<>>, void(*)(Component<>&, Message)>> m_Components;
+		void AddComponent(Component<>*, Component<>::Handle);
+		Component<>& GetComponent(Component<>::Handle) const;
+
+		std::vector<std::pair<std::unique_ptr<Component<>>, Component<>::Handle>> m_Components;
 
 		std::vector<Object> m_Children;
 
@@ -99,6 +91,18 @@ namespace tei::internal::ecs
 		bool m_Initialised;
 
 	};
+
+}
+
+using tei::internal::ecs::On;
+
+namespace tei::external
+{
+	namespace ecs = tei::internal::ecs;
+}
+
+namespace tei::internal::ecs
+{
 
 	inline Object::operator bool() const noexcept
 	{
@@ -134,6 +138,19 @@ namespace tei::internal::ecs
 		return std::views::filter(this->AllChildren(), std::logical_not{});
 	}
 
-}
+	template<typename Data>
+	inline Object::Component<Data>::Component(Data data)
+		: data{ std::move(data) }
+	{}
 
-using tei::internal::ecs::On;
+	template<typename Data>
+	inline void Object::Component<Data>::Handle(Component<>& data, Message message)
+	{
+		[] <size_t ... MESSAGE> (Component& data, Message message, std::index_sequence<MESSAGE...>)
+		{
+			((message == static_cast<Message>(MESSAGE) && (On<static_cast<Message>(MESSAGE)>(data.data), true)) || ...);
+		}
+		(static_cast<Component&>(data), message, std::make_index_sequence<static_cast<size_t>(Message::_COUNT)>{});
+	}
+
+}

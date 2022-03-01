@@ -30,22 +30,22 @@ Object& Object::AddChild(bool active)
 	return m_Children.emplace_back(active);
 }
 
-void Object::AddComponent(Component<>* pComp, Handler pHandler)
+void Object::AddComponent(Component<>* pComp, Component<>::Handle pHandle)
 {
 	
 	METRICS_TIMEBLOCK;
 
 	m_Components.push_back({
 		std::unique_ptr<Component<>>{ pComp },
-		pHandler
+		pHandle
 	});
 }
 
-Object::Component<>& Object::GetComponent(Handler handler) const
+Object::Component<>& Object::GetComponent(Component<>::Handle handle) const
 {
 	METRICS_TIMEBLOCK;
 
-	auto const it{ std::ranges::find(m_Components, handler, utility::tuple_index_projector<1>{}) };
+	auto const it{ std::ranges::find(m_Components, handle, utility::tuple_index_projector<1>{}) };
 	if (it == m_Components.end())
 		throw utility::TeiRuntimeError{ "No such component", typeid(std::to_address(it)).name() };
 	return *it->first;

@@ -1,10 +1,12 @@
 #pragma once
 
-//#define METRICS
-
 #ifndef METRICS
 #if (defined(__cpp_lib_source_location)) && (defined(DEBUG) || defined(_DEBUG))
 #define METRICS
+#endif
+#else
+#if (2 * METRICS +1 == 1)
+#undef METRICS
 #endif
 #endif
 

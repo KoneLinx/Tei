@@ -217,7 +217,7 @@
     <ClCompile Include="Audio\AudioHandler.cpp" />
     <ClCompile Include="Audio\DebugAudio.cpp" />
     <ClCompile Include="Audio\SDLAudio.cpp" />
-    <ClCompile Include="Components\Object.cpp" />
+    <ClCompile Include="ECS\Object.cpp" />
     <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="Core\main.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
@@ -237,7 +237,7 @@
     <ClInclude Include="Audio\DebugAudio.h" />
     <ClInclude Include="Audio\SDLAudio.h" />
     <ClInclude Include="Components\Components.h" />
-    <ClInclude Include="Components\Object.h" />
+    <ClInclude Include="ECS\Object.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Renderer\Renderer.h" />
     <ClInclude Include="Resources\Audio.h" />
@@ -252,6 +252,7 @@
     <ClInclude Include="tei\render.h" />
     <ClInclude Include="tei\resource.h" />
     <ClInclude Include="tei\scene.h" />
+    <ClInclude Include="tei\tei.h" />
     <ClInclude Include="tei\time.h" />
     <ClInclude Include="tei\unit.h" />
     <ClInclude Include="Time\Chrono.h" />
