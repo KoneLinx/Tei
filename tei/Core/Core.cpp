@@ -7,6 +7,8 @@
 #include <tei/audio.h>
 #include <tei/render.h>
 
+#include "../External/Client.h"
+
 using namespace tei::internal::core;
 
 using namespace tei::internal;
@@ -98,7 +100,7 @@ void Core::Run()
 	resource::Resources->AddLoader(new resource::prefab::AudioLoader{});
 
 	// Client init
-	//TeiClientInit();
+	TeiClientInit();
 
 	// Game
 	try
@@ -112,7 +114,7 @@ void Core::Run()
 	scene::Scene.Register(nullptr);
 
 	// Client quit
-	//TeiClientQuit();
+	TeiClientCleanup();
 
 	// Clear services
 	resource::Resources.Register(nullptr);

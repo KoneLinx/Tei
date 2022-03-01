@@ -5,6 +5,7 @@
 #include <ranges>
 #include <array>
 #include <span>
+#include <list>
 
 #include <tei/utility.h>
 
@@ -14,7 +15,7 @@ namespace tei::internal::ecs
 	enum struct Message
 	{
 		INIT,
-		FREE,
+		CLEANUP,
 		ENABLE,
 		DISABLE,
 		UPDATE,
@@ -84,7 +85,7 @@ namespace tei::internal::ecs
 
 		std::vector<std::pair<std::unique_ptr<Component<>>, Component<>::Handle>> m_Components;
 
-		std::vector<Object> m_Children;
+		std::list<Object> m_Children;
 
 		bool m_Active;
 		bool m_SetActive;
@@ -125,17 +126,17 @@ namespace tei::internal::ecs
 	
 	inline auto Object::AllChildren() const noexcept
 	{
-		return std::span{ m_Children };
+		return std::views::all(m_Children);
 	}
 	
 	inline auto Object::ActiveChildren() const noexcept
 	{
-		return std::views::filter(this->AllChildren(), std::identity{});
+		return std::views::filter(AllChildren(), std::identity{});
 	}
 	
 	inline auto Object::InactiveChildren() const noexcept
 	{
-		return std::views::filter(this->AllChildren(), std::logical_not{});
+		return std::views::filter(AllChildren(), std::logical_not{});
 	}
 
 	template<typename Data>

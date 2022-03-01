@@ -15,7 +15,7 @@ Object::Object(bool active)
 
 Object::~Object()
 {
-	Do(Message::FREE);
+	Do(Message::CLEANUP);
 }
 
 void Object::Activate(bool state) noexcept
@@ -26,15 +26,12 @@ void Object::Activate(bool state) noexcept
 Object& Object::AddChild(bool active)
 {
 	METRICS_TIMEBLOCK;
-
 	return m_Children.emplace_back(active);
 }
 
 void Object::AddComponent(Component<>* pComp, Component<>::Handle pHandle)
-{
-	
+{	
 	METRICS_TIMEBLOCK;
-
 	m_Components.push_back({
 		std::unique_ptr<Component<>>{ pComp },
 		pHandle
@@ -44,7 +41,6 @@ void Object::AddComponent(Component<>* pComp, Component<>::Handle pHandle)
 Object::Component<>& Object::GetComponent(Component<>::Handle handle) const
 {
 	METRICS_TIMEBLOCK;
-
 	auto const it{ std::ranges::find(m_Components, handle, utility::tuple_index_projector<1>{}) };
 	if (it == m_Components.end())
 		throw utility::TeiRuntimeError{ "No such component", typeid(std::to_address(it)).name() };
@@ -58,7 +54,7 @@ void Object::Do(Message message)
 	using enum Message;
 	switch (message)
 	{
-	case FREE:
+	case CLEANUP:
 	{
 		if (!m_Initialised)
 			return;
@@ -88,8 +84,10 @@ void Object::Do(Message message)
 	for (auto& [pComp, pHandle] : m_Components)
 		pHandle(*pComp, message);
 
+	// TODO move bools out of object on stack into cache!
+
 	for (auto& child : m_Children)
-		if (child.m_Active || message == ENABLE || message == FREE || message == UPDATE)
+		if (child.m_Active || message == ENABLE || message == CLEANUP || message == UPDATE)
 			child.Do(message);
 
 	switch (message)
@@ -99,7 +97,7 @@ void Object::Do(Message message)
 		m_Initialised = true;
 	}
 	break;
-	case FREE:
+	case CLEANUP:
 	{
 		m_Active = false;
 		m_SetActive = false;

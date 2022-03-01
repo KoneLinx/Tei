@@ -9,7 +9,7 @@
 #include <vld.h>
 #endif
 
-int _main(int argc, char** argv)
+int main(int argc, char** argv)
 {
 	try
 	{

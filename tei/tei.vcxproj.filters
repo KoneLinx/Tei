@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Time\Clock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -86,10 +83,10 @@
     <ClInclude Include="Utility\Service.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tei\utility.h">
+    <ClInclude Include="include\tei\utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tei\time.h">
+    <ClInclude Include="include\tei\time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Time\Clock.impl.h">
@@ -104,7 +101,7 @@
     <ClInclude Include="Units\Units.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tei\unit.h">
+    <ClInclude Include="include\tei\unit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Units\glm.h">
@@ -116,10 +113,10 @@
     <ClInclude Include="Application\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tei\ecs.h">
+    <ClInclude Include="include\tei\ecs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tei\application.h">
+    <ClInclude Include="include\tei\application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\Renderer.h">
@@ -140,13 +137,13 @@
     <ClInclude Include="Resources\Textures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tei\resource.h">
+    <ClInclude Include="include\tei\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tei\render.h">
+    <ClInclude Include="include\tei\render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tei\audio.h">
+    <ClInclude Include="include\tei\audio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Audio\AudioHandler.h">
@@ -164,13 +161,16 @@
     <ClInclude Include="Scenes\SceneManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tei\scene.h">
+    <ClInclude Include="include\tei\scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tei\tei.h">
+    <ClInclude Include="include\tei.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\Client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

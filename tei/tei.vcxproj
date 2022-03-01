@@ -27,26 +27,26 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -77,18 +77,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -227,7 +231,6 @@
     <ClCompile Include="Resources\Textures.cpp" />
     <ClCompile Include="Scenes\SceneManager.cpp" />
     <ClCompile Include="Time\Clock.cpp" />
-    <ClCompile Include="_test.cpp" />
     <ClCompile Include="Time\Time.cpp" />
     <ClCompile Include="Utility\Helpers.cpp" />
   </ItemGroup>
@@ -239,6 +242,7 @@
     <ClInclude Include="Components\Components.h" />
     <ClInclude Include="ECS\Object.h" />
     <ClInclude Include="Core\Core.h" />
+    <ClInclude Include="External\Client.h" />
     <ClInclude Include="Renderer\Renderer.h" />
     <ClInclude Include="Resources\Audio.h" />
     <ClInclude Include="Resources\Fonts.h" />
@@ -246,15 +250,15 @@
     <ClInclude Include="Resources\Resources.h" />
     <ClInclude Include="Resources\Textures.h" />
     <ClInclude Include="Scenes\SceneManager.h" />
-    <ClInclude Include="tei\application.h" />
-    <ClInclude Include="tei\audio.h" />
-    <ClInclude Include="tei\ecs.h" />
-    <ClInclude Include="tei\render.h" />
-    <ClInclude Include="tei\resource.h" />
-    <ClInclude Include="tei\scene.h" />
-    <ClInclude Include="tei\tei.h" />
-    <ClInclude Include="tei\time.h" />
-    <ClInclude Include="tei\unit.h" />
+    <ClInclude Include="include\tei\application.h" />
+    <ClInclude Include="include\tei\audio.h" />
+    <ClInclude Include="include\tei\ecs.h" />
+    <ClInclude Include="include\tei\render.h" />
+    <ClInclude Include="include\tei\resource.h" />
+    <ClInclude Include="include\tei\scene.h" />
+    <ClInclude Include="include\tei.h" />
+    <ClInclude Include="include\tei\time.h" />
+    <ClInclude Include="include\tei\unit.h" />
     <ClInclude Include="Time\Chrono.h" />
     <ClInclude Include="Time\Clock.h" />
     <ClInclude Include="Time\Clock.impl.h" />
@@ -266,7 +270,7 @@
     <ClInclude Include="Utility\Metrics\Metrics.h" />
     <ClInclude Include="Utility\Metrics\Metrics.hpp" />
     <ClInclude Include="Utility\Service.h" />
-    <ClInclude Include="tei\utility.h" />
+    <ClInclude Include="include\tei\utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

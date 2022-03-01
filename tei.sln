@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tei", "tei\tei.vcxproj", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "solution", "solution.vcxproj", "{A8F797A9-3F51-4BA3-BE27-E71BD65F0937}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientTest", "..\ClientTest\ClientTest.vcxproj", "{F6854907-E9FF-4D9B-9525-1C1528C77EFF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{A8F797A9-3F51-4BA3-BE27-E71BD65F0937}.Release|x64.Build.0 = Release|x64
 		{A8F797A9-3F51-4BA3-BE27-E71BD65F0937}.Release|x86.ActiveCfg = Release|Win32
 		{A8F797A9-3F51-4BA3-BE27-E71BD65F0937}.Release|x86.Build.0 = Release|Win32
+		{F6854907-E9FF-4D9B-9525-1C1528C77EFF}.Debug|x64.ActiveCfg = Debug|x64
+		{F6854907-E9FF-4D9B-9525-1C1528C77EFF}.Debug|x64.Build.0 = Debug|x64
+		{F6854907-E9FF-4D9B-9525-1C1528C77EFF}.Debug|x86.ActiveCfg = Debug|Win32
+		{F6854907-E9FF-4D9B-9525-1C1528C77EFF}.Debug|x86.Build.0 = Debug|Win32
+		{F6854907-E9FF-4D9B-9525-1C1528C77EFF}.Release|x64.ActiveCfg = Release|x64
+		{F6854907-E9FF-4D9B-9525-1C1528C77EFF}.Release|x64.Build.0 = Release|x64
+		{F6854907-E9FF-4D9B-9525-1C1528C77EFF}.Release|x86.ActiveCfg = Release|Win32
+		{F6854907-E9FF-4D9B-9525-1C1528C77EFF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
