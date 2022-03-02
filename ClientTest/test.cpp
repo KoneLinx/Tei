@@ -6,7 +6,7 @@
 void TeiClientInit()
 {
 
-	puts("hello");
+	puts("Client init");
 
 	using namespace std::literals;
 
@@ -38,6 +38,6 @@ void TeiClientInit()
 void TeiClientCleanup()
 {
 
-	puts("goodbye");
+	puts("Client cleanup");
 
 }
