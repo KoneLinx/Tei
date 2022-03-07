@@ -1,7 +1,7 @@
 #include "Application.h"
 
 #include <tei/render.h>
-//#include "../Core/Core.h"
+#include <tei/internal/core.h>
 #include <tei/time.h>
 #include <SDL.h>
 
@@ -53,8 +53,7 @@ void Application::SetFullscreen(bool state, bool fake) const
 void Application::Quit() const
 {
 	METRICS_TIMEBLOCK;
-	SDL_Event quit{ .quit = {} };
-	SDL_PushEvent(&quit);
+	tei::internal::core::Core->Stop();
 }
 
 void Application::OpenWindow()

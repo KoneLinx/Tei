@@ -83,7 +83,7 @@
     <ClInclude Include="Utility\Service.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\tei\utility.h">
+    <ClInclude Include="include\tei\internal\utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\tei\time.h">
@@ -113,7 +113,7 @@
     <ClInclude Include="Application\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\tei\ecs.h">
+    <ClInclude Include="include\tei\internal\ecs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\tei\application.h">
@@ -171,6 +171,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="External\Client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

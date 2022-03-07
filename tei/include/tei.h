@@ -2,7 +2,6 @@
 
 #include "tei/application.h"
 #include "tei/audio.h"
-#include "tei/ecs.h"
 #include "tei/render.h"
 #include "tei/resource.h"
 #include "tei/scene.h"
@@ -11,7 +10,7 @@
 
 #include "../External/Client.h"
 
-namespace tei 
+namespace tei
 {
 	using namespace tei::external;
 }

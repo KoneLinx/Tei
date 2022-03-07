@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 
 			srand(unsigned(time(nullptr)));
 			tei::internal::application::StartApplication(argc, argv);
-			tei::internal::core::Core{}.Run();
+			tei::internal::core::Core->Run();
 			tei::internal::application::StopApplication();
 
 			puts("Tei engine - quit successfully");

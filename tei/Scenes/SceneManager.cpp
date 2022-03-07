@@ -4,7 +4,7 @@
 #include <ranges>
 #include <algorithm>
 
-#include <tei/utility.h>
+#include <tei/internal/utility.h>
 
 namespace tei::internal::scene
 {

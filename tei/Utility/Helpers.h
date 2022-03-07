@@ -1,8 +1,7 @@
 #pragma once
 
-#include <optional>
-#include <concepts>
 #include <functional>
+#include <ranges>
 
 namespace tei::internal::utility
 {
@@ -93,5 +92,26 @@ namespace tei::internal::utility
 	template <>
 	struct projector_sequence<void> : std::identity
 	{};
+	
+	struct addressof_projector
+	{
+		constexpr auto operator () (auto& tup) -> decltype(auto)
+		{
+			return std::addressof(tup);
+		}
+	};
+
+	template <std::ranges::random_access_range Rng>
+	constexpr auto RangePerIndex(Rng& rng) noexcept
+	{
+		using Size = std::ranges::range_size_t<Rng>;
+		return std::views::transform(
+			std::views::iota(Size(), Size(std::ranges::size(rng))),
+			[&rng] (Size index) -> std::ranges::range_reference_t<Rng> 
+			{ 
+				return rng[index];
+			}
+		);
+	}
 
 }

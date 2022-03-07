@@ -5,7 +5,7 @@
 #include <string>
 #include <span>
 
-#include <tei/utility.h>
+#include <tei/internal/utility.h>
 
 namespace tei::internal::application
 {

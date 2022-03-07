@@ -174,6 +174,11 @@ public:
     {
         return std::chrono::time_point<Clock, Duration>{ clock::epoch() } + std::chrono::duration_cast<Duration>(this->time_since_epoch());
     }
+
+    constexpr auto operator <=> (clock::duration const& duration) const
+    {
+        return time_since_epoch() <=> duration;
+    }
     
 private:
 

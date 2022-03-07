@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <tei/utility.h>
+#include <tei/internal/utility.h>
 #include <tei/resource.h>
 
 #include <span>

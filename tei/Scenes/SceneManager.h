@@ -3,8 +3,8 @@
 #include <vector>
 #include <memory>
 
-#include <tei/ecs.h>
-#include <tei/utility.h>
+#include <tei/internal/ecs.h>
+#include <tei/internal/utility.h>
 
 namespace tei::internal::scene
 {

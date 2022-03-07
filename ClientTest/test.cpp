@@ -1,37 +1,52 @@
 
+#include "TestComponent.h"
+
 #include <tei.h>
 
-#include "TestComponent.h"
+using namespace tei::literals;
+
+struct Timer {};
+
+void OnUpdate(Timer)
+{
+#ifdef _DEBUG
+	if (tei::Time->frame.now > 3_s)
+		tei::Application->Quit();
+#endif
+}
 
 void TeiClientInit()
 {
 
 	puts("Client init");
 
-	using namespace std::literals;
+	tei::Scene->AddComponent<Timer>();
 
-	tei::Scene->AddComponent("Scene"sv);
+	tei::Scene->AddComponent<std::string>();
 
-	auto& c1 = tei::Scene->AddChild();
+	{
+		auto& c1 = tei::Scene->AddChild();
+		c1.AddComponent<std::string>();
 
-	c1.AddComponent("child 1"sv);
+		c1.AddChild().AddComponent<std::string>();
+		c1.AddChild().AddComponent<std::string>();
+	}
 
-	tei::Scene->AddChild().AddComponent("child 1.1"sv);
-	tei::Scene->AddChild().AddComponent("child 1.2"sv);
+	{
+		auto& c2 = tei::Scene->AddChild();
+		c2.AddComponent<std::string>();
 
-	auto& c2 = tei::Scene->AddChild();
+		{
+			auto& c21 = c2.AddChild();
+			c21.AddComponent<std::string>();
 
-	c1.AddComponent("child 2"sv);
+			c21.AddChild().AddComponent<std::string>();
+			c21.AddChild().AddComponent<std::string>();
+			c21.AddChild().AddComponent<std::string>();
+		}
 
-	auto& c21 = c2.AddChild();
-	c21.AddComponent("child 2.1"sv);
-
-	c21.AddChild().AddComponent("child 2.1.1"sv);
-	c21.AddChild().AddComponent("child 2.1.2"sv);
-	c21.AddChild().AddComponent("child 2.1.3"sv);
-
-	tei::Scene->AddChild().AddComponent("child 2.2"sv);
-
+		c2.AddChild().AddComponent<std::string>();
+	}
 
 }
 

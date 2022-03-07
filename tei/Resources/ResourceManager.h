@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <any>
 
-#include <tei/utility.h>
+#include <tei/internal/utility.h>
 
 namespace tei::internal::resource
 {

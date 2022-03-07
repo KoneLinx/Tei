@@ -2,20 +2,14 @@
 
 #include <tei.h>
 
-template<>
-void On<tei::ecs::Message::INIT>(std::string_view);
+void OnInitialize(std::string&, tei::ecs::Object&);
 
-template<>
-void On<tei::ecs::Message::ENABLE>(std::string_view);
+void OnEnable(std::string_view);
 
-template<>
-void On<tei::ecs::Message::UPDATE>(std::string_view);
+void OnUpdate(std::string_view);
 
-template<>
-void On<tei::ecs::Message::RENDER>(std::string_view);
+void OnRender(std::string_view);
 
-template<>
-void On<tei::ecs::Message::DISABLE>(std::string_view);
+void OnDisable(std::string_view);
 
-template<>
-void On<tei::ecs::Message::CLEANUP>(std::string_view);
+void OnCleanup(std::string_view);

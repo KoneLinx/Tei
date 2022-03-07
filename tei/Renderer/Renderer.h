@@ -3,7 +3,7 @@
 #include <optional>
 
 #include <tei/resource.h>
-#include <tei/utility.h>
+#include <tei/internal/utility.h>
 #include <tei/unit.h>
 
 namespace tei::internal::application

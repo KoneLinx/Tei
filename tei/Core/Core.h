@@ -1,9 +1,11 @@
 #pragma once
 
+#include <tei/internal/utility.h>
+
 namespace tei::internal::core
 {
 
-	class Core
+	class CoreFunction
 	{
 
 	public:
@@ -19,5 +21,7 @@ namespace tei::internal::core
 		bool m_IsRunning{ true };
 
 	};
+
+	extern utility::Static<CoreFunction> Core;
 
 }

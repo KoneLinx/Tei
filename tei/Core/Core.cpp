@@ -9,59 +9,68 @@
 
 #include "../External/Client.h"
 
+#include <SDL.h>
+
 using namespace tei::internal::core;
 
 using namespace tei::internal;
 using namespace tei::internal::time;
 using namespace tei::internal::time::literals;
-using enum ecs::Message;
 
-struct StopSignal {};
+utility::Static<CoreFunction> tei::internal::core::Core{};
 
-void Core::GameLoop()
+void CoreFunction::GameLoop()
 {
-	auto& time = Time->frame;
-	auto current = time.now = Clock::now();
+	auto& frame = Time->frame;
+	auto current = frame.now = Clock::now();
 	while (m_IsRunning)
 	{
 		METRICS_TIMEBLOCK;
 
 		Time->global.now = current = Clock::now();
-		if (time.fixed)
+		if (frame.fixed)
 		{
-			time.lag = current - time.now;
-			time.now += time.delta = time.step;
+			frame.lag = current - frame.now;
+			frame.now += frame.delta = frame.step;
 
 			FrameUpdate();
 
-			if (m_IsRunning && time.lag < time.step)
-				std::this_thread::sleep_until(time.now);
+			if (m_IsRunning && frame.lag < frame.step)
+				std::this_thread::sleep_until(frame.now);
 		}
 		else
 		{
-			time.delta = current - time.now;
-			time.now = current;
-			time.lag = {};
+			frame.delta = current - frame.now;
+			frame.now = current;
+			frame.lag = {};
 
 			FrameUpdate();
 
-			//if (m_IsRunning && time.synced)
+			//if (m_IsRunning && frame.synced)
 			/* sync */
 		}
 	}
 }
 
-void Core::FrameUpdate()
+void CoreFunction::FrameUpdate()
 {
 	METRICS_TIMEBLOCK;
 
 	// Update
 	{
+
+		SDL_Event e{};
+		while (SDL_PollEvent(&e))
+		{
+			if (e.type == SDL_QUIT)
+				Stop();
+		}
+
 		//events::Events->Update();
 
 		if (!m_IsRunning) return;
 
-		scene::Scene->Do(UPDATE);
+		scene::Scene->Do(ecs::Message::UPDATE);
 
 		if (!m_IsRunning) return;
 
@@ -72,19 +81,13 @@ void Core::FrameUpdate()
 	// Render
 	{
 		render::Renderer->Clear();
-		scene::Scene->Do(RENDER);
+		scene::Scene->Do(ecs::Message::RENDER);
 		render::Renderer->Present();
 	}
 
-	// debug
-#if defined(DEBUG) || defined(_DEBUG)
-	if (Time->global.now.time_since_epoch() > 3_s)
-		Stop();
-#endif // DEBUG
-
 }
 
-void Core::Run()
+void CoreFunction::Run()
 {
 	METRICS_TIMEBLOCK;
 
@@ -92,7 +95,7 @@ void Core::Run()
 	audio::Audio.Register(new audio::SDLAudio{});
 	//events::Events.Register(new events::EventManager{});
 	resource::Resources.Register(new resource::ResourceManager{});
-	scene::Scene.Register(new ecs::Object{ true });
+	scene::Scene.Register(new ecs::Object{ nullptr, true });
 
 	// Resource loaders
 	resource::Resources->AddLoader(new resource::prefab::TextureLoader{});
@@ -103,12 +106,7 @@ void Core::Run()
 	TeiClientInit();
 
 	// Game
-	try
-	{
-		GameLoop();
-	}
-	catch (StopSignal)
-	{}
+	GameLoop();
 
 	// Clear scenes
 	scene::Scene.Register(nullptr);
@@ -124,8 +122,7 @@ void Core::Run()
 	// End
 }
 
-void Core::Stop()
+void CoreFunction::Stop()
 {
 	m_IsRunning = false;
-	throw StopSignal{};
 }

@@ -3,13 +3,16 @@
 
 #include <algorithm>
 
+#include <cassert>
+
 using namespace tei::internal::ecs;
 
-Object::Object(bool active)
-	: m_Components{}
+Object::Object(Object* pParent, bool active)
+	: m_pParent{ pParent }
+	, m_Components{}
 	, m_Children{}
 	, m_Active{ false }
-	, m_SetActive{ active }
+	, m_State{ active }
 	, m_Initialised{}
 {}
 
@@ -18,18 +21,24 @@ Object::~Object()
 	Do(Message::CLEANUP);
 }
 
-void Object::Activate(bool state) noexcept
+void Object::SetState(bool state) noexcept
 {
-	m_SetActive = state;
+	m_State = state;
 }
 
 Object& Object::AddChild(bool active)
 {
 	METRICS_TIMEBLOCK;
-	return m_Children.emplace_back(active);
+	return m_Children.emplace_back(Object{ this, active });
 }
 
-void Object::AddComponent(Component<>* pComp, Component<>::Handle pHandle)
+void Object::RemoveChild(Object const& child)
+{
+	auto it{ std::ranges::find(m_Children, &child, utility::addressof_projector{})};
+	m_Children.erase(it);
+}
+
+void Object::AddComponent(Component<>* pComp, Handle pHandle)
 {	
 	METRICS_TIMEBLOCK;
 	m_Components.push_back({
@@ -38,13 +47,22 @@ void Object::AddComponent(Component<>* pComp, Component<>::Handle pHandle)
 	});
 }
 
-Object::Component<>& Object::GetComponent(Component<>::Handle handle) const
+typename decltype(Object::m_Components)::const_iterator Object::GetComponent(Handle handle) const
 {
 	METRICS_TIMEBLOCK;
 	auto const it{ std::ranges::find(m_Components, handle, utility::tuple_index_projector<1>{}) };
 	if (it == m_Components.end())
 		throw utility::TeiRuntimeError{ "No such component", typeid(std::to_address(it)).name() };
-	return *it->first;
+	return it;
+}
+
+std::unique_ptr<Object::Component<>> tei::internal::ecs::Object::ExtractComponent(Handle pHandle)
+{
+	auto constIt{ GetComponent(pHandle) };
+	auto it{ m_Components.begin() + std::distance(m_Components.cbegin(), constIt) };
+	auto uptr{ std::move(it->first) };
+	m_Components.erase(it);
+	return uptr;
 }
 
 void Object::Do(Message message)
@@ -64,7 +82,7 @@ void Object::Do(Message message)
 	break;
 	case ENABLE:
 	{
-		if (!m_SetActive)
+		if (!m_State)
 			return;
 		if (!m_Initialised)
 			Do(INIT);
@@ -73,18 +91,18 @@ void Object::Do(Message message)
 	break;
 	case UPDATE:
 	{
-		if (m_Active != m_SetActive)
-			Do(m_SetActive ? ENABLE : DISABLE);
+		if (m_Active != m_State)
+			Do(m_State ? ENABLE : DISABLE);
 		if (!m_Active)
 			return;
 	}
 	break;
 	}
 
-	for (auto& [pComp, pHandle] : m_Components)
-		pHandle(*pComp, message);
+	for (auto& [pComp, pHandle] : utility::RangePerIndex(m_Components) /* Mutation safe */)
+		pHandle(*pComp, message, *this);
 
-	// TODO move bools out of object on stack into cache!
+	// TODO move bools out of object on heap into cache!
 
 	for (auto& child : m_Children)
 		if (child.m_Active || message == ENABLE || message == CLEANUP || message == UPDATE)
@@ -100,7 +118,7 @@ void Object::Do(Message message)
 	case CLEANUP:
 	{
 		m_Active = false;
-		m_SetActive = false;
+		m_State = false;
 		m_Initialised = false;
 		m_Children.clear();
 		m_Components.clear();

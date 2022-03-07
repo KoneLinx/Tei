@@ -2,34 +2,37 @@
 
 #include <iostream>
 
-template<>
-void On<tei::ecs::Message::INIT>(std::string_view name)
+void OnInitialize(std::string& name, tei::ecs::Object& parent)
 {
-	std::cout << "Initialised " << name << std::endl;
+	if (auto& root = parent.GetParent(); &root != nullptr)
+	{
+		auto it = std::ranges::find(root.GetAllChildren(), &name, [](auto& obj) { return &obj.GetComponent<std::string>(); });
+		name = root.GetComponent<std::string>() + " > Child-" + std::to_string(std::distance(root.GetAllChildren().begin(), it));
+	}
+	else
+		name = "Scene";
 }
 
-template<>
-void On<tei::ecs::Message::ENABLE>(std::string_view name)
+void OnEnable(std::string_view name)
 {
-	std::cout << "Enabled " << name << std::endl;
+	std::cout << "Enabled: " << name << std::endl;
 }
-template<>
-void On<tei::ecs::Message::UPDATE>(std::string_view name)
+void OnUpdate(std::string_view name)
 {
-	std::cout << "Updated " << name << std::endl;
+	std::cout << "Updated: " << name << std::endl;
 }
-template<>
-void On<tei::ecs::Message::RENDER>(std::string_view name)
+
+void OnRender(std::string_view name)
 {
-	std::cout << "Rendered " << name << std::endl;
+	std::cout << "Rendered: " << name << std::endl;
 }
-template<>
-void On<tei::ecs::Message::DISABLE>(std::string_view name)
+
+void OnDisable(std::string_view name)
 {
-	std::cout << "Disabled " << name << std::endl;
+	std::cout << "Disabled: " << name << std::endl;
 }
-template<>
-void On<tei::ecs::Message::CLEANUP>(std::string_view name)
+
+void OnCleanup(std::string_view name)
 {
-	std::cout << "Cleaned " << name << " up" << std::endl;
+	std::cout << "Cleaning: " << name << std::endl;
 }
