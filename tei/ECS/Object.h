@@ -106,7 +106,6 @@ namespace tei::internal::ecs
 		return this != nullptr && m_Active;
 	}
 	
-	// Add a component
 	template<typename Data>
 	inline Data& Object::AddComponent(Data data)
 	{
@@ -115,14 +114,12 @@ namespace tei::internal::ecs
 		return pComponent->data;
 	}
 	
-	// Get a component (throws if not present)
 	template<typename Data>
 	inline Data& Object::GetComponent() const
 	{
 		return static_cast<Component<Data>&>(*GetComponent(&Component<Data>::Handle)->first).data;
 	}
 	
-	// Remove a component (throws if not present)
 	template<typename Data>
 	inline Data Object::RemoveComponent()
 	{
@@ -130,25 +127,21 @@ namespace tei::internal::ecs
 		return std::move(static_cast<Component<Data>&>(*ExtractComponent(&Component<Data>::Handle)).data);
 	}
 	
-	// Guaranteed, except for root (scene). Null reference for root. 
 	inline Object& Object::GetParent() const noexcept
 	{
 		return *m_pParent;
 	}
 	
-	// View of all children
 	inline auto Object::GetAllChildren() const noexcept
 	{
 		return std::views::all(m_Children);
 	}
 	
-	// View of all active children
 	inline auto Object::GetActiveChildren() const noexcept
 	{
 		return std::views::filter(GetAllChildren(), std::identity{});
 	}
 	
-	// View of all inactive children
 	inline auto Object::GetInactiveChildren() const noexcept
 	{
 		return std::views::filter(GetAllChildren(), std::logical_not{});
@@ -224,11 +217,6 @@ namespace tei::internal::ecs
 				::OnRender(data);
 			break;
 		}
-		//[] <size_t ... MESSAGE> (Component& data, Message message, std::index_sequence<MESSAGE...>)
-		//{
-		//	((message == static_cast<Message>(MESSAGE) && (On<static_cast<Message>(MESSAGE)>(data.data), true)) || ...);
-		//}
-		//(static_cast<Component&>(data), message, std::make_index_sequence<static_cast<size_t>(Message::_COUNT)>{});
 	}
 
 }
