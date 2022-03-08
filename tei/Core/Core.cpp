@@ -2,32 +2,26 @@
 
 #include <thread>
 
-#include <tei/time.h>
-#include <tei/scene.h>
-#include <tei/audio.h>
-#include <tei/render.h>
-
-#include "../External/Client.h"
+#include <tei.h>
 
 #include <SDL.h>
 
 using namespace tei::internal::core;
 
 using namespace tei::internal;
-using namespace tei::internal::time;
-using namespace tei::internal::time::literals;
+using namespace tei::literals;
 
 utility::Static<CoreFunction> tei::internal::core::Core{};
 
 void CoreFunction::GameLoop()
 {
-	auto& frame = Time->frame;
+	auto& frame = time::Time->frame;
 	auto current = frame.now = Clock::now();
 	while (m_IsRunning)
 	{
 		METRICS_TIMEBLOCK;
 
-		Time->global.now = current = Clock::now();
+		time::Time->global.now = current = Clock::now();
 		if (frame.fixed)
 		{
 			frame.lag = current - frame.now;

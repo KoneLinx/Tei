@@ -232,6 +232,7 @@
     <ClCompile Include="Scenes\SceneManager.cpp" />
     <ClCompile Include="Time\Clock.cpp" />
     <ClCompile Include="Time\Time.cpp" />
+    <ClCompile Include="Transform\Transform.cpp" />
     <ClCompile Include="Utility\Helpers.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -243,6 +244,7 @@
     <ClInclude Include="ECS\Object.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="External\Client.h" />
+    <ClInclude Include="include\tei\components.h" />
     <ClInclude Include="include\tei\internal\core.h" />
     <ClInclude Include="Renderer\Renderer.h" />
     <ClInclude Include="Resources\Audio.h" />
@@ -264,6 +266,7 @@
     <ClInclude Include="Time\Clock.h" />
     <ClInclude Include="Time\Clock.impl.h" />
     <ClInclude Include="Time\Time.h" />
+    <ClInclude Include="Transform\Transform.h" />
     <ClInclude Include="Units\glm.h" />
     <ClInclude Include="Units\Units.h" />
     <ClInclude Include="Utility\Error.h" />

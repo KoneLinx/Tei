@@ -18,7 +18,7 @@ namespace tei::internal::unit
 				using T::T;
 				using T::operator=;
 
-				constexpr type() = default;
+				constexpr type() noexcept = default;
 
 				template <std::same_as<T> Val>
 				constexpr type(Val&& val) noexcept
@@ -62,7 +62,7 @@ namespace tei::internal::unit
 		Scale    scale   {};
 		Rotation rotation{};
 
-		Transform(
+		constexpr Transform(
 			Position const& = {},
 			Scale    const& = { 1, 1 },
 			Rotation const& = {}
@@ -84,6 +84,8 @@ namespace tei::internal::unit
 		operator ScaleMatrix      () const   noexcept;
 		operator TranslationMatrix() const   noexcept;
 		operator TransformMatrix  () const   noexcept;
+
+		Transform operator + (Transform const&) const; // Combine
 	};
 
 }
@@ -96,7 +98,7 @@ namespace tei::external
 namespace tei::internal::unit
 {
 
-	inline Transform::Transform(Position const& t, Scale const& s, Rotation const& r) noexcept
+	inline constexpr Transform::Transform(Position const& t, Scale const& s, Rotation const& r) noexcept
 		: position{ t }
 		, scale{ s }
 		, rotation{ r }
@@ -174,6 +176,15 @@ namespace tei::internal::unit
 	inline Transform::operator TransformMatrix() const noexcept
 	{
 		return TransformMatrix{ ScaleMatrix(*this) * RotationMatrix(*this) } * TranslationMatrix(*this);
+	}
+
+	inline Transform Transform::operator + (Transform const& other) const
+	{
+		return {
+			position + other.position,
+			scale * other.scale,
+			rotation + other.rotation,
+		};
 	}
 
 }
