@@ -3,13 +3,8 @@
 #include <optional>
 
 #include <tei/resource.h>
-#include <tei/internal/utility.h>
 #include <tei/unit.h>
-
-namespace tei::internal::application
-{
-	struct Window;
-}
+#include <tei/application.h>
 
 namespace tei::internal::render
 {
@@ -18,15 +13,17 @@ namespace tei::internal::render
 	{
 	public:
 
-		RendererClass(application::Window const&);
+		RendererClass(application::Application::Window const&);
 		~RendererClass();
 
 		void Clear();
 		void Update();
 		void Present();
 
-		auto const& RenderTraget()
+		auto const& GetRenderTraget()
 		{ return m_RenderTarget; }
+
+		void SetVSync(bool synced) const;
 
 		void DrawTexture(resource::Texture const& texture, unit::Transform const& transform, std::optional<unit::Rectangle> source = std::nullopt) const;
 		void DrawSprite(resource::Sprite const& texture, unit::Transform const& transform) const;

@@ -10,13 +10,6 @@
 namespace tei::internal::application
 {
 
-	struct Window
-	{
-		void* pData;
-		int x, y;
-		int w, h;
-	};
-
 	class Application
 	{
 
@@ -28,15 +21,23 @@ namespace tei::internal::application
 
 		~Application();
 
-		inline Window const& Window() const
+		inline auto const& GetWindow() const
 		{ return m_Window; }
 
-		void SetFullscreen(bool state, bool fake = false) const;
+		void SetFullscreen(bool state, bool fake = false);
+		void SetWindowSize(int width, int height);
 
 		inline std::span<std::string_view const> Args() const
 		{ return m_Args; }
 
 		void Quit() const;
+
+		struct Window
+		{
+			void* pData;
+			int x, y;
+			int w, h;
+		};
 
 	private:
 
@@ -47,11 +48,11 @@ namespace tei::internal::application
 		void ExitAudio();
 
 		std::vector<std::string_view> const m_Args{};
-		struct Window m_Window{};
+		Window m_Window{};
 
 	public:
 
-		using Service = utility::Service<Application const>;
+		using Service = utility::Service<Application>;
 
 	};
 

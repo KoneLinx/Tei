@@ -19,20 +19,21 @@ using namespace tei::internal;
 
 #define m_SDLRenderer RefAs<SDL_Renderer>(m_RenderTarget.pData)
 
-RendererClass::RendererClass(application::Window const& window)
+RendererClass::RendererClass(application::Application::Window const& window)
 {
 	METRICS_TIMEBLOCK;
 
 	m_SDLRenderer = SDL_CreateRenderer(
 		static_cast<SDL_Window*>(window.pData),
 		-1,
-		SDL_RENDERER_ACCELERATED |
-		SDL_RENDERER_PRESENTVSYNC
+		SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
 	);
 	if (m_SDLRenderer == nullptr)
 		throw utility::TeiRuntimeError{ "Could not load SDL Renerer", SDL_GetError() };
 
 	SDL_GetRendererOutputSize(m_SDLRenderer, &m_RenderTarget.w, &m_RenderTarget.h);
+
+	tei::internal::time::Time->frame.vsync = true;
 }
 
 RendererClass::~RendererClass()
@@ -69,6 +70,14 @@ void RendererClass::Present()
 	SDL_RenderPresent(m_SDLRenderer);
 }
 
+void RendererClass::SetVSync(bool synced) const
+{
+	if (SDL_RenderSetVSync(m_SDLRenderer, int(synced)) != 0)
+		throw utility::TeiRuntimeError{ "Could not alter vsync status", !synced };
+	else
+		tei::internal::time::Time->frame.vsync = synced;
+}
+
 void RendererClass::DrawTexture(resource::Texture const& texture, unit::Transform const& transform, std::optional<unit::Rectangle> source) const
 {
 	METRICS_TIMEBLOCK;
@@ -84,18 +93,19 @@ void RendererClass::DrawTexture(resource::Texture const& texture, unit::Transfor
 		.w = int(scale.x),
 		.h = int(scale.y),
 	};
-	auto src = [&] { 
+	auto const src = [texture] (unit::Rectangle source) 
+	{
 		return SDL_Rect{
-				.x = int(source.value()[0].x * texture.w),
-				.y = int(source.value()[0].y * texture.h),
-				.w = int(source.value()[1].x * texture.w),
-				.h = int(source.value()[1].y * texture.h),
+			.x = int(source[0].x * texture.w),
+			.y = int(source[0].y * texture.h),
+			.w = int(source[1].x * texture.w),
+			.h = int(source[1].y * texture.h),
 		}; 
 	};
 	SDL_RenderCopyEx(
 		m_SDLRenderer,
 		static_cast<SDL_Texture*>(texture.pData),
-		source ? std::data({ src() }) : nullptr,
+		source ? std::data({ src(*source) }) : nullptr,
 		&dest,
 		glm::degrees(transform.rotation.x),
 		std::data({ SDL_Point{

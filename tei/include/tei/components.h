@@ -2,4 +2,5 @@
 
 #include "internal/ecs.h"
 
-#include "../../Transform/Transform.h"
+#include "../../Components/Transform.h"
+#include "../../Components/TextureComponent.h"

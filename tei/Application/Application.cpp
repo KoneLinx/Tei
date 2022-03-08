@@ -43,11 +43,21 @@ Application::~Application()
 	SDL_Quit();
 }
 
-void Application::SetFullscreen(bool state, bool fake) const
+void Application::SetFullscreen(bool state, bool fake)
 {
 	METRICS_TIMEBLOCK;
 	SDL_SetWindowFullscreen(m_SDLWindow, state ? (fake ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_FULLSCREEN) : 0);
-	tei::internal::render::Renderer->Update();
+	SDL_GetWindowSize(m_SDLWindow, &m_Window.w, &m_Window.h);
+	SDL_GetWindowPosition(m_SDLWindow, &m_Window.x, &m_Window.y);
+}
+
+void Application::SetWindowSize(int width, int height)
+{
+	auto old{ m_Window };
+	SDL_SetWindowSize(m_SDLWindow, width, height);
+	SDL_GetWindowSize(m_SDLWindow, &m_Window.w, &m_Window.h);
+	SDL_SetWindowPosition(m_SDLWindow, old.x + (old.w - m_Window.w) / 2, old.y + (old.h - m_Window.h) / 2);
+	SDL_GetWindowPosition(m_SDLWindow, &m_Window.x, &m_Window.y);
 }
 
 void Application::Quit() const
@@ -63,13 +73,16 @@ void Application::OpenWindow()
 		"Tei engine",
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		/*640*/480,
-		/*480*/640,
+		640,
+		480,
 		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
 	);
 
 	if (m_SDLWindow == nullptr)
 		throw utility::TeiRuntimeError{ "Could not create SDL Window", SDL_GetError() };
+
+	SDL_GetWindowSize(m_SDLWindow, &m_Window.w, &m_Window.h);
+	SDL_GetWindowPosition(m_SDLWindow, &m_Window.x, &m_Window.y);
 
 	render::Renderer.Register(new render::RendererClass{ m_Window });
 }

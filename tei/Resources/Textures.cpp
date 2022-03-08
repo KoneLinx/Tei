@@ -2,6 +2,7 @@
 
 #include <tei/render.h>
 #include <SDL_image.h>
+#include "Textures.h"
 
 using namespace tei::internal::resource;
 
@@ -28,7 +29,7 @@ Texture* prefab::TextureLoader::OnLoad(std::filesystem::path const& path, Resour
 	if (!init) init = Texture{};
 
 	SDL_Texture* pTexture = IMG_LoadTexture(
-		static_cast<SDL_Renderer*>(render::Renderer->RenderTraget().pData),
+		static_cast<SDL_Renderer*>(render::Renderer->GetRenderTraget().pData),
 		pathStr.c_str()
 	);
 	init->pData = pTexture;
@@ -54,4 +55,3 @@ void prefab::TextureLoader::OnFree(ResourceManager const&, Texture* texture) con
 	SDL_DestroyTexture(static_cast<SDL_Texture*>(texture->pData));
 	delete texture;
 }
-
