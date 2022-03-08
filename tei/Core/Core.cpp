@@ -60,6 +60,7 @@ void CoreFunction::FrameUpdate()
 				Stop();
 		}
 
+		input::Input->ProcessInput();
 		//events::Events->Update();
 
 		if (!m_IsRunning) return;
@@ -87,6 +88,7 @@ void CoreFunction::Run()
 
 	// Services
 	audio::Audio.Register(new audio::SDLAudio{});
+	input::Input.Register(new input::InputManager{});
 	//events::Events.Register(new events::EventManager{});
 	resource::Resources.Register(new resource::ResourceManager{});
 	scene::Scene.Register(new ecs::Object{ nullptr, true });
@@ -110,6 +112,7 @@ void CoreFunction::Run()
 
 	// Clear services
 	resource::Resources.Register(nullptr);
+	input::Input.Register(nullptr);
 	//events::Events.Register(nullptr);
 	audio::Audio.Register(nullptr);
 

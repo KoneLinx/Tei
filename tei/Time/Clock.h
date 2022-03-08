@@ -72,7 +72,7 @@ namespace tei::internal::time
 
     };
 
-    namespace literals 
+    inline namespace literals 
     {}
 
 }

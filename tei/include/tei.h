@@ -8,6 +8,7 @@
 #include "tei/time.h"
 #include "tei/unit.h"
 #include "tei/components.h"
+#include "tei/input.h"
 
 namespace tei
 {

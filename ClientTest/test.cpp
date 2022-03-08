@@ -11,8 +11,11 @@ struct Timer {};
 
 void OnUpdate(Timer)
 {
-	if (tei::Time->frame.now > 3_s)
+	if (tei::Time->frame.now > 6_s)
 		tei::Application->Quit();
+
+	if (tei::Time->frame.now > 3_s)
+		tei::Application->SetWindowSize(720, 720);
 }
 
 void OnRender(tei::components::ObjectTransform const& t)
@@ -22,12 +25,14 @@ void OnRender(tei::components::ObjectTransform const& t)
 
 void TeiClientInit()
 {
-	using tei::components::ObjectTransform;
+	using namespace tei::components;
 
 	puts("Client init");
 
 	tei::Scene->AddComponent<Timer>();
 	tei::Scene->AddComponent(ObjectTransform{});
+	tei::Scene->AddComponent(tei::Resources->Load<tei::resource::Texture>("_smile.jpg"));
+	tei::Scene->AddComponent(TextureRenderComponent{});
 
 	tei::Scene->AddComponent<std::string>();
 

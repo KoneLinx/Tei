@@ -11,8 +11,8 @@ namespace tei::internal::time
 
 		struct
 		{
-			Clock::time_point			now          {};
-			Clock::time_point const		startup      {};
+			Clock::time_point           now          {};
+			Clock::time_point const	    startup      {};
 		}
 		global;
 
@@ -22,8 +22,9 @@ namespace tei::internal::time
 			Clock::duration				delta        {};
 			Clock::duration				lag          {};
 
-			Clock::duration				step         { 1.f / 25.f };
+			Clock::duration				step         { 1_s / 60 };
 			bool						fixed        { false };
+			bool						vsync        {};
 		}
 		frame;
 
