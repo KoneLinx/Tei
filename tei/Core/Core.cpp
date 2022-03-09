@@ -6,6 +6,8 @@
 
 #include <SDL.h>
 
+#include <ImGui.h>
+
 using namespace tei::internal::core;
 
 using namespace tei::internal;
@@ -56,6 +58,7 @@ void CoreFunction::FrameUpdate()
 		SDL_Event e{};
 		while (SDL_PollEvent(&e))
 		{
+			ImGui_ImplSDL2_ProcessEvent(&e);
 			if (e.type == SDL_QUIT)
 				Stop();
 		}
@@ -87,16 +90,21 @@ void CoreFunction::Run()
 	METRICS_TIMEBLOCK;
 
 	// Services
+	resource::Resources.Register(new resource::ResourceManager{});
 	audio::Audio.Register(new audio::SDLAudio{});
 	input::Input.Register(new input::InputManager{});
 	//events::Events.Register(new events::EventManager{});
-	resource::Resources.Register(new resource::ResourceManager{});
 	scene::Scene.Register(new ecs::Object{ nullptr, true });
 
 	// Resource loaders
 	resource::Resources->AddLoader(new resource::prefab::TextureLoader{});
 	resource::Resources->AddLoader(new resource::prefab::FontsLoader{});
 	resource::Resources->AddLoader(new resource::prefab::AudioLoader{});
+
+	std::this_thread::sleep_for(1.5_s);
+	render::Renderer->Clear();
+	render::Renderer->Present();
+
 
 	// Client init
 	TeiClientInit();

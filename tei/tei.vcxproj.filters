@@ -81,6 +81,9 @@
     <ClCompile Include="Input\Controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Extra\StaticEngineResources.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Time\Chrono.h">
@@ -216,6 +219,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\tei\input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extra\StaticEngineResources.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

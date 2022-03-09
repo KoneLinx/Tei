@@ -106,7 +106,13 @@ namespace tei::internal::utility
 	{
 		using Size = std::ranges::range_size_t<Rng>;
 		return std::views::transform(
-			std::views::iota(Size(), Size(std::ranges::size(rng))),
+			std::views::take_while(
+				std::views::iota(Size()),
+				[&rng] (Size index) -> bool
+				{ 
+					return index < std::ranges::size(rng);
+				}
+			),
 			[&rng] (Size index) -> std::ranges::range_reference_t<Rng> 
 			{ 
 				return rng[index];

@@ -235,6 +235,7 @@
     <ClCompile Include="Resources\Textures.cpp" />
     <ClCompile Include="Scenes\SceneManager.cpp" />
     <ClCompile Include="Components\TextureComponent.cpp" />
+    <ClCompile Include="Extra\StaticEngineResources.cpp" />
     <ClCompile Include="Time\Clock.cpp" />
     <ClCompile Include="Time\Time.cpp" />
     <ClCompile Include="Components\Transform.cpp" />
@@ -273,6 +274,7 @@
     <ClInclude Include="include\tei\time.h" />
     <ClInclude Include="include\tei\unit.h" />
     <ClInclude Include="Components\TextureComponent.h" />
+    <ClInclude Include="Extra\StaticEngineResources.h" />
     <ClInclude Include="Time\Chrono.h" />
     <ClInclude Include="Time\Clock.h" />
     <ClInclude Include="Time\Clock.impl.h" />

@@ -5,6 +5,8 @@
 #include <tei/time.h>
 #include <SDL.h>
 
+#include <ImGui.h>
+
 namespace tei::internal::render
 {
 
@@ -47,6 +49,10 @@ void RendererClass::Clear()
 {
 	METRICS_TIMEBLOCK;
 	SDL_RenderClear(m_SDLRenderer);
+
+	ImGui_ImplSDLRenderer_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
 }
 
 void RendererClass::Update()
@@ -67,11 +73,16 @@ void RendererClass::Update()
 void RendererClass::Present()
 {
 	METRICS_TIMEBLOCK;
+
+	ImGui::Render();
+	ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+
 	SDL_RenderPresent(m_SDLRenderer);
 }
 
 void RendererClass::SetVSync(bool synced) const
 {
+	METRICS_TIMEBLOCK;
 	if (SDL_RenderSetVSync(m_SDLRenderer, int(synced)) != 0)
 		throw utility::TeiRuntimeError{ "Could not alter vsync status", !synced };
 	else
@@ -85,7 +96,7 @@ void RendererClass::DrawTexture(resource::Texture const& texture, unit::Transfor
 	auto const sourceRatio{ source ? source.value()[1] : unit::Scale{ 1, 1 } };
 	auto const texRatio{ sourceRatio * unit::Scale{ texture.w, texture.h } / float(std::min(texture.w, texture.h)) };
 	auto const center = m_TargetCenter + transform.position / 2.f * m_TargetScale;
-	auto const scale = transform.scale * m_TargetScale * texRatio;
+	auto const scale = transform.scale * m_TargetScale * texRatio / 2.f;
 	auto const position = center - scale / 2.f;
 	SDL_Rect const dest{
 		.x = int(position.x),
@@ -118,6 +129,8 @@ void RendererClass::DrawTexture(resource::Texture const& texture, unit::Transfor
 
 void RendererClass::DrawSprite(resource::Sprite const& sprite, unit::Transform const& transform) const
 {
+	METRICS_TIMEBLOCK;
+
 	auto frame = unsigned((m_Time - sprite.origintime) / sprite.frameduration);
 
 	if (sprite.loop == false)

@@ -13,9 +13,9 @@
 #include <Xinput.h>
 #pragma comment(lib, "xinput.lib")
 
-using namespace tei::internal::input;
+tei::internal::input::InputManager::Service tei::internal::input::Input{};
 
-InputManager::Service Input{};
+using namespace tei::internal::input;
 
 struct InputManager::PollData
 {

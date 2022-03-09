@@ -18,30 +18,29 @@ int main(int argc, char** argv)
 			METRICS_INITLOG("_metrics.json");
 			METRICS_TIMEBLOCK;
 
-			puts("Tei engine - starting");
-
+			//puts("Tei engine - starting");
 
 			srand(unsigned(time(nullptr)));
 			tei::internal::application::StartApplication(argc, argv);
 			tei::internal::core::Core->Run();
 			tei::internal::application::StopApplication();
 
-			puts("Tei engine - quit successfully");
+			//puts("Tei engine - quit successfully");
 
 		}
 		return 0;
 	}
 	catch (const std::exception& e)
 	{
-		puts("[Error] Uncaught exception!");
-		puts(e.what());
-		puts("[Error] Quitting...");
+		fputs("[Error] Uncaught exception!", stderr);
+		fputs(e.what(), stderr);
+		fputs("[Error] Quitting...", stderr);
 	}
 	catch (...)
 	{
-		puts("[Error] Uncaught exception!");
-		puts("[Error] exception Unknown");
-		puts("[Error] Quitting...");
+		fputs("[Error] Uncaught exception!", stderr);
+		fputs("[Error] exception Unknown", stderr);
+		fputs("[Error] Quitting...", stderr);
 	}
 	return -1;
 }

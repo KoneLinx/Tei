@@ -5,6 +5,10 @@
 #include <tei/time.h>
 #include <SDL.h>
 
+#include <ImGui.h>
+
+#include "../Extra/StaticEngineResources.h"
+
 namespace tei::internal::application
 {
 
@@ -68,29 +72,54 @@ void Application::Quit() const
 
 void Application::OpenWindow()
 {
+	SDL_Rect display{};
+	if (SDL_GetDisplayBounds(0, &display) == 0)
+		display.w = (display.h = 1080) * 18 / 9;
+
 	METRICS_TIMEBLOCK;
 	m_SDLWindow = SDL_CreateWindow(
 		"Tei engine",
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		640,
-		480,
+		display.w / 3,
+		display.h / 3,
 		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
 	);
 
 	if (m_SDLWindow == nullptr)
 		throw utility::TeiRuntimeError{ "Could not create SDL Window", SDL_GetError() };
 
+	SDL_SetWindowBordered(m_SDLWindow, SDL_FALSE);
+
 	SDL_GetWindowSize(m_SDLWindow, &m_Window.w, &m_Window.h);
 	SDL_GetWindowPosition(m_SDLWindow, &m_Window.x, &m_Window.y);
 
-	render::Renderer.Register(new render::RendererClass{ m_Window });
+	auto& renderer = render::Renderer.Register(new render::RendererClass{ m_Window });
+
+	auto target = static_cast<SDL_Renderer*>(renderer.GetRenderTraget().pData);
+	ImGui::CreateContext();
+	ImGui_ImplSDLRenderer_Init(target);
+	ImGui_ImplSDL2_InitForSDLRenderer(m_SDLWindow, target);
+
+	renderer.Update();
+	renderer.Clear();
+	renderer.DrawTexture(extra::resources::EngineLoaderBackground(), unit::Scale{2, 2});
+	renderer.Present();
+
 }
 
 void Application::CloseWindow()
 {
 	METRICS_TIMEBLOCK;
-	if (m_SDLWindow != nullptr) SDL_DestroyWindow(std::exchange(m_SDLWindow, nullptr));
+
+	ImGui_ImplSDL2_Shutdown();
+	ImGui_ImplSDLRenderer_Shutdown();
+	ImGui::DestroyContext();
+
+	render::Renderer.Register(nullptr);
+
+	if (m_SDLWindow != nullptr)
+		SDL_DestroyWindow(std::exchange(m_SDLWindow, nullptr));
 }
 
 void Application::InitAudio()

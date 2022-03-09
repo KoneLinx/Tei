@@ -15,6 +15,7 @@ void OnEnable(TextureRenderComponent& comp, Object const& obj)
 	comp.pTexture = &obj.GetComponent<Texture>();
 	comp.pTransform = &obj.GetComponent<ObjectTransform>();
 }
+
 void OnEnable(SpriteRenderComponent& comp, Object const& obj)
 {
 	comp.pSprite = &obj.GetComponent<Sprite>();
