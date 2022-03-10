@@ -17,6 +17,7 @@ namespace tei::internal::application
 }
 
 using namespace tei::internal::application;
+using namespace tei::internal;
 using namespace std::literals;
 
 #define m_SDLWindow utility::RefAs<SDL_Window>(m_Window.pData)
@@ -64,6 +65,12 @@ void Application::SetWindowSize(int width, int height)
 	SDL_GetWindowPosition(m_SDLWindow, &m_Window.x, &m_Window.y);
 }
 
+void Application::SetWindowBorder(bool state)
+{
+	SDL_SetWindowBordered(m_SDLWindow, state ? SDL_TRUE : SDL_FALSE);
+	SDL_SetWindowResizable(m_SDLWindow, SDL_TRUE);
+}
+
 void Application::Quit() const
 {
 	METRICS_TIMEBLOCK;
@@ -83,7 +90,7 @@ void Application::OpenWindow()
 		SDL_WINDOWPOS_CENTERED,
 		display.w / 3,
 		display.h / 3,
-		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
+		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS
 	);
 
 	if (m_SDLWindow == nullptr)
@@ -94,7 +101,7 @@ void Application::OpenWindow()
 	SDL_GetWindowSize(m_SDLWindow, &m_Window.w, &m_Window.h);
 	SDL_GetWindowPosition(m_SDLWindow, &m_Window.x, &m_Window.y);
 
-	auto& renderer = render::Renderer.Register(new render::RendererClass{ m_Window });
+	auto& renderer{ render::Renderer.Register(new render::RendererClass{ m_Window }) };
 
 	auto target = static_cast<SDL_Renderer*>(renderer.GetRenderTraget().pData);
 	ImGui::CreateContext();

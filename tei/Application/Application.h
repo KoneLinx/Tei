@@ -26,6 +26,7 @@ namespace tei::internal::application
 
 		void SetFullscreen(bool state, bool fake = false);
 		void SetWindowSize(int width, int height);
+		void SetWindowBorder(bool state);
 
 		inline std::span<std::string_view const> Args() const
 		{ return m_Args; }

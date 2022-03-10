@@ -94,7 +94,7 @@ void CoreFunction::Run()
 	audio::Audio.Register(new audio::SDLAudio{});
 	input::Input.Register(new input::InputManager{});
 	//events::Events.Register(new events::EventManager{});
-	scene::Scene.Register(new ecs::Object{ nullptr, true });
+	scene::Scene.Register(new ecs::Object{ ecs::CreateRoot() });
 
 	// Resource loaders
 	resource::Resources->AddLoader(new resource::prefab::TextureLoader{});
@@ -102,9 +102,7 @@ void CoreFunction::Run()
 	resource::Resources->AddLoader(new resource::prefab::AudioLoader{});
 
 	std::this_thread::sleep_for(1.5_s);
-	render::Renderer->Clear();
-	render::Renderer->Present();
-
+	application::ApplicationService->SetWindowBorder(true);
 
 	// Client init
 	TeiClientInit();

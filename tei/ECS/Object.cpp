@@ -5,6 +5,14 @@
 
 #include <cassert>
 
+namespace tei::internal::ecs
+{
+	Object CreateRoot()
+	{
+		return Object{ nullptr, true };
+	}
+}
+
 using namespace tei::internal::ecs;
 
 Object::Object(Object* pParent, bool active)
@@ -149,5 +157,13 @@ Object::Object(Object const& other)
 		}
 	);
 
-	m_Children = other.m_Children;
+	m_Children.reserve(std::ranges::size(other.m_Children));
+	std::ranges::transform(
+		other.m_Children,
+		std::back_inserter(m_Children),
+		[] (Object const& obj) -> Object
+		{
+			return { obj };
+		}
+	);
 }

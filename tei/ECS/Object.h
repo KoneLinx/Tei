@@ -25,9 +25,13 @@ namespace tei::internal::ecs
 
 	class Object final
 	{
-	public:
 
 		Object(Object* pParent, bool active);
+
+		friend Object CreateRoot();
+
+	public:
+
 		~Object();
 
 		Object(Object&& other) = default;
@@ -90,6 +94,8 @@ namespace tei::internal::ecs
 		std::unique_ptr<Component<>> ExtractComponent(Handle);
 
 	};
+
+	Object CreateRoot();
 
 }
 
