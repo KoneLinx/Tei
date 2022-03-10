@@ -44,7 +44,10 @@ Application::Application(int argc, char const* const* argv)
 Application::~Application()
 {
 	METRICS_TIMEBLOCK;
-	render::Renderer.Register(nullptr);
+
+	if (m_SDLWindow)
+		CloseWindow();
+
 	SDL_Quit();
 }
 

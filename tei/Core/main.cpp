@@ -33,14 +33,20 @@ int main(int argc, char** argv)
 	catch (const std::exception& e)
 	{
 		fputs("[Error] Uncaught exception!", stderr);
+		fputc('\n', stderr);
 		fputs(e.what(), stderr);
+		fputc('\n', stderr);
 		fputs("[Error] Quitting...", stderr);
+		fputc('\n', stderr);
 	}
 	catch (...)
 	{
 		fputs("[Error] Uncaught exception!", stderr);
+		fputc('\n', stderr);
 		fputs("[Error] exception Unknown", stderr);
+		fputc('\n', stderr);
 		fputs("[Error] Quitting...", stderr);
+		fputc('\n', stderr);
 	}
 	return -1;
 }

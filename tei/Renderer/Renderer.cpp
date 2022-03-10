@@ -145,5 +145,5 @@ void RendererClass::DrawSprite(resource::Sprite const& sprite, unit::Transform c
 		frame / sprite.cols % sprite.rows
 	};
 
-	DrawTexture(sprite.texture, transform, unit::Rectangle{ div * pos, div });
+	DrawTexture(sprite, transform, unit::Rectangle{ div * pos, div });
 }

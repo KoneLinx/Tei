@@ -31,8 +31,7 @@ void TeiClientInit()
 
 	{
 		auto& bgObject = tei::Scene->AddChild();
-		auto& bgTexture = tei::Resources->Load<tei::resource::Texture>("_smile.jpg");
-		bgObject.AddComponent(bgTexture);
+		bgObject.AddComponent(tei::Resources->LoadShared<tei::resource::Texture>("_smile.jpg"));
 		bgObject.AddComponent<ObjectTransform>();
 		bgObject.AddComponent<TextureRenderComponent>();
 	}

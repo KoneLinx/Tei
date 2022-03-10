@@ -14,24 +14,24 @@ namespace tei::internal::resource
 		{ return this != nullptr && pData != nullptr; }
 	};
 
-	namespace prefab
-	{
+	//namespace prefab
+	//{
 
-		class FontsLoader final : public ResourceManager::template Loader<Font>
-		{
-		public:
+	//	class FontsLoader final : public ResourceManager::template Loader<Font>
+	//	{
+	//	public:
 
-			FontsLoader();
+	//		FontsLoader();
 
-		private:
+	//	private:
 
-			Font* OnLoad(std::filesystem::path const& path, ResourceManager const& resources, std::optional<Font> init) const override;
+	//		Font* OnLoad(std::filesystem::path const& path, ResourceManager const& resources, std::optional<Font> init) const override;
 
-			void OnFree(ResourceManager const& resources, Font* font) const override;
+	//		void OnFree(ResourceManager const& resources, Font* font) const override;
 
-		};
+	//	};
 
-	}
+	//}
 
 }
 
@@ -40,3 +40,9 @@ namespace tei::external::resource
 	using tei::internal::resource::Font;
 }
 
+tei::external::Resource<tei::external::resource::Font>
+Load(
+	tei::external::resource::ToLoad<tei::external::resource::Font>,
+	std::filesystem::path const&,
+	int ptSize = 11
+);

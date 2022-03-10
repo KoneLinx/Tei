@@ -97,9 +97,9 @@ void CoreFunction::Run()
 	scene::Scene.Register(new ecs::Object{ ecs::CreateRoot() });
 
 	// Resource loaders
-	resource::Resources->AddLoader(new resource::prefab::TextureLoader{});
-	resource::Resources->AddLoader(new resource::prefab::FontsLoader{});
-	resource::Resources->AddLoader(new resource::prefab::AudioLoader{});
+	//resource::Resources->AddLoader(new resource::prefab::TextureLoader{});
+	//resource::Resources->AddLoader(new resource::prefab::FontsLoader{});
+	//resource::Resources->AddLoader(new resource::prefab::AudioLoader{});
 
 	std::this_thread::sleep_for(1.5_s);
 	application::ApplicationService->SetWindowBorder(true);
