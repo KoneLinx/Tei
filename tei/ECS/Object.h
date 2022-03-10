@@ -30,9 +30,6 @@ namespace tei::internal::ecs
 		Object(Object* pParent, bool active);
 		~Object();
 
-		Object(const Object& other) = delete;
-		Object& operator = (const Object& other) = delete;
-
 		Object(Object&& other) = default;
 		Object& operator = (Object&& other) = default;
 
@@ -50,7 +47,7 @@ namespace tei::internal::ecs
 		Data& GetComponent() const;
 		// Remove a component (throws if not present)
 		template <typename Data>
-		Data RemoveComponent();
+		auto RemoveComponent();
 
 		// Add a child object
 		Object& AddChild(bool active = true);
@@ -71,6 +68,9 @@ namespace tei::internal::ecs
 		void Do(Message);
 
 	private:
+		
+		Object(const Object& other);
+		Object& operator = (const Object& other) = delete;
 
 		template <typename Data = void>
 		struct Component;
@@ -79,7 +79,7 @@ namespace tei::internal::ecs
 
 		Object* m_pParent;
 		std::vector<std::pair<std::unique_ptr<Component<>>, Handle>> m_Components;
-		std::list<Object> m_Children;
+		std::vector<Object> m_Children;
 
 		bool m_Active;
 		bool m_State;
@@ -121,10 +121,14 @@ namespace tei::internal::ecs
 	}
 	
 	template<typename Data>
-	inline Data Object::RemoveComponent()
+	inline auto Object::RemoveComponent()
 	{
 		// unique_ptr is to be discarded
-		return std::move(static_cast<Component<Data>&>(*ExtractComponent(&Component<Data>::Handle)).data);
+		auto uptr{ ExtractComponent(&Component<Data>::Handle) };
+		if constexpr (std::movable<Data>)
+			return std::move(static_cast<Component<Data>&>(*uptr).data);
+		else
+			return; // void, unable to move
 	}
 	
 	inline Object& Object::GetParent() const noexcept
@@ -155,12 +159,16 @@ namespace tei::internal::ecs
 		Component(Data data);
 
 		static void Handle(Component<>&, Message, Object&);
+
+		virtual std::unique_ptr<Component<>> Clone() const override;
 	};
 
 	template <>
 	struct Object::Component<void>
 	{
 		virtual ~Component() = default;
+
+		virtual std::unique_ptr<Component<>> Clone() const = 0;
 	};
 
 	template<typename Data>
@@ -217,6 +225,15 @@ namespace tei::internal::ecs
 				::OnRender(data);
 			break;
 		}
+	}
+
+	template <typename Data>
+	inline std::unique_ptr<Object::Component<>> Object::Component<Data>::Clone() const
+	{
+		if constexpr (std::copyable<Data>)
+			return std::unique_ptr<Component<>>{ new Component<Data>{ data } };
+		else
+			throw utility::TeiRuntimeError{ "While cloning Object: Component not copyable", typeid(Data).name() };
 	}
 
 }

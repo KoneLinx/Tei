@@ -99,7 +99,7 @@ void Object::Do(Message message)
 	break;
 	}
 
-	for (auto& [pComp, pHandle] : utility::RangePerIndex(m_Components) /* Mutation safe */)
+	for (auto& [pComp, pHandle] : utility::RangePerIndex(m_Components) /* Mutation safe */) // False intelisense error
 		pHandle(*pComp, message, *this);
 
 	// TODO move bools out of object on heap into cache!
@@ -130,4 +130,24 @@ void Object::Do(Message message)
 	}
 	break;
 	}
+}
+
+Object::Object(Object const& other)
+	: Object{ nullptr, other.m_State }
+{	
+	m_Initialised = other.m_Initialised;
+
+	m_Components.reserve(std::ranges::size(other.m_Components));
+	using cref_type = std::ranges::range_reference_t<decltype(std::as_const(m_Components))>;
+	using value_type = std::ranges::range_value_t<decltype(m_Components)>;
+	std::ranges::transform(
+		other.m_Components,
+		std::back_inserter(m_Components),
+		[] (cref_type val) -> value_type
+		{
+			return { val.first->Clone(), val.second };
+		}
+	);
+
+	m_Children = other.m_Children;
 }
