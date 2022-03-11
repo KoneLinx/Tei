@@ -57,7 +57,7 @@ using namespace tei::internal;
 //	delete texture;
 //}
 
-Texture LoadTexture(std::filesystem::path const& path)
+Texture LoadTexture(std::filesystem::path const& path, bool nonempty = true)
 {
 	static bool init{
 		bool(IMG_Init(IMG_INIT_JPG) & IMG_INIT_JPG) &&
@@ -65,23 +65,27 @@ Texture LoadTexture(std::filesystem::path const& path)
 		(throw utility::TeiRuntimeError{ "Could not properly initialize SDL_image", SDL_GetError() }, false)
 	};
 
-	SDL_Texture* pTexture = IMG_LoadTexture(
-		static_cast<SDL_Renderer*>(render::Renderer->GetRenderTraget().pData),
-		path.string().c_str()
-	);
-
 	Texture texture{};
-	texture.pData = pTexture;
 
-	if (pTexture == nullptr ||
-		SDL_QueryTexture(
-			pTexture,
-			nullptr, nullptr,
-			&texture.w, &texture.h
-		) != 0
-	)
+	if (nonempty)
 	{
-		throw utility::TeiRuntimeError{ "Could not load texture: " + path.string(), SDL_GetError() };
+		SDL_Texture* pTexture = IMG_LoadTexture(
+			static_cast<SDL_Renderer*>(render::Renderer->GetRenderTraget().pData),
+			path.string().c_str()
+		);
+
+		texture.pData = pTexture;
+
+		if (pTexture == nullptr ||
+			SDL_QueryTexture(
+				pTexture,
+				nullptr, nullptr,
+				&texture.w, &texture.h
+			) != 0
+		)
+		{
+			throw utility::TeiRuntimeError{ "Could not load texture: " + path.string(), SDL_GetError() };
+		}
 	}
 
 	return texture;
@@ -89,13 +93,16 @@ Texture LoadTexture(std::filesystem::path const& path)
 
 static constexpr auto  DELETER = [] (auto* pTexture) // Texture or Sprite
 {
-	SDL_DestroyTexture(static_cast<SDL_Texture*>(pTexture->pData));
+	if (pTexture->pData)
+	{
+		SDL_DestroyTexture(static_cast<SDL_Texture*>(pTexture->pData));
+	}
 	delete pTexture;
 };
 
-Resource<Texture> Load(ToLoad<Texture>, std::filesystem::path const& path)
+Resource<Texture> Load(ToLoad<Texture>, std::filesystem::path const& path, bool nonempty)
 {
-	return { std::shared_ptr<Texture>{ new Texture{ LoadTexture(path) }, DELETER } };
+	return { std::shared_ptr<Texture>{ new Texture{ LoadTexture(path, nonempty) }, DELETER } };
 }
 
 Resource<Sprite> Load(ToLoad<Sprite>, std::filesystem::path const& path, time::Clock::duration frameduration, int cols, int rows, bool loop, time::Clock::time_point origin)

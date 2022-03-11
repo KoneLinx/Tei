@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef METRICS
-#define METRICS 0
+#define METRICS 1
 #endif
 
 

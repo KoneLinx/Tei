@@ -19,31 +19,31 @@ void CoreFunction::GameLoop()
 {
 	auto& frame = time::Time->frame;
 	auto current = frame.now = Clock::now();
+
 	while (m_IsRunning)
 	{
 		METRICS_TIMEBLOCK;
 
 		time::Time->global.now = current = Clock::now();
+
 		if (frame.fixed)
 		{
 			frame.lag = current - frame.now;
 			frame.now += frame.delta = frame.step;
 
-			FrameUpdate();
+			if (!frame.allow_drop || frame.lag < frame.step)
+				FrameUpdate();
 
 			if (m_IsRunning && frame.lag < frame.step)
 				std::this_thread::sleep_until(frame.now);
 		}
 		else
 		{
+			frame.lag = {};
 			frame.delta = current - frame.now;
 			frame.now = current;
-			frame.lag = {};
 
 			FrameUpdate();
-
-			//if (m_IsRunning && frame.synced)
-			/* sync */
 		}
 	}
 }
@@ -101,7 +101,7 @@ void CoreFunction::Run()
 	//resource::Resources->AddLoader(new resource::prefab::FontsLoader{});
 	//resource::Resources->AddLoader(new resource::prefab::AudioLoader{});
 
-	std::this_thread::sleep_for(1.5_s);
+	//std::this_thread::sleep_for(1.5_s);
 	application::ApplicationService->SetWindowBorder(true);
 
 	// Client init

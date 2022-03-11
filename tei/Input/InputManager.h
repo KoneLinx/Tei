@@ -20,7 +20,7 @@ namespace tei::internal::input
 		~InputManager();
 
 		template <typename MyCommand, typename = typename MyCommand::InputType>
-		void AddCommand(MyCommand command);
+		MyCommand& AddCommand(MyCommand command = {});
 
 		void ProcessInput();
 
@@ -51,9 +51,11 @@ namespace tei::internal::input
 	extern InputManager::Service Input;
 
 	template <typename MyCommand, typename InputType>
-	inline void InputManager::AddCommand(MyCommand command)
+	inline MyCommand& InputManager::AddCommand(MyCommand command)
 	{
-		std::get<std::vector<std::unique_ptr<Command<InputType>>>>(m_Commands).emplace_back(new MyCommand{ std::move(command) });
+		auto* pCommand{ new MyCommand{ std::move(command) } };
+		std::get<std::vector<std::unique_ptr<Command<InputType>>>>(m_Commands).emplace_back(pCommand);
+		return *pCommand;
 	}
 
 	template<typename InputType>

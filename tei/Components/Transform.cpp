@@ -7,8 +7,17 @@ ObjectTransform const ObjectTransform::ROOT{};
 
 void OnEnable(ObjectTransform& transform, Object const& object)
 {
-	if (auto & parent{ object.GetParent() })
-		transform.parent = &parent.GetComponent<ObjectTransform>();
+	Object const* parent{ &object };
+	do
+	{
+		parent = &parent->GetParent();
+		if (auto parentTransform{ parent->GetComponent<ObjectTransform>() })
+		{
+			transform.parent = parentTransform;
+			break;
+		}
+	}
+	while (!parent->IsRoot());
 	OnUpdate(transform);
 }
 

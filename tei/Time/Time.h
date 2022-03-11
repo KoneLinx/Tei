@@ -11,22 +11,35 @@ namespace tei::internal::time
 
 		struct
 		{
-			Clock::time_point           now          {};
-			Clock::time_point const	    startup      {};
+			Clock::time_point now;
+			Clock::time_point startup;
 		}
 		global;
 
 		struct
 		{
-			Clock::time_point			now          {};
-			Clock::duration				delta        {};
-			Clock::duration				lag          {};
+			Clock::time_point now;
+			Clock::duration	delta;
+			Clock::duration	lag;
 
-			Clock::duration				step         { 1_s / 60 };
-			bool						fixed        { false };
-			bool						vsync        {};
+			Clock::duration	step;
+			bool fixed;
+			bool allow_drop;
+			bool vsynced;
 		}
 		frame;
+
+		struct
+		{
+			Clock::time_point now;
+			Clock::duration	delta;
+			Clock::duration	lag;
+
+			Clock::duration	step;
+			bool fixed;
+			bool allow_drop;
+		}
+		fixed;
 
 	};
 

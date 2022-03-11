@@ -37,7 +37,9 @@ namespace tei::internal::ecs
 		Object(Object&& other) = default;
 		Object& operator = (Object&& other) = default;
 
-		// Test if object is valid and active
+		bool IsRoot() const noexcept;
+		bool IsActive() const noexcept;
+
 		operator bool() const noexcept;
 
 		// Set update state
@@ -48,7 +50,7 @@ namespace tei::internal::ecs
 		Data& AddComponent(Data data = {});
 		// Get a component (throws if not present)
 		template <typename Data>
-		Data& GetComponent() const;
+		Data* GetComponent() const noexcept;
 		// Remove a component (throws if not present)
 		template <typename Data>
 		auto RemoveComponent();
@@ -59,13 +61,17 @@ namespace tei::internal::ecs
 		void RemoveChild(Object const& child);
 
 		// Guaranteed, except for root (scene). Null reference for root. 
-		Object& GetParent() const noexcept;
+		Object& GetParent() noexcept;
+		Object const& GetParent() const noexcept;
 
 		// View of all children
+		auto GetAllChildren() noexcept;
 		auto GetAllChildren() const noexcept;
 		// View of all active children
+		auto GetActiveChildren() noexcept;
 		auto GetActiveChildren() const noexcept;
 		// View of all inactive children
+		auto GetInactiveChildren() noexcept;
 		auto GetInactiveChildren() const noexcept;
 
 		// Send message down the hirarchy
@@ -83,14 +89,14 @@ namespace tei::internal::ecs
 
 		Object* m_pParent;
 		std::vector<std::pair<std::unique_ptr<Component<>>, Handle>> m_Components;
-		std::vector<Object> m_Children;
+		std::list<Object> m_Children;
 
 		bool m_Active;
 		bool m_State;
 		bool m_Initialised;
 
 		void AddComponent(Component<>*, Handle);
-		typename decltype(m_Components)::const_iterator GetComponent(Handle) const;
+		typename decltype(m_Components)::const_iterator GetComponent(Handle) const noexcept;
 		std::unique_ptr<Component<>> ExtractComponent(Handle);
 
 	};
@@ -107,11 +113,21 @@ namespace tei::external::ecs
 namespace tei::internal::ecs
 {
 
-	inline Object::operator bool() const noexcept
+	inline bool Object::IsRoot() const noexcept
 	{
-		return this != nullptr && m_Active;
+		return m_pParent == nullptr;
 	}
 	
+	inline bool Object::IsActive() const noexcept
+	{
+		return m_Active;
+	}
+	
+	inline Object::operator bool() const noexcept
+	{
+		return IsActive();
+	}
+
 	template<typename Data>
 	inline Data& Object::AddComponent(Data data)
 	{
@@ -121,9 +137,13 @@ namespace tei::internal::ecs
 	}
 	
 	template<typename Data>
-	inline Data& Object::GetComponent() const
+	inline Data* Object::GetComponent() const noexcept
 	{
-		return static_cast<Component<Data>&>(*GetComponent(&Component<Data>::Handle)->first).data;
+		auto it{ GetComponent(&Component<Data>::Handle) };
+		if (it == m_Components.end())
+			return nullptr;
+		else
+			return &static_cast<Component<Data>&>(*it->first).data;
 	}
 	
 	template<typename Data>
@@ -137,11 +157,31 @@ namespace tei::internal::ecs
 			return; // void, unable to move
 	}
 	
-	inline Object& Object::GetParent() const noexcept
+	inline Object& Object::GetParent() noexcept
+	{
+		return *m_pParent;
+	}
+
+	inline Object const& Object::GetParent() const noexcept
 	{
 		return *m_pParent;
 	}
 	
+	inline auto Object::GetAllChildren() noexcept
+	{
+		return std::views::all(m_Children);
+	}
+	
+	inline auto Object::GetActiveChildren() noexcept
+	{
+		return std::views::filter(GetAllChildren(), std::identity{});
+	}
+	
+	inline auto Object::GetInactiveChildren() noexcept
+	{
+		return std::views::filter(GetAllChildren(), std::logical_not{});
+	}
+
 	inline auto Object::GetAllChildren() const noexcept
 	{
 		return std::views::all(m_Children);

@@ -47,7 +47,7 @@ namespace tei::internal::time
     class Clock
     {
 
-        using Source = std::chrono::steady_clock;
+        using Source = std::chrono::system_clock;
 
     public:
 

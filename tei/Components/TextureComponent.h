@@ -1,22 +1,15 @@
 #pragma once
 
 #include <tei/resource.h>
+#include "RefComponent.h"
 #include "Transform.h"
 
 namespace tei::internal::components
 {
 
-	struct TextureRenderComponent
-	{
-		resource::Texture const* pTexture;
-		components::ObjectTransform const* pTransform;
-	};
+	using TextureRenderComponent = RefComponent<"trc", resource::Resource<resource::Texture>, components::ObjectTransform>;
 
-	struct SpriteRenderComponent
-	{
-		resource::Sprite const* pSprite;
-		components::ObjectTransform const* pTransform;
-	};
+	using SpriteRenderComponent = RefComponent<"src", resource::Resource<resource::Sprite>, components::ObjectTransform>;
 
 }
 
@@ -26,11 +19,5 @@ namespace tei::external::components
 	using tei::internal::components::SpriteRenderComponent;
 }
 
-void OnEnable(tei::internal::components::TextureRenderComponent&, tei::internal::ecs::Object const&);
-void OnEnable(tei::internal::components::SpriteRenderComponent&, tei::internal::ecs::Object const&);
-
-//void OnUpdate(tei::internal::render::detail::SpriteRenderComponent&);
-
 void OnRender(tei::internal::components::TextureRenderComponent const&);
 void OnRender(tei::internal::components::SpriteRenderComponent const&);
-

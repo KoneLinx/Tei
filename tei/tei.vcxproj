@@ -236,6 +236,7 @@
     <ClCompile Include="Scenes\SceneManager.cpp" />
     <ClCompile Include="Components\TextureComponent.cpp" />
     <ClCompile Include="Extra\StaticEngineResources.cpp" />
+    <ClCompile Include="Components\TextComponent.cpp" />
     <ClCompile Include="Time\Clock.cpp" />
     <ClCompile Include="Time\Time.cpp" />
     <ClCompile Include="Components\Transform.cpp" />
@@ -246,6 +247,7 @@
     <ClInclude Include="Audio\AudioHandler.h" />
     <ClInclude Include="Audio\DebugAudio.h" />
     <ClInclude Include="Audio\SDLAudio.h" />
+    <ClInclude Include="Components\RefComponent.h" />
     <ClInclude Include="include\tei\input.h" />
     <ClInclude Include="Input\Controller.h" />
     <ClInclude Include="Input\Command.h" />
@@ -275,6 +277,7 @@
     <ClInclude Include="include\tei\unit.h" />
     <ClInclude Include="Components\TextureComponent.h" />
     <ClInclude Include="Extra\StaticEngineResources.h" />
+    <ClInclude Include="Components\TextComponent.h" />
     <ClInclude Include="Time\Chrono.h" />
     <ClInclude Include="Time\Clock.h" />
     <ClInclude Include="Time\Clock.impl.h" />

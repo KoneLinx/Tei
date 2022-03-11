@@ -57,7 +57,8 @@ namespace tei::external::resource
 tei::external::Resource<tei::external::resource::Texture>
 Load(
 	tei::external::resource::ToLoad<tei::external::resource::Texture>,
-	std::filesystem::path const&
+	std::filesystem::path const&,
+	bool nonempty = true
 );
 
 tei::external::Resource<tei::external::resource::Sprite> 

@@ -35,7 +35,7 @@ RendererClass::RendererClass(application::Application::Window const& window)
 
 	SDL_GetRendererOutputSize(m_SDLRenderer, &m_RenderTarget.w, &m_RenderTarget.h);
 
-	tei::internal::time::Time->frame.vsync = true;
+	tei::internal::time::Time->frame.vsynced = true;
 }
 
 RendererClass::~RendererClass()
@@ -86,7 +86,7 @@ void RendererClass::SetVSync(bool synced) const
 	if (SDL_RenderSetVSync(m_SDLRenderer, int(synced)) != 0)
 		throw utility::TeiRuntimeError{ "Could not alter vsync status", !synced };
 	else
-		tei::internal::time::Time->frame.vsync = synced;
+		tei::internal::time::Time->frame.vsynced = synced;
 }
 
 void RendererClass::DrawTexture(resource::Texture const& texture, unit::Transform const& transform, std::optional<unit::Rectangle> source) const

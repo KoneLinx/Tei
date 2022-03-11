@@ -55,18 +55,17 @@ void Object::AddComponent(Component<>* pComp, Handle pHandle)
 	});
 }
 
-typename decltype(Object::m_Components)::const_iterator Object::GetComponent(Handle handle) const
+typename decltype(Object::m_Components)::const_iterator Object::GetComponent(Handle handle) const noexcept
 {
 	METRICS_TIMEBLOCK;
-	auto const it{ std::ranges::find(m_Components, handle, utility::tuple_index_projector<1>{}) };
-	if (it == m_Components.end())
-		throw utility::TeiRuntimeError{ "No such component", typeid(std::to_address(it)).name() };
-	return it;
+	return std::ranges::find(m_Components, handle, utility::tuple_index_projector<1>{});
 }
 
 std::unique_ptr<Object::Component<>> tei::internal::ecs::Object::ExtractComponent(Handle pHandle)
 {
 	auto constIt{ GetComponent(pHandle) };
+	if (constIt == m_Components.cend())
+		throw utility::TeiRuntimeError{ "No such component found in object" };
 	auto it{ m_Components.begin() + std::distance(m_Components.cbegin(), constIt) };
 	auto uptr{ std::move(it->first) };
 	m_Components.erase(it);
@@ -157,7 +156,7 @@ Object::Object(Object const& other)
 		}
 	);
 
-	m_Children.reserve(std::ranges::size(other.m_Children));
+	//m_Children.reserve(std::ranges::size(other.m_Children));
 	std::ranges::transform(
 		other.m_Children,
 		std::back_inserter(m_Children),

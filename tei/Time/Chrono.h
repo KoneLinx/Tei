@@ -26,7 +26,7 @@ public:
     constexpr duration() = default;
 
     template <std::convertible_to<rep> Rep2>
-    constexpr explicit duration(Rep2 const& value) noexcept(std::is_nothrow_convertible_v<Rep2, rep>)
+    constexpr duration(Rep2 const& value) noexcept(std::is_nothrow_convertible_v<Rep2, rep>)
         : m_Value{ static_cast<rep::Rep>(value) }
     {}
 
@@ -115,6 +115,17 @@ public:
         return duration{ std::numeric_limits<rep>::max() };
     }
 
+    // Extra
+
+    constexpr operator rep() const noexcept
+    {
+        return m_Value;
+    }
+    constexpr operator rep::Rep() const noexcept
+    {
+        return m_Value;
+    }
+
 private:
 
     rep m_Value{};
@@ -122,8 +133,9 @@ private:
 };
 
 template <>
-class std::chrono::time_point<tei::internal::time::Clock, std::chrono::duration<tei::internal::time::TimeRep, std::ratio<1>>>
+class std::chrono::time_point<tei::internal::time::Clock, std::chrono::duration<tei::internal::time::TimeRep, std::ratio<1>>> : public std::chrono::duration<tei::internal::time::Clock::rep, std::ratio<1>>
 {
+    using super = std::chrono::duration<tei::internal::time::Clock::rep, std::ratio<1>>;
 public:
 
     using clock = tei::internal::time::Clock;
@@ -133,28 +145,28 @@ public:
 
     constexpr time_point() = default;
 
-    constexpr explicit time_point(const duration& duration) noexcept
-        : m_Value{ duration }
+    constexpr time_point(const duration& duration) noexcept
+        : super{ duration }
     {}
 
     template <std::convertible_to<duration> Duration2>
     constexpr time_point(const time_point<clock, Duration2>& other) noexcept(std::is_nothrow_convertible_v<Duration2, duration>)
-        : m_Value{ other.time_since_epoch() }
+        : super{ other.time_since_epoch() }
     {}
 
     [[nodiscard]] constexpr duration time_since_epoch() const noexcept
     {
-        return m_Value;
+        return *this;
     }
 
     constexpr time_point& operator += (duration const& other) noexcept
     {
-        m_Value += other;
+        super::operator+=(other);
         return *this;
     }
     constexpr time_point& operator -= (duration const& other) noexcept
     {
-        m_Value -= other;
+        super::operator-=(other);
         return *this;
     }
 
@@ -169,19 +181,25 @@ public:
 
     // EXTRA
 
-    template <typename Clock, typename Duration> requires std::convertible_to<clock::Source::time_point, std::chrono::time_point<Clock, Duration>>
+    template <typename Clock, typename Duration> //requires std::convertible_to<clock::Source::time_point, std::chrono::time_point<Clock, Duration>>
     [[nodiscard]] operator std::chrono::time_point<Clock, Duration> () const
     {
-        return std::chrono::time_point<Clock, Duration>{ clock::epoch() } + std::chrono::duration_cast<Duration>(this->time_since_epoch());
+        return std::chrono::time_point<Clock, Duration>{ std::chrono::duration_cast<Duration>(std::chrono::clock_cast<Clock>(clock::epoch()).time_since_epoch()) + std::chrono::duration_cast<Duration>(this->time_since_epoch()) };
     }
 
-    constexpr auto operator <=> (clock::duration const& duration) const
-    {
-        return time_since_epoch() <=> duration;
-    }
+    //template <typename Rep, typename Period> //requires std::convertible_to<clock::Source::time_point::duration, std::chrono::duration<Rep, Period>>
+    //[[nodiscard]] operator std::chrono::duration<Rep, Period> () const
+    //{
+    //    return std::chrono::duration_cast<std::chrono::duration<Rep, Period>>(clock::epoch().time_since_epoch()) + std::chrono::duration_cast<std::chrono::duration<Rep, Period>>(this->time_since_epoch());
+    //}
+
+    //constexpr auto operator <=> (clock::duration const& duration) const
+    //{
+    //    return time_since_epoch() <=> duration;
+    //}
     
 private:
 
-    duration m_Value{};
+    //duration m_Value{};
 
 };

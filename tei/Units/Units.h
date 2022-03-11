@@ -182,7 +182,7 @@ namespace tei::internal::unit
 	{
 		return {
 			position + other.position,
-			scale * other.scale,
+			{ scale.x * other.scale.x, scale.y * other.scale.y },
 			rotation + other.rotation,
 		};
 	}
