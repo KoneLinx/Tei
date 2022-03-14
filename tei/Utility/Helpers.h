@@ -183,4 +183,38 @@ namespace tei::internal::utility
 		bool m_Updated{ true };
 	};
 
+	template <typename>
+	concept Auto = true;
+
+	template <typename It, typename Sentinel>
+	auto SubrangeFromPair(std::pair<It, Sentinel> range)
+	{
+		return std::ranges::subrange{ range.first, range.second };
+	}
+
+	class AnyRef
+	{
+	public:
+
+		inline AnyRef(auto& value) noexcept
+			: m_Data{ std::addressof(value) }
+		{}
+
+		template <typename T>
+		inline operator T () noexcept
+		{
+			return static_cast<T*>(m_Data);
+		}
+
+		template <typename T>
+		inline operator T const () const noexcept
+		{
+			return static_cast<T*>(m_Data);
+		}
+
+	private:
+
+		void* m_Data;
+	};
+
 }

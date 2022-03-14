@@ -17,15 +17,13 @@ namespace tei::internal::input
 	public:
 
 		template <std::invocable<Data const&> Action>
-		Command(InputType input, Action action, bool onChangeOnly = true);
+		Command(InputType input, Action action);
 		
 		template <typename UserData, std::invocable<Data const&, UserData&> Action>
-		Command(InputType input, Action action, UserData&& userdata, bool onChangeOnly = true);
+		Command(InputType input, Action action, UserData&& userdata);
 		
 		InputType GetInputType() const noexcept;
 		void SetInputType(InputType) noexcept;
-		
-		bool OnChangeOnly() const noexcept;
 
 		bool HasUserData() const noexcept; 
 		template <typename UserData>
@@ -40,7 +38,6 @@ namespace tei::internal::input
 		InputType m_InputType;
 		std::function<void(Data const&)> const m_Action;
 		std::any m_Data;
-		bool m_ChangeOnly;
 	};
 
 	using CommandBinary = Command<InputBinary>;
@@ -50,23 +47,21 @@ namespace tei::internal::input
 
 	template <typename InputType, typename Data>
 	template <std::invocable<Data const&> Action>
-	inline Command<InputType, Data>::Command(InputType input, Action action, bool onChangeOnly)
+	inline Command<InputType, Data>::Command(InputType input, Action action)
 		: m_InputType{ input }
 		, m_Data{}
 		, m_Action{ std::move(action) }
-		, m_ChangeOnly{ onChangeOnly }
 	{}
 
 	template<typename InputType, typename Data>
 	template<typename UserData, std::invocable<Data const&, UserData&> Action>
-	inline Command<InputType, Data>::Command(InputType input, Action action, UserData&& data, bool onChangeOnly)
+	inline Command<InputType, Data>::Command(InputType input, Action action, UserData&& data)
 		: Command{
 			input, 
 			[action = std::move(action), this] (InputType const& input)
 			{
 				action(input, std::any_cast<UserData&>(this->m_Data));
-			}, 
-			onChangeOnly
+			}
 		}
 	{}
 
@@ -80,12 +75,6 @@ namespace tei::internal::input
 	inline void Command<InputType, Data>::SetInputType(InputType input) noexcept
 	{
 		m_InputType = input;
-	}
-
-	template<typename InputType, typename Data>
-	inline bool Command<InputType, Data>::OnChangeOnly() const noexcept
-	{
-		return m_ChangeOnly;
 	}
 
 	template<typename InputType, typename Data>

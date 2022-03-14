@@ -11,36 +11,67 @@ namespace tei::internal::input
 		CONTROLER,
 	};
 
-	template <typename Data_t>
+	template <typename Data_t, typename State_t>
 	struct InputType
 	{
 		using Data = Data_t;
+		using State = State_t;
 
 		DeviceId deviceId;
+		uint16_t deviceIndex{};
 		uint32_t keyId;
-		uint16_t deviceIndex;
 
-		constexpr InputType(DeviceId deviceId, uint32_t keyId, uint16_t deviceIndex = {}) noexcept;
+		State_t state{};
+
+		bool onChange{ true };
+
+		constexpr InputType(DeviceId deviceId, uint32_t keyId, bool onChange = true, State state = {}, uint16_t deviceIndex = {}) noexcept;
+		constexpr InputType(InputType const&, bool onChange, State state = {}, uint16_t deviceIndex = {}) noexcept;
+		constexpr InputType(InputType const&, State state, uint16_t deviceIndex = {}) noexcept;
 		constexpr InputType(InputType const&, uint16_t deviceIndex) noexcept;
 	};
 
-	using InputBinary = InputType<bool>;
-	using InputAnalog = InputType<float>;
-	using InputAnalog2 = InputType<std::pair<float, float>>;
+	enum struct BinaryState
+	{
+		ANY = BinaryState{},
+		PRESSED, RELEASED
+	};
+
+	using BinaryData = bool;
+	using AnalogData = float;
+	using AnalogState = std::pair<AnalogData, AnalogData>;
+	using Analog2Data = std::pair<AnalogData, AnalogData>;
+	using Analog2State = std::pair<Analog2Data, Analog2Data>;
+
+	using InputBinary = InputType<bool, BinaryState>;
+	using InputAnalog = InputType<AnalogData, AnalogState>;
+	using InputAnalog2 = InputType<Analog2Data, Analog2State>;
 
 	using SomeCommonInputType = std::variant<InputBinary, InputAnalog, InputAnalog2>;
 	using SomeCommonInputData = std::variant<InputBinary::Data, InputAnalog::Data, InputAnalog2::Data>;
 	
-	template<typename Data_t>
-	inline constexpr InputType<Data_t>::InputType(DeviceId deviceId, uint32_t keyId, uint16_t deviceIndex) noexcept
+	template<typename Data_t, typename State_t>
+	inline constexpr InputType<Data_t, State_t>::InputType(DeviceId deviceId, uint32_t keyId, bool onChange, State_t state, uint16_t deviceIndex) noexcept
 		: deviceId{ deviceId }
 		, keyId{ keyId }
 		, deviceIndex{ deviceIndex }
+		, onChange{ onChange }
+		, state{ state }
 	{}
 
-	template<typename Data_t>
-	inline constexpr InputType<Data_t>::InputType(InputType const& toCopy, uint16_t deviceIndex) noexcept
-		: InputType{ toCopy.deviceId, toCopy.keyId, deviceIndex }
+	template<typename Data_t, typename State_t>
+	inline constexpr InputType<Data_t, State_t>::InputType(InputType const& toCopy, bool onChange, State_t state, uint16_t deviceIndex) noexcept
+		: InputType{ toCopy.deviceId, toCopy.keyId, onChange, state, deviceIndex }
+	{}
+
+	template<typename Data_t, typename State_t>
+	inline constexpr InputType<Data_t, State_t>::InputType(InputType const& other, State state, uint16_t deviceIndex) noexcept
+		: InputType{ other.deviceId, other.keyId, true, state, deviceIndex }
+	{}
+
+	template<typename Data_t, typename State_t>
+	inline constexpr InputType<Data_t, State_t>::InputType(InputType const& other, uint16_t deviceIndex) noexcept
+		: InputType{ other.deviceId, other.keyId, true, State{}, deviceIndex }
 	{}
 
 }
