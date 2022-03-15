@@ -165,7 +165,7 @@ namespace tei::internal::resource
 		
 		// Load resource regardless of duplication
 		template <typename Data, typename ... Args> //requires LoadableResource<Data, Args...>
-		[[nodiscard]] Resource<Data> LoadUnique(std::filesystem::path const& filepath, Args&& ...);
+		[[nodiscard]] Resource<Data> LoadUnique(std::filesystem::path const& filepath = {}, Args&& ...);
 
 	private:
 

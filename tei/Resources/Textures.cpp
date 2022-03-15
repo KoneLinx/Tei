@@ -57,7 +57,7 @@ using namespace tei::internal;
 //	delete texture;
 //}
 
-Texture LoadTexture(std::filesystem::path const& path, bool nonempty = true)
+Texture LoadTexture(std::filesystem::path const& path, bool empty = false)
 {
 	static bool init{
 		bool(IMG_Init(IMG_INIT_JPG) & IMG_INIT_JPG) &&
@@ -67,7 +67,7 @@ Texture LoadTexture(std::filesystem::path const& path, bool nonempty = true)
 
 	Texture texture{};
 
-	if (nonempty)
+	if (!empty)
 	{
 		SDL_Texture* pTexture = IMG_LoadTexture(
 			static_cast<SDL_Renderer*>(render::Renderer->GetRenderTraget().pData),
@@ -98,13 +98,13 @@ static constexpr auto  DELETER = [] (auto* pTexture) // Texture or Sprite
 	delete pTexture;
 };
 
-Resource<Texture> Load(ToLoad<Texture>, std::filesystem::path const& path, bool nonempty)
+Resource<Texture> Load(ToLoad<Texture>, std::filesystem::path const& path)
 {
-	return { std::shared_ptr<Texture>{ new Texture{ LoadTexture(path, nonempty) }, DELETER } };
+	return { std::shared_ptr<Texture>{ new Texture{ LoadTexture(path, path.empty()) }, DELETER } };
 }
 
 Resource<Sprite> Load(ToLoad<Sprite>, std::filesystem::path const& path, time::Clock::duration frameduration, int cols, int rows, bool loop, time::Clock::time_point origin)
 {
-	return { std::shared_ptr<Sprite>{ new Sprite{ LoadTexture(path), frameduration, cols, rows, loop, origin }, DELETER } };
+	return { std::shared_ptr<Sprite>{ new Sprite{ LoadTexture(path, path.empty()), frameduration, cols, rows, loop, origin }, DELETER } };
 }
 

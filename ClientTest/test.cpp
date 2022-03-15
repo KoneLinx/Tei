@@ -103,8 +103,8 @@ void TeiClientInit()
 
 			title.AddComponent<tei::components::Observed<std::string>>({ "Splash screen text" });
 			title.AddComponent(tei::Resources->LoadUnique<Font>("resources/Lingua.otf", 32));
-			title.AddComponent(tei::Resources->LoadUnique<Texture>("", 0));
-			title.AddComponent<ObjectTransform>(Position{ 0, -windowScale.y / 2.f / 5.f * 3.f });
+			title.AddComponent(tei::Resources->LoadUnique<Texture>());
+			title.AddComponent<ObjectTransform>(Position{ 0, -windowScale.y / 2 / 5 * 3 });
 			title.AddComponent<TextRenderComponent>();
 		}
 
@@ -113,7 +113,7 @@ void TeiClientInit()
 
 			fps.AddComponent<tei::components::Observed<std::string>>();
 			fps.AddComponent(tei::Resources->LoadUnique<Font>("resources/Lingua.otf", 11));
-			fps.AddComponent(tei::Resources->LoadUnique<Texture>("", 0));
+			fps.AddComponent(tei::Resources->LoadUnique<Texture>());
 			fps.AddComponent<ObjectTransform>(Position{ windowScale / -2.f + 12.f });
 			fps.AddComponent<FpsComponent>();
 			fps.AddComponent<TextRenderComponent>();

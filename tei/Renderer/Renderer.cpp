@@ -125,7 +125,7 @@ void RendererClass::SetVSync(bool synced) const
 
 void RendererClass::DrawTexture(resource::Texture const& texture, unit::Transform const& transform, std::optional<unit::Rectangle> source) const
 {
-	auto const scale = texture.size * transform.scale * (m_TargetScale / 480.f);
+	auto const scale = texture.size * transform.scale;// * (m_TargetScale / 480.f);
 	auto const pos   = m_TargetCenter + transform.position - scale / 2.f;
 
 	auto const angle = sin(transform.rotation).r;
