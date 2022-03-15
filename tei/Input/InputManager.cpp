@@ -3,8 +3,11 @@
 #include <optional>
 #include <limits>
 #include <ranges>
+#include <array>
 
 #include "Controller.h"
+
+#include <SDL.h>
 
 #pragma warning(disable: 5105) // macro error in windows.h
 #define WIN32_LEAN_AND_MEAN
@@ -17,9 +20,22 @@ tei::internal::input::InputManager::Service tei::internal::input::Input{};
 
 using namespace tei::internal::input;
 
+struct Controller
+{
+	XINPUT_STATE currentState{}, previousState{};
+};
+
+struct Keyboard
+{
+	using State = std::array<uint8_t, SDL_NUM_SCANCODES>;
+	State state[2]{};
+	State* currentState{ state }, * previousState{ state + 1 };
+};
+
 struct InputManager::PollData
 {
-	XINPUT_STATE currentState, previousState;
+	Keyboard keyboard;
+	Controller controller;
 };
 
 template <typename InputType>
@@ -30,17 +46,30 @@ bool TestInput(XINPUT_STATE const& state, InputBinary input)
 	return (state.Gamepad.wButtons & input.keyId) != 0;
 }
 
+bool TestInput(Keyboard::State const& state, InputBinary input)
+{
+	return state[input.keyId] != 0;
+}
+
 template <>
 auto TestInput<InputBinary>(InputManager::PollData const& data, InputBinary input)
 {
 	using Ret = std::optional<bool>;
 
-	if (input.deviceId == DeviceId::CONTROLER)
+	switch (input.deviceId)
 	{
-		if (auto state = TestInput(data.currentState, input); !input.onChange || state != TestInput(data.previousState, input))
+	case DeviceId::KEYBOARD:
+	{
+		if (auto state = TestInput(*data.keyboard.currentState, input); !input.onChange || state != TestInput(*data.keyboard.previousState, input))
+			return Ret{ bool(state) };
+	}
+	break;
+	case DeviceId::CONTROLER:
+	{
+		if (auto state = TestInput(data.controller.currentState, input); !input.onChange || state != TestInput(data.controller.previousState, input))
 			return Ret{ bool{ state } };
-		else 
-			return Ret{};
+	}
+	break;
 	}
 	
 	return Ret{};
@@ -62,13 +91,14 @@ auto TestInput<InputAnalog>(InputManager::PollData const& data, InputAnalog inpu
 		switch (input.keyId)
 		{
 		case ControllerInput::Trigger::Index::LEFT:
-			if (!input.onChange || data.currentState.Gamepad.bLeftTrigger != data.previousState.Gamepad.bLeftTrigger)
-				return Ret{ OverMax<InputAnalog::Data>(data.currentState.Gamepad.bLeftTrigger) };
+			if (!input.onChange || data.controller.currentState.Gamepad.bLeftTrigger != data.controller.previousState.Gamepad.bLeftTrigger)
+				return Ret{ OverMax<InputAnalog::Data>(data.controller.currentState.Gamepad.bLeftTrigger) };
+			break;
 		case ControllerInput::Trigger::Index::RIGHT:
-			if (!input.onChange || data.currentState.Gamepad.bRightTrigger != data.previousState.Gamepad.bRightTrigger)
-				return Ret{ OverMax<InputAnalog::Data>(data.currentState.Gamepad.bRightTrigger) };
+			if (!input.onChange || data.controller.currentState.Gamepad.bRightTrigger != data.controller.previousState.Gamepad.bRightTrigger)
+				return Ret{ OverMax<InputAnalog::Data>(data.controller.currentState.Gamepad.bRightTrigger) };
+			break;
 		}
-		return Ret{};
 	}
 
 	return Ret{};
@@ -85,19 +115,20 @@ auto TestInput<InputAnalog2>(InputManager::PollData const& data, InputAnalog2 in
 		switch (input.keyId)
 		{
 		case ControllerInput::Stick::Index::LEFT:
-			if (!input.onChange || data.currentState.Gamepad.sThumbLX != data.previousState.Gamepad.sThumbLX || data.currentState.Gamepad.sThumbLY != data.previousState.Gamepad.sThumbLY)
-			return Ret{{
-				OverMax<Data_t>(data.currentState.Gamepad.sThumbLX),
-				OverMax<Data_t>(data.currentState.Gamepad.sThumbLY)
-			}};
+			if (!input.onChange || data.controller.currentState.Gamepad.sThumbLX != data.controller.previousState.Gamepad.sThumbLX || data.controller.currentState.Gamepad.sThumbLY != data.controller.previousState.Gamepad.sThumbLY)
+				return Ret{{
+					OverMax<Data_t>(data.controller.currentState.Gamepad.sThumbLX),
+					OverMax<Data_t>(data.controller.currentState.Gamepad.sThumbLY)
+				}};
+			break;
 		case ControllerInput::Stick::Index::RIGHT:
-			if (!input.onChange || data.currentState.Gamepad.sThumbRX != data.previousState.Gamepad.sThumbRX || data.currentState.Gamepad.sThumbRY != data.previousState.Gamepad.sThumbRY)
-			return Ret{{
-				OverMax<Data_t>(data.currentState.Gamepad.sThumbRX),
-				OverMax<Data_t>(data.currentState.Gamepad.sThumbRY)
-			}};
+			if (!input.onChange || data.controller.currentState.Gamepad.sThumbRX != data.controller.previousState.Gamepad.sThumbRX || data.controller.currentState.Gamepad.sThumbRY != data.controller.previousState.Gamepad.sThumbRY)
+				return Ret{{
+					OverMax<Data_t>(data.controller.currentState.Gamepad.sThumbRX),
+					OverMax<Data_t>(data.controller.currentState.Gamepad.sThumbRY)
+				}};
+			break;
 		}
-		return Ret{};
 	}
 
 	return Ret{};
@@ -124,8 +155,14 @@ void InputManager::ProcessInput()
 {
 	InputManager::PollData& data{ *m_PollData };
 
-	data.previousState = std::exchange(data.currentState, {});
-	XInputGetState(0, &data.currentState);
+	int stateSize{};
+	uint8_t const* stateData{ SDL_GetKeyboardState(&stateSize) };
+	std::swap(data.keyboard.previousState, data.keyboard.currentState);
+	std::ranges::copy_n(stateData, stateSize, data.keyboard.currentState->data());
+	std::ranges::fill_n(data.keyboard.currentState->data() + stateSize, data.keyboard.currentState->size() - stateSize, uint8_t{});
+
+	data.controller.previousState = std::exchange(data.controller.currentState, {});
+	XInputGetState(0, &data.controller.currentState);
 
 	std::apply(
 		[&] (auto& ... lists) 

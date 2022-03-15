@@ -228,6 +228,7 @@
     <ClCompile Include="Core\main.cpp" />
     <ClCompile Include="Input\InputManager.cpp" />
     <ClCompile Include="Input\InputType.cpp" />
+    <ClCompile Include="Input\Keyboard.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
     <ClCompile Include="Resources\Audio.cpp" />
     <ClCompile Include="Resources\Fonts.cpp" />
@@ -237,7 +238,7 @@
     <ClCompile Include="Components\TextureComponent.cpp" />
     <ClCompile Include="Extra\StaticEngineResources.cpp" />
     <ClCompile Include="Components\TextComponent.cpp" />
-    <ClCompile Include="Subject.cpp" />
+    <ClCompile Include="Components\Subject.cpp" />
     <ClCompile Include="Time\Clock.cpp" />
     <ClCompile Include="Time\Time.cpp" />
     <ClCompile Include="Components\Transform.cpp" />
@@ -260,6 +261,7 @@
     <ClInclude Include="include\tei\internal\core.h" />
     <ClInclude Include="Input\InputManager.h" />
     <ClInclude Include="Input\InputType.h" />
+    <ClInclude Include="Input\Keyboard.h" />
     <ClInclude Include="Renderer\Renderer.h" />
     <ClInclude Include="Resources\Audio.h" />
     <ClInclude Include="Resources\Fonts.h" />
@@ -279,7 +281,7 @@
     <ClInclude Include="Components\TextureComponent.h" />
     <ClInclude Include="Extra\StaticEngineResources.h" />
     <ClInclude Include="Components\TextComponent.h" />
-    <ClInclude Include="Subject.h" />
+    <ClInclude Include="Components\Subject.h" />
     <ClInclude Include="Time\Chrono.h" />
     <ClInclude Include="Time\Clock.h" />
     <ClInclude Include="Time\Clock.impl.h" />

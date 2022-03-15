@@ -70,7 +70,6 @@ void TeiClientInit()
 			}
 		}
 
-
 		{
 			auto& title = root.AddChild();
 
@@ -80,21 +79,22 @@ void TeiClientInit()
 			title.AddComponent<ObjectTransform>({ { Position{ 0, -.66f }, Scale{ .2f, .2f } } });
 			title.AddComponent<TextRenderComponent>();
 		}
-	}
+
 #endif
 
-	{
-		auto& fps = tei::Scene->AddChild();
+		{
+			auto& fps = tei::Scene->AddChild();
 
-		fps.AddComponent<tei::components::Observed<std::string>>();
-		fps.AddComponent(tei::Resources->LoadUnique<Font>("resources/Lingua.otf", 11));
-		fps.AddComponent(tei::Resources->LoadUnique<Texture>("", 0));
-		fps.AddComponent<ObjectTransform>({ { Position{ -.95f, -.95f }, Scale{ .05f, .05f } } });
-		fps.AddComponent<FpsComponent>();
-		fps.AddComponent<TextRenderComponent>();
+			fps.AddComponent<tei::components::Observed<std::string>>();
+			fps.AddComponent(tei::Resources->LoadUnique<Font>("resources/Lingua.otf", 11));
+			fps.AddComponent(tei::Resources->LoadUnique<Texture>("", 0));
+			fps.AddComponent<ObjectTransform>({ { Position{ -.95f, -.95f }, Scale{ .05f, .05f } } });
+			fps.AddComponent<FpsComponent>();
+			fps.AddComponent<TextRenderComponent>();
+		}
+
 	}
 
-	auto& scene = *tei::Scene.operator->();
 }
 
 void TeiClientCleanup()

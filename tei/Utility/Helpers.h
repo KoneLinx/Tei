@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <ranges>
+#include <cassert>
 
 namespace tei::internal::utility
 {
@@ -196,25 +197,42 @@ namespace tei::internal::utility
 	{
 	public:
 
-		inline AnyRef(auto& value) noexcept
+		// Only const for now
+
+		inline AnyRef(auto const& value) noexcept
 			: m_Data{ std::addressof(value) }
+#if defined(DEBUG) || defined(_DEBUG)
+			, m_Type{ &typeid(value) }
+#endif
 		{}
 
+		//template <typename T>
+		//inline operator T& () noexcept
+		//{
+		//	return cast<T>();
+		//}
+
 		template <typename T>
-		inline operator T () noexcept
+		inline operator T const& () const noexcept
 		{
-			return static_cast<T*>(m_Data);
+			return cast<T const>();
 		}
 
 		template <typename T>
-		inline operator T const () const noexcept
+		T const& cast() const
 		{
-			return static_cast<T*>(m_Data);
+			assert(typeid(T) == *m_Type);
+			return *static_cast<T*>(m_Data);
 		}
 
 	private:
 
-		void* m_Data;
+		void const* m_Data;
+
+#if defined(DEBUG) || defined(_DEBUG)
+		std::type_info const* m_Type;
+#endif 
+
 	};
 
 }
