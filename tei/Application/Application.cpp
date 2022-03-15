@@ -23,10 +23,8 @@ using namespace std::literals;
 #define m_SDLWindow utility::RefAs<SDL_Window>(m_Window.pData)
 
 Application::Application(int argc, char const* const* argv)
-	: m_Args{ 
-		argv,
-		argv + (argv != nullptr ? argc : 0) 
-	}
+	: m_Args{ argv, argv + (argv != nullptr ? argc : 0) }
+	, m_Window{}
 {
 	METRICS_TIMEBLOCK;
 
@@ -51,27 +49,77 @@ Application::~Application()
 	SDL_Quit();
 }
 
-void Application::SetFullscreen(bool state, bool fake)
+void Application::Update()
 {
-	METRICS_TIMEBLOCK;
-	SDL_SetWindowFullscreen(m_SDLWindow, state ? (fake ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_FULLSCREEN) : 0);
-	SDL_GetWindowSize(m_SDLWindow, &m_Window.w, &m_Window.h);
-	SDL_GetWindowPosition(m_SDLWindow, &m_Window.x, &m_Window.y);
+	int x{}, y{};
+	SDL_GetWindowSize(m_SDLWindow, &x, &y);
+	m_Window.transform.scale.x = float(x), m_Window.transform.scale.y = float(y);
+	SDL_GetWindowPosition(m_SDLWindow, &x, &y);
+	m_Window.transform.position.x = float(x), m_Window.transform.position.y = float(y);
 }
 
-void Application::SetWindowSize(int width, int height)
+void Application::SetWindowProperty(unit::Scale size)
 {
-	auto old{ m_Window };
-	SDL_SetWindowSize(m_SDLWindow, width, height);
-	SDL_GetWindowSize(m_SDLWindow, &m_Window.w, &m_Window.h);
-	SDL_SetWindowPosition(m_SDLWindow, old.x + (old.w - m_Window.w) / 2, old.y + (old.h - m_Window.h) / 2);
-	SDL_GetWindowPosition(m_SDLWindow, &m_Window.x, &m_Window.y);
+	auto old{ m_Window.transform };
+	int x{}, y{};
+	SDL_SetWindowSize(m_SDLWindow, int(size.x), int(size.y));
+	SDL_GetWindowSize(m_SDLWindow, &x, &y);
+	m_Window.transform.scale.x = float(x), m_Window.transform.scale.y = float(y);
+	SDL_SetWindowPosition(m_SDLWindow, int(old.position.x + (old.scale.x - m_Window.transform.scale.x) / 2), int(old.position.y + (old.scale.y - m_Window.transform.scale.y) / 2));
+	Update();
 }
 
-void Application::SetWindowBorder(bool state)
+void Application::SetWindowProperty(unit::Position pos)
 {
-	SDL_SetWindowBordered(m_SDLWindow, state ? SDL_TRUE : SDL_FALSE);
-	SDL_SetWindowResizable(m_SDLWindow, SDL_TRUE);
+	SDL_SetWindowPosition(m_SDLWindow, int(pos.x), int(pos.y));
+	Update();
+}
+
+void Application::SetWindowProperty(unit::Transform transform)
+{
+	SDL_SetWindowSize(m_SDLWindow, int(transform.scale.x), int(transform.scale.y));
+	SDL_SetWindowPosition(m_SDLWindow, int(transform.position.x), int(transform.position.y));
+	Update();
+}
+
+void Application::SetWindowProperty(WindowProperty property)
+{
+	switch (property)
+	{
+	case tei::internal::application::WindowProperty::BORDERED:
+		SDL_SetWindowBordered(m_SDLWindow, SDL_TRUE);
+		break;
+	case tei::internal::application::WindowProperty::UNBORDERED:
+		SDL_SetWindowBordered(m_SDLWindow, SDL_FALSE);
+		break;
+	case tei::internal::application::WindowProperty::RESIZABLE:
+		SDL_SetWindowResizable(m_SDLWindow, SDL_TRUE);
+		break;
+	case tei::internal::application::WindowProperty::FIXED:
+		SDL_SetWindowResizable(m_SDLWindow, SDL_FALSE);
+		break;
+	case tei::internal::application::WindowProperty::FULLSCREEN:
+		SDL_SetWindowFullscreen(m_SDLWindow, SDL_WINDOW_FULLSCREEN);
+		break;
+	case tei::internal::application::WindowProperty::FULLSCREEN_FAKE:
+		SDL_SetWindowFullscreen(m_SDLWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		break;
+	case tei::internal::application::WindowProperty::MAXIMISED:
+		SDL_MaximizeWindow(m_SDLWindow);
+		break;
+	case tei::internal::application::WindowProperty::MINIMISED:
+		SDL_MinimizeWindow(m_SDLWindow);
+		break;
+	case tei::internal::application::WindowProperty::RESTORED:
+		SDL_RestoreWindow(m_SDLWindow);
+		SDL_SetWindowAlwaysOnTop(m_SDLWindow, SDL_FALSE);
+		break;
+	case tei::internal::application::WindowProperty::ALWAYS_IN_FRONT:
+		SDL_SetWindowAlwaysOnTop(m_SDLWindow, SDL_TRUE);
+		break;
+	}
+	
+	Update();
 }
 
 void Application::Quit() const
@@ -99,10 +147,7 @@ void Application::OpenWindow()
 	if (m_SDLWindow == nullptr)
 		throw utility::TeiRuntimeError{ "Could not create SDL Window", SDL_GetError() };
 
-	SDL_SetWindowBordered(m_SDLWindow, SDL_FALSE);
-
-	SDL_GetWindowSize(m_SDLWindow, &m_Window.w, &m_Window.h);
-	SDL_GetWindowPosition(m_SDLWindow, &m_Window.x, &m_Window.y);
+	SetWindowProperty(WindowProperty::UNBORDERED);
 
 	auto& renderer{ render::Renderer.Register(new render::RendererClass{ m_Window }) };
 
@@ -111,9 +156,11 @@ void Application::OpenWindow()
 	ImGui_ImplSDLRenderer_Init(target);
 	ImGui_ImplSDL2_InitForSDLRenderer(m_SDLWindow, target);
 
+	auto splash = extra::resources::EngineLoaderBackground();
+
 	renderer.Update();
 	renderer.Clear();
-	renderer.DrawTexture(extra::resources::EngineLoaderBackground(), unit::Scale{2, 2});
+	renderer.DrawTexture(splash, unit::Scale{ m_Window.transform.scale.x / splash.size.x * 2.f });
 	renderer.Present();
 
 }

@@ -6,9 +6,27 @@
 #include <span>
 
 #include <tei/internal/utility.h>
+#include <tei/unit.h>
 
 namespace tei::internal::application
 {
+
+	enum struct WindowProperty
+	{
+		BORDERED,
+		UNBORDERED,
+
+		RESIZABLE,
+		FIXED,
+
+		FULLSCREEN,
+		FULLSCREEN_FAKE,
+		MAXIMISED,
+		MINIMISED,
+		RESTORED,
+		ALWAYS_IN_FRONT,
+
+	};
 
 	class Application
 	{
@@ -21,12 +39,15 @@ namespace tei::internal::application
 
 		~Application();
 
+		void Update();
+
 		inline auto const& GetWindow() const
 		{ return m_Window; }
 
-		void SetFullscreen(bool state, bool fake = false);
-		void SetWindowSize(int width, int height);
-		void SetWindowBorder(bool state);
+		void SetWindowProperty(unit::Scale);
+		void SetWindowProperty(unit::Position);
+		void SetWindowProperty(unit::Transform);
+		void SetWindowProperty(WindowProperty);
 
 		inline std::span<std::string_view const> Args() const
 		{ return m_Args; }
@@ -36,8 +57,7 @@ namespace tei::internal::application
 		struct Window
 		{
 			void* pData;
-			int x, y;
-			int w, h;
+			unit::Transform transform;
 		};
 
 	private:
@@ -48,8 +68,8 @@ namespace tei::internal::application
 		void InitAudio();
 		void ExitAudio();
 
-		std::vector<std::string_view> const m_Args{};
-		Window m_Window{};
+		std::vector<std::string_view> const m_Args;
+		Window m_Window;
 
 	public:
 
@@ -66,6 +86,10 @@ namespace tei::internal::application
 
 namespace tei::external
 {
+	namespace application
+	{
+		using tei::internal::application::WindowProperty;
+	}
 
 	static constexpr auto const& Application { tei::internal::application::ApplicationService };
 
