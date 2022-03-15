@@ -8,6 +8,9 @@
 
 #include <ImGui.h>
 
+#include <barrier>
+#include <latch>
+
 using namespace tei::internal::core;
 
 using namespace tei::internal;
@@ -15,103 +18,140 @@ using namespace tei::literals;
 
 utility::Static<CoreFunction> tei::internal::core::Core{};
 
-void CoreFunction::GameLoop()
+enum struct FrameUpdateType : size_t
 {
-	auto& frame = time::Time->frame;
-	auto current = frame.now = Clock::now();
+	RENDER        = 1ull << 0,
+	FREE_UPDATE   = 1ull << 1,
+	FIXED_UPDATE  = 1ull << 2,
+	EVENTS        = 1ull << 3,
 
-	while (m_IsRunning)
-	{
-		METRICS_TIMEBLOCK;
+	FRAME         = RENDER | EVENTS | FREE_UPDATE,
+	FIXED         = FIXED_UPDATE,
+};
 
-		time::Time->global.now = current = Clock::now();
-
-		if (frame.fixed)
-		{
-			frame.lag = current - frame.now;
-			frame.now += frame.delta = frame.step;
-
-			if (!frame.allow_drop || frame.lag < frame.step)
-				FrameUpdate();
-
-			if (m_IsRunning && frame.lag < frame.step)
-				std::this_thread::sleep_until(frame.now);
-		}
-		else
-		{
-			frame.lag = {};
-			frame.delta = current - frame.now;
-			frame.now = current;
-
-			FrameUpdate();
-		}
-	}
+bool operator == (FrameUpdateType a, FrameUpdateType b)
+{
+	using Int = std::underlying_type_t<FrameUpdateType>;
+	return (Int(a) & Int(b)) != 0;
 }
 
-void CoreFunction::FrameUpdate()
+
+void FrameUpdate(bool& isRunning, FrameUpdateType updateType)
 {
 	METRICS_TIMEBLOCK;
 
-	// Update
+	if (isRunning && updateType == FrameUpdateType::EVENTS)
 	{
-
 		SDL_Event e{};
 		while (SDL_PollEvent(&e))
 		{
 			ImGui_ImplSDL2_ProcessEvent(&e);
 			if (e.type == SDL_QUIT)
-				Stop();
+				Core->Stop();
 		}
-
 		input::Input->ProcessInput();
-		//events::Events->Update();
-
-		if (!m_IsRunning) return;
-
-		scene::Scene->Do(ecs::Message::UPDATE);
-
-		if (!m_IsRunning) return;
-
-		audio::Audio->Update();
-		render::Renderer->Update();
+		//events::Event->Update();
 	}
-
-	// Render
+	if (isRunning && updateType == FrameUpdateType::FREE_UPDATE)
 	{
+		scene::Scenes->Do(ecs::Message::UPDATE);
+		application::ApplicationService->Update();
+		audio::Audio->Update();
+	}
+	if (isRunning && updateType == FrameUpdateType::FIXED_UPDATE)
+	{
+		scene::Scenes->Do(ecs::Message::FIXEDUPDATE);
+	}
+	if (isRunning && updateType == FrameUpdateType::RENDER)
+	{
+		render::Renderer->Update();
 		render::Renderer->Clear();
-		scene::Scene->Do(ecs::Message::RENDER);
+		scene::Scenes->Do(ecs::Message::RENDER);
 		render::Renderer->Present();
 	}
 
+}
+
+void GameLoop(bool& isRunning, auto& time, FrameUpdateType updateType)
+{
+	//auto& time = time::Time->frame;
+	auto current = time.now = time::Clock::now();
+
+	while (isRunning)
+	{
+		METRICS_TIMEBLOCK;
+
+		time::Time->global.now = current = time::Clock::now();
+
+		if (time.fixed)
+		{
+			time.lag = current - time.now;
+			time.now += time.delta = time.step;
+
+			if (!time.allow_drop || time.lag < time.step)
+				FrameUpdate(isRunning, updateType);
+
+			if (isRunning && time.lag < time.step)
+				std::this_thread::sleep_until(time.now);
+		}
+		else
+		{
+			time.lag = {};
+			time.delta = current - time.now;
+			time.now = current;
+
+			FrameUpdate(isRunning, updateType);
+		}
+	}
 }
 
 void CoreFunction::Run()
 {
 	METRICS_TIMEBLOCK;
 
+	bool isRunning{ true };
+	m_IsRunning = &isRunning;
+
 	// Services
 	resource::Resources.Register(new resource::ResourceManager{});
 	audio::Audio.Register(new audio::SDLAudio{});
 	input::Input.Register(new input::InputManager{});
-	//events::Events.Register(new events::EventManager{});
-	scene::Scene.Register(new ecs::Object{ ecs::CreateRoot() });
-
-	// Resource loaders
-	//resource::Resources->AddLoader(new resource::prefab::TextureLoader{});
-	//resource::Resources->AddLoader(new resource::prefab::FontsLoader{});
-	//resource::Resources->AddLoader(new resource::prefab::AudioLoader{});
+	events::Event.Register(new components::Subject{});
+	scene::Scenes.Register(new scene::SceneManager{});
 
 	//std::this_thread::sleep_for(1.5_s);
-	application::ApplicationService->SetWindowBorder(true);
+	application::ApplicationService->SetWindowProperty(application::WindowProperty::BORDERED);
 
 	// Client init
 	TeiClientInit();
 
 	// Game
-	GameLoop();
+	{
+		std::latch sync{ 2 };
+
+		std::jthread fixed{
+			[&isRunning, &sync]
+			{
+				METRICS_TIMEBLOCK;
+				time::Time->thread = &time::Time->fixed;
+				sync.arrive_and_wait();
+				GameLoop(isRunning, time::Time->fixed, FrameUpdateType::FIXED);
+			}
+		};
+		
+		// render
+		[&isRunning, &sync]
+		{
+			METRICS_TIMEBLOCK;
+			sync.arrive_and_wait();
+			time::Time->thread = &time::Time->frame;
+			GameLoop(isRunning, time::Time->frame, FrameUpdateType::FRAME);
+		}
+		();
+	}
 
 	// Clear scenes
-	scene::Scene.Register(nullptr);
+	scene::Scenes.Register(nullptr);
 
 	// Client quit
 	TeiClientCleanup();
@@ -119,7 +159,7 @@ void CoreFunction::Run()
 	// Clear services
 	resource::Resources.Register(nullptr);
 	input::Input.Register(nullptr);
-	//events::Events.Register(nullptr);
+	events::Event.Register(nullptr);
 	audio::Audio.Register(nullptr);
 
 	// End
@@ -127,5 +167,5 @@ void CoreFunction::Run()
 
 void CoreFunction::Stop()
 {
-	m_IsRunning = false;
+	*m_IsRunning = false;
 }

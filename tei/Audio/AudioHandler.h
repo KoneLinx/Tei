@@ -56,7 +56,7 @@ namespace tei::internal::audio
 
 namespace tei::external
 {
-	constexpr static auto const& Audio{ tei::internal::audio::Audio };
+	inline constexpr auto const& Audio{ tei::internal::audio::Audio };
 }
 
 #pragma region _impl

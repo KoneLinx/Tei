@@ -17,4 +17,7 @@ namespace tei::internal::time
 			}
 		}
 	};
+
+	thread_local TimeOject::Thread const* TimeOject::thread{};
+
 }

@@ -221,6 +221,7 @@
     <ClCompile Include="Audio\AudioHandler.cpp" />
     <ClCompile Include="Audio\DebugAudio.cpp" />
     <ClCompile Include="Audio\SDLAudio.cpp" />
+    <ClCompile Include="Events\Events.cpp" />
     <ClCompile Include="Input\Controller.cpp" />
     <ClCompile Include="Input\Command.cpp" />
     <ClCompile Include="ECS\Object.cpp" />
@@ -250,6 +251,8 @@
     <ClInclude Include="Audio\DebugAudio.h" />
     <ClInclude Include="Audio\SDLAudio.h" />
     <ClInclude Include="Components\RefComponent.h" />
+    <ClInclude Include="Events\Events.h" />
+    <ClInclude Include="include\tei\event.h" />
     <ClInclude Include="include\tei\input.h" />
     <ClInclude Include="Input\Controller.h" />
     <ClInclude Include="Input\Command.h" />

@@ -5,14 +5,6 @@
 
 #include <cassert>
 
-namespace tei::internal::ecs
-{
-	Object CreateRoot()
-	{
-		return Object{ nullptr, true };
-	}
-}
-
 using namespace tei::internal::ecs;
 
 Object::Object(Object* pParent, bool active)
@@ -29,7 +21,7 @@ Object::~Object()
 	Do(Message::CLEANUP);
 }
 
-void Object::SetState(bool state) noexcept
+void Object::SetState(bool state) 
 {
 	m_State = state;
 }
@@ -37,37 +29,39 @@ void Object::SetState(bool state) noexcept
 Object& Object::AddChild(bool active)
 {
 	METRICS_TIMEBLOCK;
-	return m_Children.emplace_back(Object{ this, active });
+	return *m_Children.emplace_back(new Object{ this, active });
 }
 
 void Object::RemoveChild(Object const& child)
 {
-	auto it{ std::ranges::find(m_Children, &child, utility::addressof_projector{})};
+	auto it{ std::ranges::find(m_Children, &child, utility::wrapped_ptr_projector{})};
 	m_Children.erase(it);
 }
 
-void Object::AddComponent(Component<>* pComp, Handle pHandle)
+void Object::AddComponent(std::type_index type, Component<>* pComp, Handle pHandle)
 {	
 	METRICS_TIMEBLOCK;
 	m_Components.push_back({
+		type,
 		std::unique_ptr<Component<>>{ pComp },
 		pHandle
 	});
+	pHandle(*pComp, Message::INIT, *this);
 }
 
-typename decltype(Object::m_Components)::const_iterator Object::GetComponent(Handle handle) const noexcept
+typename decltype(Object::m_Components)::const_iterator Object::GetComponent(std::type_index type) const
 {
 	METRICS_TIMEBLOCK;
-	return std::ranges::find(m_Components, handle, utility::tuple_index_projector<1>{});
+	return std::ranges::find(m_Components, type, utility::tuple_index_projector<0>{});
 }
 
-std::unique_ptr<Object::Component<>> tei::internal::ecs::Object::ExtractComponent(Handle pHandle)
+std::unique_ptr<Object::Component<>> tei::internal::ecs::Object::ExtractComponent(std::type_index type)
 {
-	auto constIt{ GetComponent(pHandle) };
+	auto constIt{ GetComponent(type) };
 	if (constIt == m_Components.cend())
 		throw utility::TeiRuntimeError{ "No such component found in object" };
 	auto it{ m_Components.begin() + std::distance(m_Components.cbegin(), constIt) };
-	auto uptr{ std::move(it->first) };
+	auto uptr{ std::move(std::get<1>(*it)) };
 	m_Components.erase(it);
 	return uptr;
 }
@@ -93,7 +87,6 @@ void Object::Do(Message message)
 			return;
 		if (!m_Initialised)
 			Do(INIT);
-		m_Active = true;
 	}
 	break;
 	case UPDATE:
@@ -104,19 +97,28 @@ void Object::Do(Message message)
 			return;
 	}
 	break;
+	case RENDER:
+	{
+		if (!m_Active)
+			return;
+	}
+	break;
 	}
 
-	for (auto& [pComp, pHandle] : utility::RangePerIndex(m_Components) /* Mutation safe */) // False intelisense error
-		pHandle(*pComp, message, *this);
-
-	// TODO move bools out of object on heap into cache!
+	for (auto& [type, pComp, handle] : utility::RangePerIndex(m_Components)) // False intelisense error
+		handle(*pComp, message, *this);
 
 	for (auto& child : m_Children)
-		if (child.m_Active || message == ENABLE || message == CLEANUP || message == UPDATE)
-			child.Do(message);
+		if (child || message == ENABLE || message == CLEANUP || message == UPDATE)
+			child->Do(message);
 
 	switch (message)
 	{
+	case ENABLE:
+	{
+		m_Active = true;
+	}
+	break;
 	case INIT:
 	{
 		m_Initialised = true;
@@ -152,17 +154,18 @@ Object::Object(Object const& other)
 		std::back_inserter(m_Components),
 		[] (cref_type val) -> value_type
 		{
-			return { val.first->Clone(), val.second };
+			auto const& [type, pValue, handle] = val;
+			return { type, pValue->Clone(), handle };
 		}
 	);
 
-	//m_Children.reserve(std::ranges::size(other.m_Children));
 	std::ranges::transform(
 		other.m_Children,
 		std::back_inserter(m_Children),
-		[] (Object const& obj) -> Object
+		[] (Object const& obj) -> std::unique_ptr<Object>
 		{
-			return { obj };
-		}
+			return std::unique_ptr<Object>{ new Object{ obj } };
+		},
+		utility::wrapped_ptr_projector<true>{}
 	);
 }

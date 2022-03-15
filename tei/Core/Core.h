@@ -15,10 +15,7 @@ namespace tei::internal::core
 
 	private:
 
-		void GameLoop();
-		void FrameUpdate();
-
-		bool m_IsRunning{ true };
+		bool* m_IsRunning{};
 
 	};
 

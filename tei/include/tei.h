@@ -9,6 +9,7 @@
 #include "tei/unit.h"
 #include "tei/components.h"
 #include "tei/input.h"
+#include "tei/event.h"
 
 namespace tei
 {

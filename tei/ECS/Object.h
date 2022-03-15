@@ -1,13 +1,20 @@
 #pragma once
 
+#include <utility>
 #include <vector>
 #include <memory>
 #include <ranges>
 #include <array>
 #include <span>
 #include <list>
+#include <typeindex>
 
 #include <tei/internal/utility.h>
+
+namespace tei::internal::scene
+{
+	class SceneManager;
+}
 
 namespace tei::internal::ecs
 {
@@ -19,8 +26,16 @@ namespace tei::internal::ecs
 		ENABLE,
 		DISABLE,
 		UPDATE,
-		RENDER,
-		_COUNT
+		FIXEDUPDATE,
+		RENDER
+	};
+
+	namespace detail
+	{
+
+		template <typename>
+		concept Component = true;
+
 	};
 
 	class Object final
@@ -28,7 +43,7 @@ namespace tei::internal::ecs
 
 		Object(Object* pParent, bool active);
 
-		friend Object CreateRoot();
+		friend class scene::SceneManager;
 
 	public:
 
@@ -37,22 +52,27 @@ namespace tei::internal::ecs
 		Object(Object&& other) = default;
 		Object& operator = (Object&& other) = default;
 
-		bool IsRoot() const noexcept;
-		bool IsActive() const noexcept;
+		bool IsRoot() const;
+		bool IsActive() const;
 
-		operator bool() const noexcept;
+		// IsActive
+		operator bool() const;
 
 		// Set update state
-		void SetState(bool active) noexcept;
+		void SetState(bool active);
 
 		// Add a component
-		template <typename Data>
-		Data& AddComponent(Data data = {});
+		template <detail::Component Data> requires std::movable<Data>
+		Data& AddComponent(Data data);
+		template <detail::Component Data, typename ... Arg> requires std::constructible_from<Data, Arg...>
+		Data& AddComponent(Arg&& ...);
+
 		// Get a component (throws if not present)
-		template <typename Data>
-		Data* GetComponent() const noexcept;
+		template <detail::Component Data>
+		Data* GetComponent() const;
+
 		// Remove a component (throws if not present)
-		template <typename Data>
+		template <detail::Component Data>
 		auto RemoveComponent();
 
 		// Add a child object
@@ -61,18 +81,19 @@ namespace tei::internal::ecs
 		void RemoveChild(Object const& child);
 
 		// Guaranteed, except for root (scene). Null reference for root. 
-		Object& GetParent() noexcept;
-		Object const& GetParent() const noexcept;
+		Object& GetParent();
+		Object const& GetParent() const;
 
 		// View of all children
-		auto GetAllChildren() noexcept;
-		auto GetAllChildren() const noexcept;
+		std::ranges::view auto GetAllChildren();
+		std::ranges::view auto GetAllChildren() const;
+
 		// View of all active children
-		auto GetActiveChildren() noexcept;
-		auto GetActiveChildren() const noexcept;
+		std::ranges::view auto GetActiveChildren();
+		std::ranges::view auto GetActiveChildren() const;
+
 		// View of all inactive children
-		auto GetInactiveChildren() noexcept;
-		auto GetInactiveChildren() const noexcept;
+		std::ranges::view auto GetInactiveChildren() const;
 
 		// Send message down the hirarchy
 		void Do(Message);
@@ -88,20 +109,18 @@ namespace tei::internal::ecs
 		using Handle = void(*)(Component<>&, Message, Object&);
 
 		Object* m_pParent;
-		std::vector<std::pair<std::unique_ptr<Component<>>, Handle>> m_Components;
-		std::list<Object> m_Children;
+		std::vector<std::tuple<std::type_index, std::unique_ptr<Component<>>, Handle>> m_Components;
+		std::vector<std::unique_ptr<Object>> m_Children;
 
 		bool m_Active;
 		bool m_State;
 		bool m_Initialised;
 
-		void AddComponent(Component<>*, Handle);
-		typename decltype(m_Components)::const_iterator GetComponent(Handle) const noexcept;
-		std::unique_ptr<Component<>> ExtractComponent(Handle);
+		void AddComponent(std::type_index, Component<>*, Handle);
+		typename decltype(m_Components)::const_iterator GetComponent(std::type_index) const;
+		std::unique_ptr<Component<>> ExtractComponent(std::type_index);
 
 	};
-
-	Object CreateRoot();
 
 }
 
@@ -113,88 +132,86 @@ namespace tei::external::ecs
 namespace tei::internal::ecs
 {
 
-	inline bool Object::IsRoot() const noexcept
+	inline bool Object::IsRoot() const
 	{
 		return m_pParent == nullptr;
 	}
 	
-	inline bool Object::IsActive() const noexcept
+	inline bool Object::IsActive() const
 	{
 		return m_Active;
 	}
 	
-	inline Object::operator bool() const noexcept
+	inline Object::operator bool() const
 	{
 		return IsActive();
 	}
 
-	template<typename Data>
+	template<detail::Component Data> requires std::movable<Data>
 	inline Data& Object::AddComponent(Data data)
 	{
-		Component<Data>* pComponent{ new Component<Data>{ std::move(data) } };
-		this->AddComponent(pComponent, &Component<Data>::Handle);
+		return AddComponent<Data, Data>(std::move(data));
+	}
+
+	template<detail::Component Data, typename ...Arg> requires std::constructible_from<Data, Arg...>
+	inline Data& ecs::Object::AddComponent(Arg&& ... arg)
+	{
+		Component<Data>* pComponent{ new Component<Data>{ std::forward<Arg>(arg)... } };
+		this->AddComponent(typeid(Data), pComponent, &Component<Data>::Handle);
 		return pComponent->data;
 	}
 	
-	template<typename Data>
-	inline Data* Object::GetComponent() const noexcept
+	template<detail::Component Data>
+	inline Data* Object::GetComponent() const
 	{
-		auto it{ GetComponent(&Component<Data>::Handle) };
+		auto it{ GetComponent(typeid(Data)) };
 		if (it == m_Components.end())
 			return nullptr;
 		else
-			return &static_cast<Component<Data>&>(*it->first).data;
+			return &static_cast<Component<Data>&>(*std::get<1>(*it)).data;
 	}
 	
-	template<typename Data>
+	template<detail::Component Data>
 	inline auto Object::RemoveComponent()
 	{
-		// unique_ptr is to be discarded
-		auto uptr{ ExtractComponent(&Component<Data>::Handle) };
+		[[maybe_unused]] auto uptr{ ExtractComponent(typeid(Data)) };
 		if constexpr (std::movable<Data>)
 			return std::move(static_cast<Component<Data>&>(*uptr).data);
 		else
 			return; // void, unable to move
 	}
 	
-	inline Object& Object::GetParent() noexcept
+	inline Object& Object::GetParent() 
 	{
 		return *m_pParent;
 	}
 
-	inline Object const& Object::GetParent() const noexcept
+	inline Object const& Object::GetParent() const 
 	{
 		return *m_pParent;
 	}
-	
-	inline auto Object::GetAllChildren() noexcept
+
+	inline std::ranges::view auto Object::GetAllChildren()
 	{
-		return std::views::all(m_Children);
+		return std::views::transform(m_Children, utility::wrapped_ptr_projector<true>{});
 	}
-	
-	inline auto Object::GetActiveChildren() noexcept
+	inline std::ranges::view auto Object::GetAllChildren() const
 	{
-		return std::views::filter(GetAllChildren(), std::identity{});
-	}
-	
-	inline auto Object::GetInactiveChildren() noexcept
-	{
-		return std::views::filter(GetAllChildren(), std::logical_not{});
+		return std::views::transform(m_Children, utility::wrapped_ptr_projector<true, true>{});
 	}
 
-	inline auto Object::GetAllChildren() const noexcept
+	inline std::ranges::view auto Object::GetActiveChildren()
 	{
-		return std::views::all(m_Children);
+		return std::views::filter(GetAllChildren(), std::identity{});
 	}
-	
-	inline auto Object::GetActiveChildren() const noexcept
+	inline std::ranges::view auto Object::GetActiveChildren() const
 	{
 		return std::views::filter(GetAllChildren(), std::identity{});
 	}
 	
-	inline auto Object::GetInactiveChildren() const noexcept
+	inline std::ranges::view auto Object::GetInactiveChildren() const
 	{
-		return std::views::filter(GetAllChildren(), std::logical_not{});
+		return std::views::filter(std::views::transform(m_Children, utility::wrapped_ptr_projector<true>{}), std::logical_not{});
 	}
 
 	template <typename Data>
@@ -202,7 +219,8 @@ namespace tei::internal::ecs
 	{
 		Data data;
 
-		Component(Data data);
+		template <typename ... Arg>
+		Component(Arg&& ... arg);
 
 		static void Handle(Component<>&, Message, Object&);
 
@@ -218,8 +236,9 @@ namespace tei::internal::ecs
 	};
 
 	template<typename Data>
-	inline Object::Component<Data>::Component(Data data)
-		: data{ std::move(data) }
+	template <typename ... Arg>
+	inline Object::Component<Data>::Component(Arg&& ... arg)
+		: data{ std::forward<Arg>(arg) ... }
 	{}
 
 	template <typename Data>
@@ -262,6 +281,13 @@ namespace tei::internal::ecs
 			else 
 			if constexpr (requires { ::OnUpdate(data); })
 				::OnUpdate(data);
+			break;
+		case Message::FIXEDUPDATE:
+			if constexpr (requires { ::OnFixedUpdate(data, parent); })
+				::OnFixedUpdate(data, parent);
+			else 
+			if constexpr (requires { ::OnFixedUpdate(data); })
+				::OnFixedUpdate(data);
 			break;
 		case Message::RENDER:
 			if constexpr (requires { ::OnRender(data, parent); })

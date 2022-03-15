@@ -15,13 +15,14 @@
 #endif
 #endif
 
-#ifdef METRICS
-
 #include <chrono>
 #include <thread>
 #include <variant>
-#include <fstream>
 #include <list>
+
+#ifdef METRICS
+
+#include <fstream>
 #include <mutex>
 
 #include <source_location>

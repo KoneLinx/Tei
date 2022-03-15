@@ -9,27 +9,14 @@ namespace tei::internal::time
 	struct TimeOject
 	{
 
-		struct
+		struct Global
 		{
 			Clock::time_point now;
 			Clock::time_point startup;
 		}
 		global;
 
-		struct
-		{
-			Clock::time_point now;
-			Clock::duration	delta;
-			Clock::duration	lag;
-
-			Clock::duration	step;
-			bool fixed;
-			bool allow_drop;
-			bool vsynced;
-		}
-		frame;
-
-		struct
+		struct Thread
 		{
 			Clock::time_point now;
 			Clock::duration	delta;
@@ -39,7 +26,9 @@ namespace tei::internal::time
 			bool fixed;
 			bool allow_drop;
 		}
-		fixed;
+		frame, fixed;
+
+		static thread_local Thread const* thread;
 
 	};
 
@@ -49,5 +38,5 @@ namespace tei::internal::time
 
 namespace tei::external
 {
-	constexpr static auto const& Time{ ::tei::internal::time::Time };
+	inline constexpr auto const& Time{ ::tei::internal::time::Time };
 }
