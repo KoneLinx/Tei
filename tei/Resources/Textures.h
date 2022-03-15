@@ -2,6 +2,7 @@
 
 #include "ResourceManager.h"
 #include <tei/time.h>
+#include <tei/unit.h>
 
 namespace tei::internal::resource
 {
@@ -9,7 +10,7 @@ namespace tei::internal::resource
 	struct Texture
 	{
 		void* pData;
-		int w, h;
+		unit::Scale size;
 
 		operator bool() const noexcept
 		{ return this != nullptr && pData != nullptr; }

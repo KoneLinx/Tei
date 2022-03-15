@@ -24,10 +24,12 @@ void OnUpdate(TextRenderComponent const& comp)
 
 		SDL_Texture* pTexture = SDL_CreateTextureFromSurface(static_cast<SDL_Renderer*>(Renderer->GetRenderTraget().pData), surf);
 
-		if (pTexture == nullptr || SDL_QueryTexture(pTexture, nullptr, nullptr, &texture->w, &texture->h) != 0)
+		int w{}, h{};
+		if (pTexture == nullptr || SDL_QueryTexture(pTexture, nullptr, nullptr, &w, &h) != 0)
 			throw utility::TeiRuntimeError{ "Creating texture from surface failed", SDL_GetError() };
-		
+
 		texture->pData = pTexture;
+		texture->size = { w, h };
 	}
 }
 

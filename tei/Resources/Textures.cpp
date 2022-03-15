@@ -76,16 +76,14 @@ Texture LoadTexture(std::filesystem::path const& path, bool nonempty = true)
 
 		texture.pData = pTexture;
 
-		if (pTexture == nullptr ||
-			SDL_QueryTexture(
-				pTexture,
-				nullptr, nullptr,
-				&texture.w, &texture.h
-			) != 0
-		)
-		{
+		if (pTexture == nullptr)
 			throw utility::TeiRuntimeError{ "Could not load texture: " + path.string(), SDL_GetError() };
-		}
+
+		int w{}, h{};
+		if (SDL_QueryTexture(pTexture, nullptr, nullptr, &w, &h) != 0)
+			throw utility::TeiRuntimeError{ "Could not querry texture: " + path.string(), SDL_GetError() };
+		
+		texture.size = { w, h };
 	}
 
 	return texture;

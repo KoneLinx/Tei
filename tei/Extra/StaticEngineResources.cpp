@@ -23,7 +23,7 @@ tei::internal::resource::Texture tei::internal::extra::resources::EngineLoaderBa
 		texture.reset(SDL_CreateTextureFromSurface(static_cast<SDL_Renderer*>(render::Renderer->GetRenderTraget().pData), surface));
 		SDL_QueryTexture(texture.get(), nullptr, nullptr, &w, &h);
 	}
-	return resource::Texture{ texture.get(), w, h};
+	return resource::Texture{ texture.get(), { w, h }  };
 }
 
 
