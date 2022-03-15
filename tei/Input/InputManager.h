@@ -19,8 +19,11 @@ namespace tei::internal::input
 		InputManager();
 		~InputManager();
 
-		template <typename MyCommand, typename = typename MyCommand::InputType>
-		MyCommand& AddCommand(MyCommand command = {});
+		template <typename InputType>
+		Command<InputType>& AddCommand(Command<InputType> command = {});
+		
+		template <typename InputType, typename Action> requires std::constructible_from<Command<InputType>, InputType, Action>
+		Command<InputType>& AddCommand(InputType input, Action action);
 
 		void ProcessInput();
 
@@ -44,18 +47,24 @@ namespace tei::internal::input
 
 	public:
 
-		using Service = utility::Service<InputManager const>;
+		using Service = utility::Service<InputManager>;
 
 	};
 
 	extern InputManager::Service Input;
 
-	template <typename MyCommand, typename InputType>
-	inline MyCommand& InputManager::AddCommand(MyCommand command)
+	template <typename InputType>
+	inline Command<InputType>& InputManager::AddCommand(Command<InputType> command)
 	{
-		auto* pCommand{ new MyCommand{ std::move(command) } };
+		auto* pCommand{ new Command<InputType>{ std::move(command) } };
 		std::get<std::vector<std::unique_ptr<Command<InputType>>>>(m_Commands).emplace_back(pCommand);
 		return *pCommand;
+	}
+
+	template <typename InputType, typename Action> requires std::constructible_from<Command<InputType>, InputType, Action>
+	inline Command<InputType>& InputManager::AddCommand(InputType input, Action action)
+	{
+		return AddCommand(Command<InputType>{ input, std::move(action) });
 	}
 
 	template<typename InputType>

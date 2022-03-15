@@ -85,7 +85,7 @@ namespace tei::internal::unit
 		operator TranslationMatrix() const   noexcept;
 		operator TransformMatrix  () const   noexcept;
 
-		Transform operator + (Transform const&) const; // Combine
+		TransformMatrix operator * (TransformMatrix const&) const; // Combine
 	};
 
 }
@@ -167,24 +167,20 @@ namespace tei::internal::unit
 	inline Transform::operator TranslationMatrix() const noexcept
 	{
 		return TranslationMatrix{
-			{ },
-			{ },
-			{ position, 0 }
+			{ 1, 0, 0 },
+			{ 0, 1, 0 },
+			{ position, 1 }
 		};
 	}
 
 	inline Transform::operator TransformMatrix() const noexcept
 	{
-		return TransformMatrix{ ScaleMatrix(*this) * RotationMatrix(*this) } * TranslationMatrix(*this);
+		return TranslationMatrix(*this) * TransformMatrix{ RotationMatrix(*this) * ScaleMatrix(*this) } ;
 	}
 
-	inline Transform Transform::operator + (Transform const& other) const
+	inline TransformMatrix Transform::operator * (TransformMatrix const& other) const
 	{
-		return {
-			position + other.position,
-			{ scale.x * other.scale.x, scale.y * other.scale.y },
-			rotation + other.rotation,
-		};
+		return TransformMatrix(*this) * other;
 	}
 
 }

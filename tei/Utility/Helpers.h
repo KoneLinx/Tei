@@ -3,9 +3,12 @@
 #include <functional>
 #include <ranges>
 #include <cassert>
+#include <random>
 
 namespace tei::internal::utility
 {
+
+	extern std::mt19937_64 RNG;
 
 	template <typename To, typename From>
 	inline auto& RefAs(From& var) noexcept
@@ -235,4 +238,9 @@ namespace tei::internal::utility
 
 	};
 
+}
+
+namespace tei::external
+{
+	using tei::internal::utility::RNG;
 }

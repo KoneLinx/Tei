@@ -24,5 +24,5 @@ void OnEnable(ObjectTransform& transform, Object const& object)
 void OnUpdate(ObjectTransform& transform)
 {
 	//if (tranform.requiresUpdate)
-	transform.world = transform.local + transform.parent->world;
+	transform.world = transform.parent->world * transform.local;
 }

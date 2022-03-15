@@ -23,6 +23,7 @@ void OnUpdate(TextRenderComponent const& comp)
 			throw utility::TeiRuntimeError{ "Rendering text failed", SDL_GetError() };
 
 		SDL_Texture* pTexture = SDL_CreateTextureFromSurface(static_cast<SDL_Renderer*>(Renderer->GetRenderTraget().pData), surf);
+		SDL_FreeSurface(surf);
 
 		int w{}, h{};
 		if (pTexture == nullptr || SDL_QueryTexture(pTexture, nullptr, nullptr, &w, &h) != 0)

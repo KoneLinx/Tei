@@ -33,7 +33,7 @@ namespace tei::internal::input
 
 	enum struct BinaryState
 	{
-		ANY = BinaryState{},
+		ANY = 0,
 		PRESSED, RELEASED
 	};
 
@@ -80,6 +80,9 @@ namespace tei::external::input
 {
 	using DeviceId = tei::internal::input::DeviceId;
 	using tei::internal::input::InputBinary;
+	using tei::internal::input::BinaryState;
 	using tei::internal::input::InputAnalog;
+	using tei::internal::input::AnalogState;
 	using tei::internal::input::InputAnalog2;
+	using tei::internal::input::Analog2State;
 }

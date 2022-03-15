@@ -41,12 +41,12 @@ struct InputManager::PollData
 template <typename InputType>
 auto TestInput(InputManager::PollData const&, InputType);
 
-bool TestInput(XINPUT_STATE const& state, InputBinary input)
+bool TestInput(XINPUT_STATE const& state, InputBinary const& input)
 {
 	return (state.Gamepad.wButtons & input.keyId) != 0;
 }
 
-bool TestInput(Keyboard::State const& state, InputBinary input)
+bool TestInput(Keyboard::State const& state, InputBinary const& input)
 {
 	return state[input.keyId] != 0;
 }
@@ -56,23 +56,36 @@ auto TestInput<InputBinary>(InputManager::PollData const& data, InputBinary inpu
 {
 	using Ret = std::optional<bool>;
 
+	bool value{};
+	bool change{ !input.onChange };
+
 	switch (input.deviceId)
 	{
 	case DeviceId::KEYBOARD:
 	{
-		if (auto state = TestInput(*data.keyboard.currentState, input); !input.onChange || state != TestInput(*data.keyboard.previousState, input))
-			return Ret{ bool(state) };
+		change = change || value != TestInput(*data.keyboard.previousState, input);
+		if (change)
+			value  = TestInput(*data.keyboard.currentState, input);
 	}
 	break;
 	case DeviceId::CONTROLER:
 	{
-		if (auto state = TestInput(data.controller.currentState, input); !input.onChange || state != TestInput(data.controller.previousState, input))
-			return Ret{ bool{ state } };
+		change = change || value != TestInput(data.controller.previousState, input);
+		if (change)
+			value  = TestInput(data.controller.currentState, input);
 	}
 	break;
 	}
 	
-	return Ret{};
+	bool state{
+		input.state == BinaryState::ANY ||
+		input.state == (value ? BinaryState::PRESSED : BinaryState::RELEASED)
+	};
+	
+	if (change && state)
+		return Ret{ bool(value) };
+	else
+		return Ret{};
 }
 
 template <typename Decimal, typename Value>
@@ -86,22 +99,40 @@ auto TestInput<InputAnalog>(InputManager::PollData const& data, InputAnalog inpu
 {
 	using Ret = std::optional<InputAnalog::Data>;
 
+	InputAnalog::Data value{};
+	bool change{ !input.onChange };
+
 	if (input.deviceId == DeviceId::CONTROLER)
 	{
 		switch (input.keyId)
 		{
 		case ControllerInput::Trigger::Index::LEFT:
-			if (!input.onChange || data.controller.currentState.Gamepad.bLeftTrigger != data.controller.previousState.Gamepad.bLeftTrigger)
-				return Ret{ OverMax<InputAnalog::Data>(data.controller.currentState.Gamepad.bLeftTrigger) };
-			break;
+		{
+			change = change || data.controller.currentState.Gamepad.bLeftTrigger != data.controller.previousState.Gamepad.bLeftTrigger;
+			if (change)
+				value = OverMax<InputAnalog::Data>(data.controller.currentState.Gamepad.bLeftTrigger);
+		}
+		break;
 		case ControllerInput::Trigger::Index::RIGHT:
-			if (!input.onChange || data.controller.currentState.Gamepad.bRightTrigger != data.controller.previousState.Gamepad.bRightTrigger)
-				return Ret{ OverMax<InputAnalog::Data>(data.controller.currentState.Gamepad.bRightTrigger) };
-			break;
+		{
+			change = change || data.controller.currentState.Gamepad.bRightTrigger != data.controller.previousState.Gamepad.bRightTrigger;
+			if (change)
+				value = OverMax<InputAnalog::Data>(data.controller.currentState.Gamepad.bLeftTrigger);
+		}
+		break;
 		}
 	}
 
-	return Ret{};
+	auto [low, high] = input.state;
+	bool state{
+		low <= value &&
+		value <= high
+	};
+
+	if (change && state)
+		return Ret{ std::move(value) };
+	else
+		return Ret{};
 }
 
 template <>
@@ -110,28 +141,53 @@ auto TestInput<InputAnalog2>(InputManager::PollData const& data, InputAnalog2 in
 	using Data_t = InputAnalog2::Data::first_type;
 	using Ret = std::optional<InputAnalog2::Data>;
 
+	InputAnalog2::Data value{};
+	bool change{ !input.onChange };
+
 	if (input.deviceId == DeviceId::CONTROLER)
 	{
 		switch (input.keyId)
 		{
 		case ControllerInput::Stick::Index::LEFT:
-			if (!input.onChange || data.controller.currentState.Gamepad.sThumbLX != data.controller.previousState.Gamepad.sThumbLX || data.controller.currentState.Gamepad.sThumbLY != data.controller.previousState.Gamepad.sThumbLY)
-				return Ret{{
+		{
+			change = change
+				|| data.controller.currentState.Gamepad.sThumbLX != data.controller.previousState.Gamepad.sThumbLX 
+				|| data.controller.currentState.Gamepad.sThumbLY != data.controller.previousState.Gamepad.sThumbLY;
+			if (change)
+				value = {
 					OverMax<Data_t>(data.controller.currentState.Gamepad.sThumbLX),
 					OverMax<Data_t>(data.controller.currentState.Gamepad.sThumbLY)
-				}};
-			break;
+				};
+		}
+		break;
 		case ControllerInput::Stick::Index::RIGHT:
-			if (!input.onChange || data.controller.currentState.Gamepad.sThumbRX != data.controller.previousState.Gamepad.sThumbRX || data.controller.currentState.Gamepad.sThumbRY != data.controller.previousState.Gamepad.sThumbRY)
-				return Ret{{
+		{
+			change = change
+				|| data.controller.currentState.Gamepad.sThumbRX != data.controller.previousState.Gamepad.sThumbRX 
+				|| data.controller.currentState.Gamepad.sThumbRY != data.controller.previousState.Gamepad.sThumbRY;
+			if (change)
+				value = {
 					OverMax<Data_t>(data.controller.currentState.Gamepad.sThumbRX),
 					OverMax<Data_t>(data.controller.currentState.Gamepad.sThumbRY)
-				}};
-			break;
+				};
+		}
+		break;
 		}
 	}
 
-	return Ret{};
+	auto [low1, high1] = input.state.first;
+	auto [low2, high2] = input.state.second;
+	bool state{
+		low1 <= value.first &&
+		value.first <= high1 &&
+		low2 <= value.second &&
+		value.second <= high2
+	};
+
+	if (change && state)
+		return Ret{ std::move(value) };
+	else
+		return Ret{};
 }
 
 template <typename InputType>

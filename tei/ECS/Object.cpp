@@ -102,14 +102,19 @@ void Object::Do(Message message)
 		if (!m_Active)
 			return;
 	}
+	case FIXEDUPDATE:
+	{
+		if (!m_Active)
+			return;
+	}
 	break;
 	}
 
 	for (auto& [type, pComp, handle] : utility::RangePerIndex(m_Components)) // False intelisense error
 		handle(*pComp, message, *this);
 
-	for (auto& child : m_Children)
-		if (child || message == ENABLE || message == CLEANUP || message == UPDATE)
+	for (auto& child : utility::RangePerIndex(m_Children))
+		if (child->m_Active || message == ENABLE || message == CLEANUP || message == UPDATE)
 			child->Do(message);
 
 	switch (message)

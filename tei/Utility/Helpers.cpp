@@ -1,7 +1,13 @@
 
+
+#include <random>
+#include <ctime>
+
 #include "Helpers.h"
 
 using namespace tei::internal::utility;
+
+std::mt19937_64 tei::internal::utility::RNG{ unsigned(time(nullptr)) };
 
 template<typename T>
 using as_const_t = decltype(as_const_projector{}(std::declval<T>()));

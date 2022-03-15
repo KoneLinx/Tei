@@ -123,7 +123,12 @@ public:
     }
     constexpr operator rep::Rep() const noexcept
     {
-        return m_Value;
+        return static_cast<rep::Rep>(m_Value);
+    }
+    template <typename T> requires std::convertible_to<rep::Rep, T>
+    constexpr operator T() const noexcept
+    {
+        return static_cast<T>(m_Value);
     }
 
 private:

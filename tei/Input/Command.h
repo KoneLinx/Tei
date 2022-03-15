@@ -11,10 +11,15 @@
 namespace tei::internal::input
 {
 
-	template <typename InputType, typename Data = typename InputType::Data>
+	template <typename InputType_t, typename Data = typename InputType_t::Data>
 	class Command
 	{
 	public:
+
+		using InputType = InputType_t;
+
+		template <std::invocable Action>
+		Command(InputType input, Action action);
 
 		template <std::invocable<Data const&> Action>
 		Command(InputType input, Action action);
@@ -40,10 +45,24 @@ namespace tei::internal::input
 		std::any m_Data;
 	};
 
+	template <typename Input, typename ... Arg>
+	Command(Input, Arg...) -> Command<Input, typename Input::Data>;
+
 	using CommandBinary = Command<InputBinary>;
 	using CommandAnalog = Command<InputAnalog>;
 	using CommandAnalog2 = Command<InputAnalog2>;
 
+	template <typename InputType, typename Data>
+	template <std::invocable Action>
+	inline Command<InputType, Data>::Command(InputType input, Action action)
+		: Command{
+			input,
+			[action = std::move(action), this] (Data const&)
+			{
+				std::invoke(action);
+			}
+		}
+	{}
 
 	template <typename InputType, typename Data>
 	template <std::invocable<Data const&> Action>
@@ -60,7 +79,7 @@ namespace tei::internal::input
 			input, 
 			[action = std::move(action), this] (InputType const& input)
 			{
-				action(input, std::any_cast<UserData&>(this->m_Data));
+				std::invoke(action, input, std::any_cast<UserData&>(this->m_Data));
 			}
 		}
 	{}
@@ -86,7 +105,7 @@ namespace tei::internal::input
 	template<typename InputType, typename Data>
 	inline void Command<InputType, Data>::Execute(Data const& data) const
 	{
-		m_Action(data);
+		std::invoke(m_Action, data);
 	}
 
 	template<typename InputType, typename Data>
@@ -111,4 +130,7 @@ namespace tei::internal::input
 namespace tei::external::input
 {
 	using tei::internal::input::Command;
+	using tei::internal::input::CommandBinary;
+	using tei::internal::input::CommandAnalog;
+	using tei::internal::input::CommandAnalog2;
 }

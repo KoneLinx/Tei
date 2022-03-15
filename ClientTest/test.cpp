@@ -3,16 +3,17 @@
 
 #include <iostream>
 #include <sstream>
+#include <random>
 
 using namespace tei::literals;
 
 struct Timer {};
 
-void OnUpdate(Timer)
-{
-	if (tei::Time->frame.now > 5_s)
-		tei::Application->Quit();
-}
+//void OnUpdate(Timer)
+//{
+//	if (tei::Time->frame.now > 5_s)
+//		tei::Application->Quit();
+//}
 
 //void OnRender(Timer)
 //{
@@ -58,13 +59,34 @@ void OnFixedUpdate(FpsComponent const&)
 	std::cout.flush();
 }
 
+struct RootComponent : tei::components::RefComponent<"root", tei::components::ObjectTransform>
+{};
+
+void OnFixedUpdate(RootComponent& comp)
+{
+	auto& [transform] = comp.refs;
+	float scale{ 1 + std::sin(tei::Time->thread->now.count()) / 5 };
+	transform.local.rotation.r = scale - 1;
+	transform.local.scale.x = scale;
+	transform.local.scale.y = scale;
+}
+
+struct SplashText : tei::components::RefComponent<"splash", tei::components::Observed<std::string>>
+{};
+
+void OnUpdate(SplashText& comp)
+{
+	auto& [text] = comp.refs;
+	text.get() = (std::stringstream{} << "0x" << std::hex << tei::RNG()).view();
+}
+
 void TeiClientInit()
 {
 	using namespace tei::components;
 	using namespace tei::resource;
 	using namespace tei::unit;
-
-	tei::Application->SetWindowProperty(tei::application::WindowProperty::RESIZABLE);
+	
+	//tei::Application->SetWindowProperty(tei::application::WindowProperty::FULLSCREEN_FAKE);
 
 	auto& scene{ tei::Scenes->AddScene(true) };
 
@@ -78,13 +100,16 @@ void TeiClientInit()
 
 		Scale windowScale{};
 
+		root.AddComponent<ObjectTransform>(Scale{ 2 });
+		root.AddComponent<RootComponent>();
+
 		{
 			auto& bg = root.AddChild();
 
 			auto& bgTex = bg.AddComponent(tei::Resources->LoadShared<Texture>("resources/background.jpg"));
 			
 			windowScale = bgTex->size;
-			tei::Application->SetWindowProperty(windowScale);
+			tei::Application->SetWindowProperty(Scale{ windowScale * 2.f });
 
 			bg.AddComponent<ObjectTransform>();
 			bg.AddComponent<TextureRenderComponent>();
@@ -105,6 +130,7 @@ void TeiClientInit()
 			title.AddComponent(tei::Resources->LoadUnique<Font>("resources/Lingua.otf", 32));
 			title.AddComponent(tei::Resources->LoadUnique<Texture>());
 			title.AddComponent<ObjectTransform>(Position{ 0, -windowScale.y / 2 / 5 * 3 });
+			title.AddComponent<SplashText>();
 			title.AddComponent<TextRenderComponent>();
 		}
 
@@ -122,6 +148,14 @@ void TeiClientInit()
 #endif
 
 	}
+
+	tei::Input->AddCommand(
+		tei::input::KeyboardInput::Main::ESCAPE,
+		[]
+		{ 
+			tei::Application->Quit(); 
+		}
+	);
 
 }
 

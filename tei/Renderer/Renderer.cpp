@@ -33,7 +33,7 @@ RendererClass::RendererClass(application::Application::Window const& window)
 	if (m_SDLRenderer == nullptr)
 		throw utility::TeiRuntimeError{ "Could not load SDL Renerer", SDL_GetError() };
 
-	SDL_GetRendererOutputSize(m_SDLRenderer, &m_RenderTarget.w, &m_RenderTarget.h);
+	Update();
 }
 
 RendererClass::~RendererClass()
@@ -57,13 +57,13 @@ void RendererClass::Update()
 {
 	METRICS_TIMEBLOCK;
 
-	SDL_GetRendererOutputSize(m_SDLRenderer, &m_RenderTarget.w, &m_RenderTarget.h);
-	m_TargetSize.x = float(m_RenderTarget.w);
-	m_TargetSize.y = float(m_RenderTarget.h);
-	m_TargetCenter = m_TargetSize / 2.f;
-	m_TargetScale.x = std::min(m_TargetSize.x, m_TargetSize.y);
-	m_TargetScale.y = m_TargetScale.x;
-	m_TargetRatio = m_TargetSize / m_TargetScale;
+	int w{}, h{};
+	SDL_GetRendererOutputSize(m_SDLRenderer, &w, &h);
+	m_RenderTarget.size = { w, h };
+	m_TargetCenter = m_RenderTarget.size / 2.f;
+	//m_TargetScale.x = std::min(m_RenderTarget.size.x, m_RenderTarget.size.y);
+	//m_TargetScale.y = m_TargetScale.x;
+	//m_TargetRatio = m_RenderTarget.size / m_TargetScale;
 
 	m_Time = time::Time->frame.now;
 }
@@ -85,50 +85,11 @@ void RendererClass::SetVSync(bool synced) const
 		throw utility::TeiRuntimeError{ "Could not alter vsync status", !synced };
 }
 
-//void RendererClass::DrawTexture(resource::Texture const& texture, unit::Transform const& transform, std::optional<unit::Rectangle> source) const
-//{
-//	METRICS_TIMEBLOCK;
-//
-//	auto const sourceRatio{ source ? source.value()[1] : unit::Scale{ 1, 1 } };
-//	auto const texRatio{ sourceRatio * unit::Scale{ texture.w, texture.h } / float(std::min(texture.w, texture.h)) };
-//	auto const center = m_TargetCenter + transform.position / 2.f * m_TargetScale;
-//	auto const scale = transform.scale * m_TargetScale * texRatio / 2.f;
-//	auto const position = center - scale / 2.f;
-//	SDL_Rect const dest{
-//		.x = int(position.x),
-//		.y = int(position.y),
-//		.w = int(scale.x),
-//		.h = int(scale.y),
-//	};
-//	auto const src = [texture] (unit::Rectangle source) 
-//	{
-//		return SDL_Rect{
-//			.x = int(source[0].x * texture.w),
-//			.y = int(source[0].y * texture.h),
-//			.w = int(source[1].x * texture.w),
-//			.h = int(source[1].y * texture.h),
-//		}; 
-//	};
-//	SDL_RenderCopyEx(
-//		m_SDLRenderer,
-//		static_cast<SDL_Texture*>(texture.pData),
-//		source ? std::data({ src(*source) }) : nullptr,
-//		&dest,
-//		glm::degrees(transform.rotation.x),
-//		std::data({ SDL_Point{
-//			.x = int(scale.x / 2),
-//			.y = int(scale.y / 2),
-//		}}),
-//		SDL_FLIP_NONE
-//	);
-//}
-
 void RendererClass::DrawTexture(resource::Texture const& texture, unit::Transform const& transform, std::optional<unit::Rectangle> source) const
 {
 	auto const scale = texture.size * transform.scale;// * (m_TargetScale / 480.f);
 	auto const pos   = m_TargetCenter + transform.position - scale / 2.f;
-
-	auto const angle = sin(transform.rotation).r;
+	auto const angle = glm::degrees(transform.rotation.r);
 
 	constexpr static auto src = [](resource::Texture const& texture, unit::Rectangle const& rect) -> SDL_Rect
 	{
@@ -151,6 +112,7 @@ void RendererClass::DrawTexture(resource::Texture const& texture, unit::Transfor
 		.x = int(scale.x) / 2,
 		.y = int(scale.y) / 2,
 	};
+
 
 	SDL_RenderCopyEx(
 		m_SDLRenderer,

@@ -35,14 +35,14 @@ namespace tei::internal::render
 		struct RenderTarget
 		{
 			void* pData;
-			int w, h;
+			unit::Scale size;
 		}
 		m_RenderTarget{};
 
-		unit::Scale m_TargetSize{};
+		//unit::Scale m_TargetSize{};
 		unit::Position m_TargetCenter{};
-		unit::Scale m_TargetRatio{};
-		unit::Scale m_TargetScale{};
+		//unit::Scale m_TargetRatio{};
+		//unit::Scale m_TargetScale{};
 
 	public:
 
