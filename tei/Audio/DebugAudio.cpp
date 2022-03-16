@@ -17,7 +17,13 @@ namespace tei::internal::audio
 	void DebugAudio::OnUpdate(std::span<std::reference_wrapper<resource::Sound const>> log)
 	{
 		for (resource::Sound const& sound : log)
-			std::cout << "[audio] " << sound.name << '\n';
+			std::cout << "[audio] " <<
+#if defined(DEBUG) || defined(_DEBUG)
+				sound.name 
+#else
+				sound.pData
+#endif
+			<< '\n';
 	}
 
 	void DebugAudio::OnMute(bool muted)

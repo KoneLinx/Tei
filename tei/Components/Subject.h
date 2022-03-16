@@ -55,15 +55,12 @@ namespace tei::internal::components
 	template<detail::Observer Observer, detail::Event Event>
 	inline void Subject::AddObserver(Observer observer)
 	{
-		auto const handle{
+		m_Observers.emplace(
+			typeid(Event),
 			[observer = std::move(observer)] (utility::AnyRef event) mutable
 			{
 				observer(event.cast<Event>());
 			}
-		};
-		m_Observers.emplace(
-			typeid(Event),
-			std::move(handle)
 		);
 	}
 

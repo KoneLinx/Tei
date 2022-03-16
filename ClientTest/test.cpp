@@ -65,7 +65,7 @@ struct RootComponent : tei::components::RefComponent<"root", tei::components::Ob
 void OnFixedUpdate(RootComponent& comp)
 {
 	auto& [transform] = comp.refs;
-	float scale{ 1 + std::sin(tei::Time->thread->now.count()) / 5 };
+	float scale{ 1 + std::sin(tei::Time->thread->now.count() * 2) / 5 };
 	transform.local.rotation.r = scale - 1;
 	transform.local.scale.x = scale;
 	transform.local.scale.y = scale;
@@ -93,7 +93,6 @@ void TeiClientInit()
 	scene.AddComponent<Timer>();
 
 // Excersise week 1
-#if true
 	{
 
 		auto& root = scene.AddChild();
@@ -144,8 +143,6 @@ void TeiClientInit()
 			fps.AddComponent<FpsComponent>();
 			fps.AddComponent<TextRenderComponent>();
 		}
-
-#endif
 
 	}
 

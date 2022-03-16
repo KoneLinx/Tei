@@ -10,33 +10,15 @@ namespace tei::internal::resource
 		void* pData;
 		float volume;
 		bool loop;
-		std::string name;
+#if defined(DEBUG) || defined(_DEBUG)
+		std::string _name;
+#endif
 
 		constexpr operator bool() const noexcept
 		{
 			return this != nullptr && pData != nullptr;
 		}
 	};
-
-	//namespace prefab
-	//{
-
-	//	class AudioLoader final : public ResourceManager::template Loader<Sound>
-	//	{
-	//	public:
-
-	//		AudioLoader();
-	//		~AudioLoader();
-
-	//	private:
-
-	//		Sound* OnLoad(std::filesystem::path const& path, ResourceManager const& resources, std::optional<Sound> init) const override;
-
-	//		void OnFree(ResourceManager const& resources, Sound* font) const override;
-
-	//	};
-
-	//}
 
 }
 

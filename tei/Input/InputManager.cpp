@@ -39,7 +39,7 @@ struct InputManager::PollData
 };
 
 template <typename InputType>
-auto TestInput(InputManager::PollData const&, InputType);
+auto TestInput(InputManager::PollData const&, InputType const&);
 
 bool TestInput(XINPUT_STATE const& state, InputBinary const& input)
 {
@@ -52,11 +52,11 @@ bool TestInput(Keyboard::State const& state, InputBinary const& input)
 }
 
 template <>
-auto TestInput<InputBinary>(InputManager::PollData const& data, InputBinary input)
+auto TestInput<InputBinary>(InputManager::PollData const& data, InputBinary const& input)
 {
 	using Ret = std::optional<bool>;
 
-	bool value{};
+	InputBinary::Data value{};
 	bool change{ !input.onChange };
 
 	switch (input.deviceId)
@@ -77,13 +77,8 @@ auto TestInput<InputBinary>(InputManager::PollData const& data, InputBinary inpu
 	break;
 	}
 	
-	bool state{
-		input.state == BinaryState::ANY ||
-		input.state == (value ? BinaryState::PRESSED : BinaryState::RELEASED)
-	};
-	
-	if (change && state)
-		return Ret{ bool(value) };
+	if (change && input & value)
+		return Ret{ value };
 	else
 		return Ret{};
 }
@@ -95,7 +90,7 @@ Decimal OverMax(Value val) noexcept
 }
 
 template <>
-auto TestInput<InputAnalog>(InputManager::PollData const& data, InputAnalog input)
+auto TestInput<InputAnalog>(InputManager::PollData const& data, InputAnalog const& input)
 {
 	using Ret = std::optional<InputAnalog::Data>;
 
@@ -123,20 +118,14 @@ auto TestInput<InputAnalog>(InputManager::PollData const& data, InputAnalog inpu
 		}
 	}
 
-	auto [low, high] = input.state;
-	bool state{
-		low <= value &&
-		value <= high
-	};
-
-	if (change && state)
+	if (change && input & value)
 		return Ret{ std::move(value) };
 	else
 		return Ret{};
 }
 
 template <>
-auto TestInput<InputAnalog2>(InputManager::PollData const& data, InputAnalog2 input)
+auto TestInput<InputAnalog2>(InputManager::PollData const& data, InputAnalog2 const& input)
 {
 	using Data_t = InputAnalog2::Data::first_type;
 	using Ret = std::optional<InputAnalog2::Data>;
@@ -175,16 +164,7 @@ auto TestInput<InputAnalog2>(InputManager::PollData const& data, InputAnalog2 in
 		}
 	}
 
-	auto [low1, high1] = input.state.first;
-	auto [low2, high2] = input.state.second;
-	bool state{
-		low1 <= value.first &&
-		value.first <= high1 &&
-		low2 <= value.second &&
-		value.second <= high2
-	};
-
-	if (change && state)
+	if (change && input & value)
 		return Ret{ std::move(value) };
 	else
 		return Ret{};
@@ -229,18 +209,32 @@ void InputManager::ProcessInput()
 	);
 }
 
-bool InputManager::IsPressed(InputBinary button) const
+bool InputManager::IsPressed(InputBinary const& button) const
 {
 	return TestInput(*m_PollData, button).value_or(false);
 }
 
-SomeCommonInputData tei::internal::input::InputManager::GetInputDataImpl(SomeCommonInputType input) const
+SomeCommonInputData tei::internal::input::InputManager::GetInputImpl(SomeCommonInputTypeRef input) const
 {
 	auto& data = *m_PollData;
 	return std::visit(
-		[&] <typename InputType> (InputType input) -> SomeCommonInputData
+		[&] <typename InputType> (std::reference_wrapper<InputType> input) -> SomeCommonInputData
 		{
-			return TestInput(data, input).value_or(typename InputType::Data{});
+			return TestInput(data, input.get()).value_or(typename InputType::Data{});
+		},
+		input
+	);
+}
+
+void InputManager::InvokeInputImpl(SomeCommonInputTypeRef input, SomeCommonInputDataRef dataref) const
+{
+	std::visit(
+		[this, &dataref] <typename InputType> (std::reference_wrapper<InputType const> invoked)
+		{
+			auto& data = std::get<std::reference_wrapper<typename InputType::Data const>>(dataref).get();
+			for (auto& command : std::get<std::vector<std::unique_ptr<Command<InputType>>>>(m_Commands))
+				if (auto& input{ command->GetInputType() }; invoked.get() == input && input & data)
+					command->Execute(data);
 		},
 		input
 	);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <variant>
+#include <tei/internal/utility.h>
 
 namespace tei::internal::input
 {
@@ -25,10 +26,12 @@ namespace tei::internal::input
 
 		bool onChange{ true };
 
-		constexpr InputType(DeviceId deviceId, uint32_t keyId, bool onChange = true, State state = {}, uint16_t deviceIndex = {}) noexcept;
-		constexpr InputType(InputType const&, bool onChange, State state = {}, uint16_t deviceIndex = {}) noexcept;
-		constexpr InputType(InputType const&, State state, uint16_t deviceIndex = {}) noexcept;
-		constexpr InputType(InputType const&, uint16_t deviceIndex) noexcept;
+		constexpr InputType(DeviceId deviceId, uint32_t keyId, bool onChange = true, State state = {}, uint16_t deviceIndex = {});
+		constexpr InputType(InputType const&, bool onChange, State state = {}, uint16_t deviceIndex = {});
+		constexpr InputType(InputType const&, State state, uint16_t deviceIndex = {});
+		constexpr InputType(InputType const&, uint16_t deviceIndex);
+
+		constexpr bool operator == (InputType const& other) const;
 	};
 
 	enum struct BinaryState
@@ -49,9 +52,44 @@ namespace tei::internal::input
 
 	using SomeCommonInputType = std::variant<InputBinary, InputAnalog, InputAnalog2>;
 	using SomeCommonInputData = std::variant<InputBinary::Data, InputAnalog::Data, InputAnalog2::Data>;
+
+	using SomeCommonInputTypeRef = utility::ApplyTrait_t<std::reference_wrapper, utility::ApplyTrait_t<std::add_const_t, SomeCommonInputType>>;
+	using SomeCommonInputDataRef = utility::ApplyTrait_t<std::reference_wrapper, utility::ApplyTrait_t<std::add_const_t, SomeCommonInputData>>;
+
+	constexpr bool operator & (InputBinary const& input, BinaryData const& value)
+	{
+		return
+			input.state == BinaryState::ANY ||
+			input.state == (value ? BinaryState::PRESSED : BinaryState::RELEASED);
+	}
+
+	constexpr bool operator & (InputAnalog const& input, AnalogData const& value)
+	{
+		auto [low, high] = input.state;
+		return
+			low <= value &&
+			value <= high;
+	}
 	
+	constexpr bool operator & (InputAnalog2 const& input, Analog2Data const& value)
+	{
+		auto [low1, high1] = input.state.first;
+		auto [low2, high2] = input.state.second;
+		return
+			low1 <= value.first &&
+			value.first <= high1 &&
+			low2 <= value.second &&
+			value.second <= high2;
+	}
+
+	template <typename InputType, typename Data = typename InputType::Data>
+	constexpr bool operator & (Data const& value, InputType const& input)
+	{
+		return input & value;
+	}
+
 	template<typename Data_t, typename State_t>
-	inline constexpr InputType<Data_t, State_t>::InputType(DeviceId deviceId, uint32_t keyId, bool onChange, State_t state, uint16_t deviceIndex) noexcept
+	inline constexpr InputType<Data_t, State_t>::InputType(DeviceId deviceId, uint32_t keyId, bool onChange, State_t state, uint16_t deviceIndex)
 		: deviceId{ deviceId }
 		, keyId{ keyId }
 		, deviceIndex{ deviceIndex }
@@ -60,19 +98,28 @@ namespace tei::internal::input
 	{}
 
 	template<typename Data_t, typename State_t>
-	inline constexpr InputType<Data_t, State_t>::InputType(InputType const& toCopy, bool onChange, State_t state, uint16_t deviceIndex) noexcept
+	inline constexpr InputType<Data_t, State_t>::InputType(InputType const& toCopy, bool onChange, State_t state, uint16_t deviceIndex)
 		: InputType{ toCopy.deviceId, toCopy.keyId, onChange, state, deviceIndex }
 	{}
 
 	template<typename Data_t, typename State_t>
-	inline constexpr InputType<Data_t, State_t>::InputType(InputType const& other, State state, uint16_t deviceIndex) noexcept
+	inline constexpr InputType<Data_t, State_t>::InputType(InputType const& other, State state, uint16_t deviceIndex)
 		: InputType{ other.deviceId, other.keyId, true, state, deviceIndex }
 	{}
 
 	template<typename Data_t, typename State_t>
-	inline constexpr InputType<Data_t, State_t>::InputType(InputType const& other, uint16_t deviceIndex) noexcept
+	inline constexpr InputType<Data_t, State_t>::InputType(InputType const& other, uint16_t deviceIndex)
 		: InputType{ other.deviceId, other.keyId, true, State{}, deviceIndex }
 	{}
+
+	template<typename Data_t, typename State_t>
+	inline constexpr bool InputType<Data_t, State_t>::operator==(InputType const& other) const
+	{
+		return
+			deviceId == other.deviceId &&
+			deviceIndex == other.deviceIndex &&
+			keyId == other.keyId;
+	}
 
 }
 

@@ -4,6 +4,7 @@
 #include <ranges>
 #include <cassert>
 #include <random>
+#include <type_traits>
 
 namespace tei::internal::utility
 {
@@ -237,6 +238,12 @@ namespace tei::internal::utility
 #endif 
 
 	};
+
+	template <template <typename> typename Trait, template <typename ...> typename Class, typename ... Types>
+	Class<Trait<Types>...> ApplyTraits_fn(Class<Types...>);
+
+	template <template <typename> typename Trait, typename Class>
+	using ApplyTrait_t = decltype(ApplyTraits_fn<Trait>(std::declval<Class>()));
 
 }
 

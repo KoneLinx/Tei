@@ -27,14 +27,18 @@ namespace tei::internal::input
 
 		void ProcessInput();
 
-		bool IsPressed(InputBinary button) const;
+		bool IsPressed(InputBinary const& button) const;
 
 		template <typename InputType>
 		typename InputType::Data GetInputData(InputType input) const;
 
+		template <typename InputType, typename Data = typename InputType::Data>
+		void InvokeInput(InputType input, Data state);
+
 	private:
 
-		SomeCommonInputData GetInputDataImpl(SomeCommonInputType) const;
+		SomeCommonInputData GetInputImpl(SomeCommonInputTypeRef) const;
+		void InvokeInputImpl(SomeCommonInputTypeRef, SomeCommonInputDataRef) const;
 
 		std::tuple<
 			std::vector<std::unique_ptr<CommandBinary>>,
@@ -70,7 +74,13 @@ namespace tei::internal::input
 	template<typename InputType>
 	inline typename InputType::Data InputManager::GetInputData(InputType input) const
 	{
-		return std::get<typename InputType::Data>(GetInputDataImpl(std::move(input)));
+		return std::get<typename InputType::Data>(GetInputImpl(std::move(input)));
+	}
+
+	template<typename InputType, typename Data>
+	inline void InputManager::InvokeInput(InputType input, Data state)
+	{
+		InvokeInputImpl(std::move(input), std::move(state));
 	}
 
 }

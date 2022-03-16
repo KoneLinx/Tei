@@ -27,7 +27,7 @@ namespace tei::internal::input
 		template <typename UserData, std::invocable<Data const&, UserData&> Action>
 		Command(InputType input, Action action, UserData&& userdata);
 		
-		InputType GetInputType() const noexcept;
+		InputType const& GetInputType() const noexcept;
 		void SetInputType(InputType) noexcept;
 
 		bool HasUserData() const noexcept; 
@@ -85,7 +85,7 @@ namespace tei::internal::input
 	{}
 
 	template<typename InputType, typename Data>
-	inline InputType Command<InputType, Data>::GetInputType() const noexcept
+	inline InputType const& Command<InputType, Data>::GetInputType() const noexcept
 	{
 		return m_InputType;
 	}
