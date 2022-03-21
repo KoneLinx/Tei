@@ -79,15 +79,23 @@ template <size_t INDEX, typename ... Components>
 struct std::tuple_element<INDEX, tei::internal::components::Refs<Components...>> : std::tuple_element<INDEX, std::tuple<Components&...>>
 {};
 
+
 template <tei::internal::components::Name NAME, typename ... Components>
-static inline void OnEnable(tei::internal::components::RefComponent<NAME, Components...>& refcomp, tei::internal::ecs::Object const& object)
+static inline void OnEnable(tei::internal::Internal, tei::internal::components::RefComponent<NAME, Components...>& refcomp, tei::internal::ecs::Object& object)
 {
 	auto const getter = [&object] <typename Component> (std::reference_wrapper<Component>& ref)
 	{
-		if (auto pComp = object.GetComponent<Component>())
-			ref = *pComp;
+		if (auto* pData = object.HasComponent<Component>())
+		{
+			ref = *pData;
+		}
 		else
-			tei::internal::utility::TeiRuntimeError{ "RefComponent could not find requied component", typeid(Component).name() };
+		{
+			if constexpr (std::default_initializable<Component>)
+				ref = object.AddComponent<Component>();
+			else
+				throw tei::internal::utility::TeiRuntimeError{ "Cannot find or create required component", typeid(Component).name() };
+		}
 	};
 	(getter(std::get<std::reference_wrapper<Components>>(refcomp.refs.as_tuple())), ...);
 }

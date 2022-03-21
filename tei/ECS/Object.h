@@ -69,7 +69,9 @@ namespace tei::internal::ecs
 
 		// Get a component (throws if not present)
 		template <detail::Component Data>
-		Data* GetComponent() const;
+		Data& GetComponent() const;
+		template <detail::Component Data>
+		Data* HasComponent() const;
 
 		// Remove a component (throws if not present)
 		template <detail::Component Data>
@@ -129,6 +131,19 @@ namespace tei::external::ecs
 	using tei::internal::ecs::Object;
 }
 
+namespace tei::internal
+{
+	struct Internal {} constexpr inline INTERNAL{};
+}
+
+//void OnInitialize();
+//void OnCleanup();
+//void OnEnable();
+//void OnDisable();
+//void OnUpdate();
+//void OnFixedUpdate();
+//void OnRender();
+
 namespace tei::internal::ecs
 {
 
@@ -162,7 +177,16 @@ namespace tei::internal::ecs
 	}
 	
 	template<detail::Component Data>
-	inline Data* Object::GetComponent() const
+	inline Data& Object::GetComponent() const
+	{
+		if (auto opt{ HasComponent<Data>() })
+			return *opt;
+		else
+			throw utility::TeiRuntimeError{ "Object has no such component", typeid(Data).name() };
+	}
+
+	template<detail::Component Data>
+	inline Data* Object::HasComponent() const
 	{
 		auto it{ GetComponent(typeid(Data)) };
 		if (it == m_Components.end())
@@ -241,6 +265,19 @@ namespace tei::internal::ecs
 		: data{ std::forward<Arg>(arg) ... }
 	{}
 
+	// waaaay too tidious to type 10 times, thus a macro
+#define _TEI_ON_MESSAGE(message) \
+	if constexpr (requires { ::message(INTERNAL, data, parent); }) \
+		::message(INTERNAL, data, parent); \
+	else \
+	if constexpr (requires { ::message(INTERNAL, data); }) \
+		::message(INTERNAL, data); \
+	if constexpr (requires { ::message(data, parent); }) \
+		::message(data, parent); \
+	else  \
+	if constexpr (requires { ::message(data); }) \
+		::message(data); 
+
 	template <typename Data>
 	inline void Object::Component<Data>::Handle(Component<>& component, Message message, Object& parent)
 	{
@@ -248,56 +285,44 @@ namespace tei::internal::ecs
 		switch (message)
 		{
 		case Message::INIT:
-			if constexpr (requires { ::OnInitialize(data, parent); })
-				::OnInitialize(data, parent);
-			else 
-			if constexpr (requires { ::OnInitialize(data); })
-				::OnInitialize(data);
-			break;
-		case Message::CLEANUP:
-			if constexpr (requires { ::OnCleanup(data, parent); })
-				::OnCleanup(data, parent);
-			else 
-			if constexpr (requires { ::OnCleanup(data); })
-				::OnCleanup(data);
-			break;
-		case Message::ENABLE:
-			if constexpr (requires { ::OnEnable(data, parent); })
-				::OnEnable(data, parent);
-			else 
-			if constexpr (requires { ::OnEnable(data); })
-				::OnEnable(data);
-			break;
-		case Message::DISABLE:
-			if constexpr (requires { ::OnDisable(data, parent); })
-				::OnDisable(data, parent);
-			else 
-			if constexpr (requires { ::OnDisable(data); })
-				::OnDisable(data);
-			break;
-		case Message::UPDATE:
-			if constexpr (requires { ::OnUpdate(data, parent); })
-				::OnUpdate(data, parent);
-			else 
-			if constexpr (requires { ::OnUpdate(data); })
-				::OnUpdate(data);
-			break;
-		case Message::FIXEDUPDATE:
-			if constexpr (requires { ::OnFixedUpdate(data, parent); })
-				::OnFixedUpdate(data, parent);
-			else 
-			if constexpr (requires { ::OnFixedUpdate(data); })
-				::OnFixedUpdate(data);
-			break;
-		case Message::RENDER:
-			if constexpr (requires { ::OnRender(data, parent); })
-				::OnRender(data, parent);
-			else 
-			if constexpr (requires { ::OnRender(data); })
-				::OnRender(data);
+		{
+			_TEI_ON_MESSAGE(OnInitialize)
 			break;
 		}
+		case Message::CLEANUP:
+		{
+			_TEI_ON_MESSAGE(OnCleanup)
+			break;
+		}
+		case Message::ENABLE:
+		{
+			_TEI_ON_MESSAGE(OnEnable)
+			break;
+		}
+		case Message::DISABLE:
+		{
+			_TEI_ON_MESSAGE(OnDisable)
+			break;
+		}
+		case Message::UPDATE:
+		{
+			_TEI_ON_MESSAGE(OnUpdate)
+			break;
+		}
+		case Message::FIXEDUPDATE:
+		{
+			_TEI_ON_MESSAGE(OnFixedUpdate)
+			break;
+		}
+		case Message::RENDER:
+		{
+			_TEI_ON_MESSAGE(OnRender)
+			break;
+		}
+		}
 	}
+
+#undef _TEI_ON_MESSAGE
 
 	template <typename Data>
 	inline std::unique_ptr<Object::Component<>> Object::Component<Data>::Clone() const

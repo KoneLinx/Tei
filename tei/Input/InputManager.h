@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <memory>
+#include <tuple>
+#include <typeindex>
 
 #include "InputType.h"
 #include "Command.h"
@@ -25,6 +27,11 @@ namespace tei::internal::input
 		template <typename InputType, typename Action> requires std::constructible_from<Command<InputType>, InputType, Action>
 		Command<InputType>& AddCommand(InputType input, Action action);
 
+		template <typename InputType>
+		void RemoveCommand(Command<InputType> const&);
+
+		void RemoveCommand(utility::AnyRef);
+
 		void ProcessInput();
 
 		bool IsPressed(InputBinary const& button) const;
@@ -40,11 +47,8 @@ namespace tei::internal::input
 		SomeCommonInputData GetInputImpl(SomeCommonInputTypeRef) const;
 		void InvokeInputImpl(SomeCommonInputTypeRef, SomeCommonInputDataRef) const;
 
-		std::tuple<
-			std::vector<std::unique_ptr<CommandBinary>>,
-			std::vector<std::unique_ptr<CommandAnalog>>,
-			std::vector<std::unique_ptr<CommandAnalog2>>
-		> m_Commands;
+		std::unordered_multimap<std::type_index, std::any> m_Commands;
+		std::unordered_multimap<utility::AnyRef, decltype(m_Commands)::const_iterator> m_CommandByData;
 
 		struct PollData;
 		std::unique_ptr<PollData> m_PollData;
@@ -60,15 +64,28 @@ namespace tei::internal::input
 	template <typename InputType>
 	inline Command<InputType>& InputManager::AddCommand(Command<InputType> command)
 	{
-		auto* pCommand{ new Command<InputType>{ std::move(command) } };
-		std::get<std::vector<std::unique_ptr<Command<InputType>>>>(m_Commands).emplace_back(pCommand);
-		return *pCommand;
+		auto it = m_Commands.insert({
+			typeid(InputType),
+			std::move(command)
+		});
+		auto& data = std::any_cast<Command<InputType>&>(it->second);
+		m_CommandByData.insert({
+			data,
+			it
+		});
+		return data;
 	}
 
 	template <typename InputType, typename Action> requires std::constructible_from<Command<InputType>, InputType, Action>
 	inline Command<InputType>& InputManager::AddCommand(InputType input, Action action)
 	{
 		return AddCommand(Command<InputType>{ input, std::move(action) });
+	}
+
+	template<typename InputType>
+	inline void InputManager::RemoveCommand(Command<InputType> const& toRemove)
+	{
+		RemoveCommand(utility::AnyRef{ toRemove });
 	}
 
 	template<typename InputType>

@@ -19,7 +19,7 @@ namespace tei::internal::audio
 		for (resource::Sound const& sound : log)
 			std::cout << "[audio] " <<
 #if defined(DEBUG) || defined(_DEBUG)
-				sound.name 
+				sound._name 
 #else
 				sound.pData
 #endif

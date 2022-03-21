@@ -63,16 +63,14 @@ auto TestInput<InputBinary>(InputManager::PollData const& data, InputBinary cons
 	{
 	case DeviceId::KEYBOARD:
 	{
+		value  = TestInput(*data.keyboard.currentState, input);
 		change = change || value != TestInput(*data.keyboard.previousState, input);
-		if (change)
-			value  = TestInput(*data.keyboard.currentState, input);
 	}
 	break;
 	case DeviceId::CONTROLER:
 	{
+		value  = TestInput(data.controller.currentState, input);
 		change = change || value != TestInput(data.controller.previousState, input);
-		if (change)
-			value  = TestInput(data.controller.currentState, input);
 	}
 	break;
 	}
@@ -171,11 +169,14 @@ auto TestInput<InputAnalog2>(InputManager::PollData const& data, InputAnalog2 co
 }
 
 template <typename InputType>
-void Update(InputManager::PollData const& data, std::vector<std::unique_ptr<Command<InputType>>> const& commands)
+void Update(InputManager::PollData const& data, auto const& commands)
 {
-	for (auto& command : commands)
-		if (auto result{ TestInput(data, command->GetInputType()) })
-			command->Execute(*result);
+	for (auto& [type, any] : commands)
+	{
+		auto& command = std::any_cast<Command<InputType>&>(any);
+		if (auto result{ TestInput(data, command.GetInput()) })
+			command.Execute(*result);
+	}
 }
 
 InputManager::InputManager()
@@ -186,6 +187,17 @@ InputManager::InputManager()
 // in .cpp: important! PollData destructor
 InputManager::~InputManager()
 {}
+
+void InputManager::RemoveCommand(utility::AnyRef some)
+{
+	auto it = m_CommandByData.find(some);
+	if (it != std::ranges::end(m_CommandByData))
+	{
+		m_Commands.erase(it->second);
+		m_CommandByData.erase(it);
+	}
+	else throw utility::TeiRuntimeError{ "Command not present" };
+}
 
 void InputManager::ProcessInput()
 {
@@ -200,13 +212,16 @@ void InputManager::ProcessInput()
 	data.controller.previousState = std::exchange(data.controller.currentState, {});
 	XInputGetState(0, &data.controller.currentState);
 
-	std::apply(
-		[&] (auto& ... lists) 
-		{ 
-			(Update(data, lists), ...);
-		}, 
-		m_Commands
-	);
+	auto updater = [&] <typename InputType> ()
+	{
+		auto subrange = utility::SubrangeFromPair(m_Commands.equal_range(typeid(InputType)));
+		Update<InputType>(data, subrange);
+	};
+
+	updater.operator()<InputBinary>();
+	updater.operator()<InputAnalog>();
+	updater.operator()<InputAnalog2>();
+
 }
 
 bool InputManager::IsPressed(InputBinary const& button) const
@@ -232,9 +247,12 @@ void InputManager::InvokeInputImpl(SomeCommonInputTypeRef input, SomeCommonInput
 		[this, &dataref] <typename InputType> (std::reference_wrapper<InputType const> invoked)
 		{
 			auto& data = std::get<std::reference_wrapper<typename InputType::Data const>>(dataref).get();
-			for (auto& command : std::get<std::vector<std::unique_ptr<Command<InputType>>>>(m_Commands))
-				if (auto& input{ command->GetInputType() }; invoked.get() == input && input & data)
-					command->Execute(data);
+			for (auto& [type, any] : utility::SubrangeFromPair(m_Commands.equal_range(typeid(InputType))))
+			{
+				auto& command = std::any_cast<Command<InputType> const&>(any);
+				if (auto& input{ command.GetInput() }; invoked.get() == input && input & data)
+					command.Execute(data);
+			}
 		},
 		input
 	);

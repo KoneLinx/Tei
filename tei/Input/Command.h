@@ -11,7 +11,7 @@
 namespace tei::internal::input
 {
 
-	template <typename InputType_t, typename Data = typename InputType_t::Data>
+	template <typename InputType_t = void, typename Data = typename InputType_t::Data>
 	class Command
 	{
 	public:
@@ -27,14 +27,14 @@ namespace tei::internal::input
 		template <typename UserData, std::invocable<Data const&, UserData&> Action>
 		Command(InputType input, Action action, UserData&& userdata);
 		
-		InputType const& GetInputType() const noexcept;
-		void SetInputType(InputType) noexcept;
+		InputType const& GetInput() const noexcept;
+		void SetInput(InputType) noexcept;
 
-		bool HasUserData() const noexcept; 
+		bool HasData() const noexcept; 
 		template <typename UserData>
-		UserData& GetUserData() const;
+		UserData& GetData() const;
 		template <typename UserData>
-		void SetUserData(UserData&& data);
+		void SetData(UserData&& data);
 
 		void Execute(Data const&) const;
 
@@ -85,19 +85,19 @@ namespace tei::internal::input
 	{}
 
 	template<typename InputType, typename Data>
-	inline InputType const& Command<InputType, Data>::GetInputType() const noexcept
+	inline InputType const& Command<InputType, Data>::GetInput() const noexcept
 	{
 		return m_InputType;
 	}
 
 	template<typename InputType, typename Data>
-	inline void Command<InputType, Data>::SetInputType(InputType input) noexcept
+	inline void Command<InputType, Data>::SetInput(InputType input) noexcept
 	{
 		m_InputType = input;
 	}
 
 	template<typename InputType, typename Data>
-	inline bool Command<InputType, Data>::HasUserData() const noexcept
+	inline bool Command<InputType, Data>::HasData() const noexcept
 	{
 		return m_Data.has_value();
 	}
@@ -110,16 +110,16 @@ namespace tei::internal::input
 
 	template<typename InputType, typename Data>
 	template <typename UserData>
-	inline UserData& Command<InputType, Data>::GetUserData() const
+	inline UserData& Command<InputType, Data>::GetData() const
 	{
 		return std::any_cast<UserData&>(m_Data);
 	}
 
 	template<typename InputType, typename Data>
 	template<typename UserData>
-	inline void Command<InputType, Data>::SetUserData(UserData&& data)
+	inline void Command<InputType, Data>::SetData(UserData&& data)
 	{
-		if (!HasUserData())
+		if (!HasData())
 			throw utility::TeiRuntimeError{ "Command has no user data" };
 		else
 			m_Data = std::forward<UserData>(data);

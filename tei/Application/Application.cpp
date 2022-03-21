@@ -1,11 +1,19 @@
 #include "Application.h"
 
+#include <iostream>
+
 #include <tei/render.h>
 #include <tei/internal/core.h>
 #include <tei/time.h>
-#include <SDL.h>
+#include <tei/event.h>
 
+#include <SDL.h>
+#include <SDL_mixer.h>
+#include <SDL_image.h>
 #include <ImGui.h>
+#include <steam_api.h>
+
+#include "../Steam.h"
 
 #include "../Extra/StaticEngineResources.h"
 
@@ -34,14 +42,22 @@ Application::Application(int argc, char const* const* argv)
 	};
 
 	if (SDL_Init(subSystems) != 0)
-		throw std::runtime_error{ "Could nit initialize SDL: "s + SDL_GetError() };
+		throw std::runtime_error{ "Could not initialize SDL: "s + SDL_GetError() };
+
+	if (IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG) == 0)
+		throw utility::TeiRuntimeError{ "Could not initialize SDL_image", SDL_GetError() };
 
 	OpenWindow();
+
+	if (!SteamInitialize())
+		std::cerr << utility::TeiRuntimeError{ "Could not initialize Steam API" }.what() << std::endl;
 }
 
 Application::~Application()
 {
 	METRICS_TIMEBLOCK;
+
+	SteamCleanup();
 
 	if (m_SDLWindow)
 		CloseWindow();
@@ -49,13 +65,19 @@ Application::~Application()
 	SDL_Quit();
 }
 
-void Application::Update()
+void Application::UpdateProps()
 {
 	int x{}, y{};
 	SDL_GetWindowSize(m_SDLWindow, &x, &y);
 	m_Window.transform.scale.x = float(x), m_Window.transform.scale.y = float(y);
 	SDL_GetWindowPosition(m_SDLWindow, &x, &y);
 	m_Window.transform.position.x = float(x), m_Window.transform.position.y = float(y);
+	
+	if (render::Renderer)
+		render::Renderer->Update();
+	
+	if (events::Event)
+		events::Event->Notify<WindowPropertyChangedEvent>();
 }
 
 void Application::SetWindowProperty(unit::Scale size)
@@ -66,20 +88,20 @@ void Application::SetWindowProperty(unit::Scale size)
 	SDL_GetWindowSize(m_SDLWindow, &x, &y);
 	m_Window.transform.scale.x = float(x), m_Window.transform.scale.y = float(y);
 	SDL_SetWindowPosition(m_SDLWindow, int(old.position.x + (old.scale.x - m_Window.transform.scale.x) / 2), int(old.position.y + (old.scale.y - m_Window.transform.scale.y) / 2));
-	Update();
+	UpdateProps();
 }
 
 void Application::SetWindowProperty(unit::Position pos)
 {
 	SDL_SetWindowPosition(m_SDLWindow, int(pos.x), int(pos.y));
-	Update();
+	UpdateProps();
 }
 
 void Application::SetWindowProperty(unit::Transform transform)
 {
 	SDL_SetWindowSize(m_SDLWindow, int(transform.scale.x), int(transform.scale.y));
 	SDL_SetWindowPosition(m_SDLWindow, int(transform.position.x), int(transform.position.y));
-	Update();
+	UpdateProps();
 }
 
 void Application::SetWindowProperty(WindowProperty property)
@@ -119,7 +141,7 @@ void Application::SetWindowProperty(WindowProperty property)
 		break;
 	}
 	
-	Update();
+	UpdateProps();
 }
 
 void Application::Quit() const
@@ -160,7 +182,7 @@ void Application::OpenWindow()
 
 	renderer.Update();
 	renderer.Clear();
-	renderer.DrawTexture(splash, unit::Scale{ m_Window.transform.scale.x / splash.size.x * 2.f });
+	renderer.DrawTexture(splash, unit::Scale{renderer.GetRenderTraget().size.y / splash.size.y});
 	renderer.Present();
 
 }
@@ -181,10 +203,25 @@ void Application::CloseWindow()
 
 void Application::InitAudio()
 {
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0)
+		throw utility::TeiRuntimeError{ "Could not open audio", SDL_GetError() };
 }
 
 void Application::ExitAudio()
 {
+	Mix_CloseAudio();
+}
+
+void Application::Update()
+{
+	for (SDL_Event event{}; SDL_PollEvent(&event);)
+	{
+		if (event.type == SDL_QUIT)
+			Quit();
+		else
+			events::Event->Notify(event);
+	}
+	SteamUpdate();
 }
 
 Application& tei::internal::application::StartApplication(int argc, char const* const* argv)

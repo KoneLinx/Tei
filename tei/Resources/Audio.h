@@ -35,3 +35,6 @@ Load(
 	float volume = .1f,
 	std::string_view name = {}
 );
+
+tei::external::Resource<tei::external::resource::Sound>
+Load(tei::external::resource::ToLoad<tei::external::resource::Sound>);

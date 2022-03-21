@@ -8,7 +8,6 @@
 
 #include <ImGui.h>
 
-#include <barrier>
 #include <latch>
 
 using namespace tei::internal::core;
@@ -42,20 +41,12 @@ void FrameUpdate(bool& isRunning, FrameUpdateType updateType)
 
 	if (isRunning && updateType == FrameUpdateType::EVENTS)
 	{
-		SDL_Event e{};
-		while (SDL_PollEvent(&e))
-		{
-			ImGui_ImplSDL2_ProcessEvent(&e);
-			if (e.type == SDL_QUIT)
-				Core->Stop();
-		}
+		application::ApplicationService->Update();
 		input::Input->ProcessInput();
-		//events::Event->Update();
 	}
 	if (isRunning && updateType == FrameUpdateType::FREE_UPDATE)
 	{
 		scene::Scenes->Do(ecs::Message::UPDATE);
-		application::ApplicationService->Update();
 		audio::Audio->Update();
 	}
 	if (isRunning && updateType == FrameUpdateType::FIXED_UPDATE)

@@ -75,22 +75,22 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(SolutionDir)libs\steam\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(SolutionDir)libs\steam\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(SolutionDir)libs\steam\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(SolutionDir)libs\steam\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
@@ -101,7 +101,8 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
-      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -132,7 +133,8 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
-      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -162,7 +164,8 @@
       <ConformanceMode>true</ConformanceMode>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
-      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -192,7 +195,8 @@
       <ConformanceMode>true</ConformanceMode>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
-      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -222,6 +226,7 @@
     <ClCompile Include="Audio\DebugAudio.cpp" />
     <ClCompile Include="Audio\SDLAudio.cpp" />
     <ClCompile Include="Events\Events.cpp" />
+    <ClCompile Include="Components\InputComponent.cpp" />
     <ClCompile Include="Input\Controller.cpp" />
     <ClCompile Include="Input\Command.cpp" />
     <ClCompile Include="ECS\Object.cpp" />
@@ -230,6 +235,7 @@
     <ClCompile Include="Input\InputManager.cpp" />
     <ClCompile Include="Input\InputType.cpp" />
     <ClCompile Include="Input\Keyboard.cpp" />
+    <ClCompile Include="Components\ObserverComponent.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
     <ClCompile Include="Resources\Audio.cpp" />
     <ClCompile Include="Resources\Fonts.cpp" />
@@ -240,6 +246,7 @@
     <ClCompile Include="Extra\StaticEngineResources.cpp" />
     <ClCompile Include="Components\TextComponent.cpp" />
     <ClCompile Include="Components\Subject.cpp" />
+    <ClCompile Include="Steam.cpp" />
     <ClCompile Include="Time\Clock.cpp" />
     <ClCompile Include="Time\Time.cpp" />
     <ClCompile Include="Components\Transform.cpp" />
@@ -250,10 +257,12 @@
     <ClInclude Include="Audio\AudioHandler.h" />
     <ClInclude Include="Audio\DebugAudio.h" />
     <ClInclude Include="Audio\SDLAudio.h" />
+    <ClInclude Include="Components\ComponentHelpers.h" />
     <ClInclude Include="Components\RefComponent.h" />
     <ClInclude Include="Events\Events.h" />
     <ClInclude Include="include\tei\event.h" />
     <ClInclude Include="include\tei\input.h" />
+    <ClInclude Include="Components\InputComponent.h" />
     <ClInclude Include="Input\Controller.h" />
     <ClInclude Include="Input\Command.h" />
     <ClInclude Include="Components\Components.h" />
@@ -265,6 +274,7 @@
     <ClInclude Include="Input\InputManager.h" />
     <ClInclude Include="Input\InputType.h" />
     <ClInclude Include="Input\Keyboard.h" />
+    <ClInclude Include="Components\ObserverComponent.h" />
     <ClInclude Include="Renderer\Renderer.h" />
     <ClInclude Include="Resources\Audio.h" />
     <ClInclude Include="Resources\Fonts.h" />
@@ -285,6 +295,7 @@
     <ClInclude Include="Extra\StaticEngineResources.h" />
     <ClInclude Include="Components\TextComponent.h" />
     <ClInclude Include="Components\Subject.h" />
+    <ClInclude Include="Steam.h" />
     <ClInclude Include="Time\Chrono.h" />
     <ClInclude Include="Time\Clock.h" />
     <ClInclude Include="Time\Clock.impl.h" />

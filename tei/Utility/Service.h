@@ -22,10 +22,12 @@ namespace tei::internal::utility
 	public:
 
 		Served* operator -> () const;
+		operator Served& () const;
 		operator bool() const;
 
 		Mutable* operator -> ();
 		Mutable& operator *  ();
+		operator Mutable& ();
 
 		Service() = default;
 		~Service();
@@ -80,6 +82,12 @@ namespace tei::internal::utility
 	}
 
 	template<typename Served, typename Registerer>
+	inline Service<Served, Registerer>::operator Served& () const
+	{
+		return *m_Service;
+	}
+
+	template<typename Served, typename Registerer>
 	inline Service<Served, Registerer>::Mutable* Service<Served, Registerer>::operator->()
 	{
 		return m_Service.get();
@@ -92,9 +100,15 @@ namespace tei::internal::utility
 	}
 
 	template<typename Served, typename Registerer>
+	inline Service<Served, Registerer>::operator Mutable& ()
+	{
+		return *m_Service;
+	}
+
+	template<typename Served, typename Registerer>
 	inline Service<Served, Registerer>::operator bool() const
 	{
-		return m_Service;
+		return bool(m_Service);
 	}
 
 	template<typename Served, typename Registerer>

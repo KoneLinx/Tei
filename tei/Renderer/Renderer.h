@@ -20,7 +20,7 @@ namespace tei::internal::render
 		void Update();
 		void Present();
 
-		auto const& GetRenderTraget()
+		auto const& GetRenderTraget() const
 		{ return m_RenderTarget; }
 
 		void SetVSync(bool synced) const;

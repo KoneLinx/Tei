@@ -6,18 +6,30 @@
 namespace tei::internal::components
 {
 
-	struct ObjectTransform
+	//struct TransformData : unit::Transform
+	//{
+	//	using unit::Transform::Transform;
+	//	using unit::Transform::operator=;
+
+	//	unit::Transform world{};
+	//};
+
+	struct TransformAccess;
+
+	class ObjectTransform : public utility::Observed<unit::Transform>
 	{
-		ObjectTransform(unit::Transform local = {}) noexcept
-			: local{ local }
-		{}
+	public:
 
-		unit::Transform local;
-		unit::Transform world{};
+		using utility::Observed<unit::Transform>::Observed;
+		using utility::Observed<unit::Transform>::operator=;
 
-		static ObjectTransform const ROOT;
-		ObjectTransform const* parent{ &ROOT };
-		//bool requiresUpdate{ true };
+		utility::Observed<unit::Transform> world;
+
+	private:
+
+		ObjectTransform* parent{};
+
+		friend struct TransformAccess;
 	};
 
 }
@@ -27,6 +39,5 @@ namespace tei::external::components
 	using tei::internal::components::ObjectTransform;
 }
 
-void OnEnable(tei::internal::components::ObjectTransform&, tei::internal::ecs::Object const&);
-
-void OnUpdate(tei::internal::components::ObjectTransform&);
+void OnEnable(tei::internal::Internal, tei::internal::components::ObjectTransform&, tei::internal::ecs::Object const&);
+void OnUpdate(tei::internal::Internal, tei::internal::components::ObjectTransform&);

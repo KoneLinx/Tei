@@ -1,28 +1,42 @@
 #include "Transform.h"
+#include "ComponentHelpers.h"
 
-using tei::internal::components::ObjectTransform;
-using tei::internal::ecs::Object;
+using namespace tei::internal;
+using namespace tei::internal::components;
+using namespace tei::internal::ecs;
+using namespace tei::internal::utility;
 
-ObjectTransform const ObjectTransform::ROOT{};
-
-void OnEnable(ObjectTransform& transform, Object const& object)
+struct tei::internal::components::TransformAccess
 {
-	Object const* parent{ &object };
-	do
+	static void Enable(ObjectTransform& transform, Object const& object)
 	{
-		parent = &parent->GetParent();
-		if (auto parentTransform{ parent->GetComponent<ObjectTransform>() })
+		transform.parent = FindParentComponent<ObjectTransform>(object);
+		Update(transform);
+	}
+
+	static void Update(ObjectTransform& transform)
+	{
+		transform.world.checkout();
+		if (transform.parent)
 		{
-			transform.parent = parentTransform;
-			break;
+			if (transform.parent->world.check() | transform.checkout())
+				transform.world = *transform.parent->world * *transform;
+		}
+		else
+		{
+			if (transform.checkout())
+				transform.world = unit::Transform{} * *transform;
 		}
 	}
-	while (!parent->IsRoot());
-	OnUpdate(transform);
+};
+
+
+void OnEnable(tei::internal::Internal, ObjectTransform& transform, Object const& object)
+{
+	TransformAccess::Enable(transform, object);
 }
 
-void OnUpdate(ObjectTransform& transform)
+void OnUpdate(tei::internal::Internal, ObjectTransform& transform)
 {
-	//if (tranform.requiresUpdate)
-	transform.world = transform.parent->world * transform.local;
+	TransformAccess::Update(transform);
 }

@@ -9,32 +9,35 @@
 using namespace tei::internal::render;
 using namespace tei::internal::components;
 using namespace tei::internal::resource;
-using namespace tei::internal;
+using namespace tei::internal::utility;
 
-void OnUpdate(TextRenderComponent const& comp)
+void OnUpdate(tei::internal::Internal, TextRenderComponent const& comp)
 {
 	if (auto& [text, font, texture, transform] = comp.refs; text.checkout())
 	{
-		if (texture->pData)
-			SDL_DestroyTexture(static_cast<SDL_Texture*>(texture->pData));
+		if (auto data = std::exchange(texture->pData, {}))
+			SDL_DestroyTexture(static_cast<SDL_Texture*>(data));
 
-		const auto surf = TTF_RenderText_Blended(static_cast<TTF_Font*>(font->pData), text->c_str(), {255, 255, 255});
-		if (surf == nullptr)
-			throw utility::TeiRuntimeError{ "Rendering text failed", SDL_GetError() };
+		if (!text->empty())
+		{
+			const auto surf = TTF_RenderText_Blended(static_cast<TTF_Font*>(font->pData), text->c_str(), { 255, 255, 255 });
+			if (surf == nullptr)
+				throw TeiRuntimeError{ "Rendering text failed", SDL_GetError() };
 
-		SDL_Texture* pTexture = SDL_CreateTextureFromSurface(static_cast<SDL_Renderer*>(Renderer->GetRenderTraget().pData), surf);
-		SDL_FreeSurface(surf);
+			SDL_Texture* pTexture = SDL_CreateTextureFromSurface(static_cast<SDL_Renderer*>(Renderer->GetRenderTraget().pData), surf);
+			SDL_FreeSurface(surf);
 
-		int w{}, h{};
-		if (pTexture == nullptr || SDL_QueryTexture(pTexture, nullptr, nullptr, &w, &h) != 0)
-			throw utility::TeiRuntimeError{ "Creating texture from surface failed", SDL_GetError() };
+			int w{}, h{};
+			if (pTexture == nullptr || SDL_QueryTexture(pTexture, nullptr, nullptr, &w, &h) != 0)
+				throw TeiRuntimeError{ "Creating texture from surface failed", SDL_GetError() };
 
-		texture->pData = pTexture;
-		texture->size = { w, h };
+			texture->pData = pTexture;
+			texture->size = { w, h };
+		}
 	}
 }
 
-void OnRender(TextRenderComponent const& comp)
+void OnRender(tei::internal::Internal, TextRenderComponent const& comp)
 {
 	auto& [text, font, texture, transform] = comp.refs;
 	Renderer->DrawTexture(*texture, transform.world);

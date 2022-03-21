@@ -25,8 +25,9 @@ namespace tei::internal::application
 		MINIMISED,
 		RESTORED,
 		ALWAYS_IN_FRONT,
-
 	};
+
+	enum struct WindowPropertyChangedEvent {};
 
 	class Application
 	{
@@ -40,6 +41,7 @@ namespace tei::internal::application
 		~Application();
 
 		void Update();
+		void UpdateProps();
 
 		inline auto const& GetWindow() const
 		{ return m_Window; }
@@ -89,6 +91,7 @@ namespace tei::external
 	namespace application
 	{
 		using tei::internal::application::WindowProperty;
+		using tei::internal::application::WindowPropertyChangedEvent;
 	}
 
 	static constexpr auto const& Application { tei::internal::application::ApplicationService };

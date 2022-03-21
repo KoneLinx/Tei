@@ -18,14 +18,15 @@ namespace tei::internal::input
 		using Data = Data_t;
 		using State = State_t;
 
-		DeviceId deviceId;
+		DeviceId deviceId{};
 		uint16_t deviceIndex{};
-		uint32_t keyId;
+		uint32_t keyId{};
 
 		State_t state{};
 
 		bool onChange{ true };
 
+		constexpr InputType() = default;
 		constexpr InputType(DeviceId deviceId, uint32_t keyId, bool onChange = true, State state = {}, uint16_t deviceIndex = {});
 		constexpr InputType(InputType const&, bool onChange, State state = {}, uint16_t deviceIndex = {});
 		constexpr InputType(InputType const&, State state, uint16_t deviceIndex = {});
@@ -33,11 +34,12 @@ namespace tei::internal::input
 
 		constexpr bool operator == (InputType const& other) const;
 	};
-
+	
 	enum struct BinaryState
 	{
-		ANY = 0,
-		PRESSED, RELEASED
+		PRESSED,
+		RELEASED,
+		ANY,
 	};
 
 	using BinaryData = bool;
@@ -49,6 +51,10 @@ namespace tei::internal::input
 	using InputBinary = InputType<bool, BinaryState>;
 	using InputAnalog = InputType<AnalogData, AnalogState>;
 	using InputAnalog2 = InputType<Analog2Data, Analog2State>;
+
+	constexpr bool operator & (InputBinary const& input, BinaryData const& value);
+	constexpr bool operator & (InputAnalog const& input, AnalogData const& value);
+	constexpr bool operator & (InputAnalog2 const& input, Analog2Data const& value);
 
 	using SomeCommonInputType = std::variant<InputBinary, InputAnalog, InputAnalog2>;
 	using SomeCommonInputData = std::variant<InputBinary::Data, InputAnalog::Data, InputAnalog2::Data>;

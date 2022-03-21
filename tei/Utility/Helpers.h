@@ -162,10 +162,22 @@ namespace tei::internal::utility
 			return m_Data;
 		}
 
-		constexpr operator Data& () noexcept
+		constexpr explicit operator Data& () noexcept
 		{
-			m_Updated;
+			m_Updated = true;
 			return m_Data;
+		}
+
+		template <std::three_way_comparable_with<Data> T>
+		constexpr auto operator <=> (T const& other) const
+		{
+			return m_Data <=> other;
+		}
+
+		template <std::equality_comparable_with<Data> T>
+		constexpr bool operator == (T const& other) const
+		{
+			return m_Data == other;
 		}
 
 		constexpr Data& get() noexcept
@@ -217,16 +229,21 @@ namespace tei::internal::utility
 		//}
 
 		template <typename T>
-		inline operator T const& () const noexcept
+		inline operator T const& () const
 		{
-			return cast<T const>();
+			return cast<T>();
 		}
 
 		template <typename T>
-		T const& cast() const
+		inline T const& cast() const
 		{
 			assert(typeid(T) == *m_Type);
-			return *static_cast<T*>(m_Data);
+			return *static_cast<T const*>(m_Data);
+		}
+
+		inline bool operator == (AnyRef other) const
+		{
+			return m_Data == other.m_Data;
 		}
 
 	private:
@@ -237,6 +254,8 @@ namespace tei::internal::utility
 		std::type_info const* m_Type;
 #endif 
 
+		friend std::pointer_traits<AnyRef>;
+
 	};
 
 	template <template <typename> typename Trait, template <typename ...> typename Class, typename ... Types>
@@ -245,7 +264,35 @@ namespace tei::internal::utility
 	template <template <typename> typename Trait, typename Class>
 	using ApplyTrait_t = decltype(ApplyTraits_fn<Trait>(std::declval<Class>()));
 
+
+	template <typename ViewIterator>
+	decltype(auto) IteratorBase(ViewIterator&& it) 
+	{
+		if constexpr (requires { it.base(); })
+			return IteratorBase(it.base());
+		else
+			return it;
+	}
+
 }
+
+template <>
+struct std::pointer_traits<tei::internal::utility::AnyRef>
+{
+	static void const* to_address(tei::internal::utility::AnyRef const& anyref) noexcept
+	{
+		return anyref.m_Data;
+	}
+};
+
+template <>
+struct std::hash<tei::internal::utility::AnyRef>
+{
+	inline auto operator () (tei::internal::utility::AnyRef const& anyref) const
+	{
+		return std::hash<void const*>{}(std::to_address(anyref));
+	}
+};
 
 namespace tei::external
 {

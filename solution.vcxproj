@@ -146,6 +146,9 @@
     <None Include=".gitignore" />
     <None Include="DefaultBuild.props" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="x64\Release\steam_appid.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

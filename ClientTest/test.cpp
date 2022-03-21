@@ -9,21 +9,17 @@ using namespace tei::literals;
 
 struct Timer {};
 
-//void OnUpdate(Timer)
-//{
-//	if (tei::Time->frame.now > 5_s)
-//		tei::Application->Quit();
-//}
+void OnUpdate(Timer)
+{
+	if (tei::Time->frame.now > 5_s)
+		0;
+		//tei::Application->Quit();
+}
 
-//void OnRender(Timer)
-//{
-//	std::cout << "  " << tei::Time->frame.now << '\r';
-//}
-
-//void OnUpdate(tei::components::TextureRenderComponent& t)
-//{
-//	get<tei::components::ObjectTransform>(t).local.rotation.r = std::sin(tei::Time->frame.now);
-//}
+void OnRender(Timer)
+{
+	std::cout << "  " << tei::Time->frame.now << '\r';
+}
 
 struct FpsComponent : tei::components::RefComponent<"fps", tei::components::Observed<std::string>, tei::components::ObjectTransform>
 {
@@ -34,10 +30,10 @@ void OnUpdate(FpsComponent& fps)
 {
 	auto& [text, transform] = fps.refs;
 
-	transform.local.position = tei::Application->GetWindow().transform.scale / -2.f + 16.f;
+	transform.get().position = tei::Application->GetWindow().transform.scale / -2.f + 16.f;
 
 	std::stringstream out{};
-	out << "[Frame]\tdelta:\t" << std::chrono::milliseconds{tei::Time->thread->delta}
+	out << "                \r[Frame]\tdelta:\t" << std::chrono::milliseconds{tei::Time->thread->delta}
 		<< "\tlag:\t" << std::chrono::microseconds{tei::Time->thread->lag}
 		<< std::endl;
 	std::cout << out.view();
@@ -52,7 +48,7 @@ void OnUpdate(FpsComponent& fps)
 void OnFixedUpdate(FpsComponent const&)
 {
 	std::stringstream out{};
-	out << "[Fixed]\tdelta:\t" << std::chrono::milliseconds{tei::Time->thread->delta}
+	out << "                \r[Fixed]\tdelta:\t" << std::chrono::milliseconds{tei::Time->thread->delta}
 		<< "\tlag:\t" << std::chrono::microseconds{tei::Time->thread->lag}
 		<< std::endl;
 	std::cout << out.view();
@@ -66,9 +62,8 @@ void OnFixedUpdate(RootComponent& comp)
 {
 	auto& [transform] = comp.refs;
 	float scale{ 1 + std::sin(tei::Time->thread->now.count() * 2) / 5 };
-	transform.local.rotation.r = scale - 1;
-	transform.local.scale.x = scale;
-	transform.local.scale.y = scale;
+	transform.get().rotation.r = scale - 1;
+	transform.get().scale = { scale, scale };
 }
 
 struct SplashText : tei::components::RefComponent<"splash", tei::components::Observed<std::string>>
@@ -92,7 +87,6 @@ void TeiClientInit()
 
 	scene.AddComponent<Timer>();
 
-// Excersise week 1
 	{
 
 		auto& root = scene.AddChild();
@@ -110,14 +104,12 @@ void TeiClientInit()
 			windowScale = bgTex->size;
 			tei::Application->SetWindowProperty(Scale{ windowScale * 2.f });
 
-			bg.AddComponent<ObjectTransform>();
 			bg.AddComponent<TextureRenderComponent>();
 
 			{
 				auto& bglogo = bg.AddChild();
 
 				bglogo.AddComponent(tei::Resources->LoadShared<Texture>("resources/logo.png"));
-				bglogo.AddComponent<ObjectTransform>();
 				bglogo.AddComponent<TextureRenderComponent>();
 			}
 		}
@@ -125,9 +117,7 @@ void TeiClientInit()
 		{
 			auto& title = root.AddChild();
 
-			title.AddComponent<tei::components::Observed<std::string>>({ "Splash screen text" });
 			title.AddComponent(tei::Resources->LoadUnique<Font>("resources/Lingua.otf", 32));
-			title.AddComponent(tei::Resources->LoadUnique<Texture>());
 			title.AddComponent<ObjectTransform>(Position{ 0, -windowScale.y / 2 / 5 * 3 });
 			title.AddComponent<SplashText>();
 			title.AddComponent<TextRenderComponent>();
@@ -136,9 +126,7 @@ void TeiClientInit()
 		{
 			auto& fps = scene.AddChild();
 
-			fps.AddComponent<tei::components::Observed<std::string>>();
 			fps.AddComponent(tei::Resources->LoadUnique<Font>("resources/Lingua.otf", 11));
-			fps.AddComponent(tei::Resources->LoadUnique<Texture>());
 			fps.AddComponent<ObjectTransform>(Position{ windowScale / -2.f + 12.f });
 			fps.AddComponent<FpsComponent>();
 			fps.AddComponent<TextRenderComponent>();

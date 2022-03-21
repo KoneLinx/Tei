@@ -46,7 +46,7 @@ void Object::AddComponent(std::type_index type, Component<>* pComp, Handle pHand
 		std::unique_ptr<Component<>>{ pComp },
 		pHandle
 	});
-	pHandle(*pComp, Message::INIT, *this);
+	//pHandle(*pComp, Message::INIT, *this);
 }
 
 typename decltype(Object::m_Components)::const_iterator Object::GetComponent(std::type_index type) const

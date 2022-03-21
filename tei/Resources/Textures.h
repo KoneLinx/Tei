@@ -61,6 +61,9 @@ Load(
 	std::filesystem::path const&
 );
 
+tei::external::Resource<tei::external::resource::Texture>
+Load(tei::external::resource::ToLoad<tei::external::resource::Texture>);
+
 tei::external::Resource<tei::external::resource::Sprite> 
 Load(
 	tei::external::resource::ToLoad<tei::external::resource::Sprite>, 

@@ -10,6 +10,10 @@
 #endif
 #endif
 
+#if defined(DEBUG) || defined(_DEBUG)
+#include <cassert>
+#include <iostream>
+#endif
 
 namespace tei::internal::utility
 {
@@ -65,7 +69,18 @@ namespace tei::internal::utility
 #endif
 #endif
 			}
-		{}
+		{
+#if defined(DEBUG) || defined(_DEBUG)
+			std::cerr << what() << std::endl;
+			std::cerr << "[DEBUG] Halt? [Y/n] ";
+			fflush(stdin);
+			if(char(getc(stdin)) != 'n')
+				abort();
+			std::cerr << "[DEBUG] Resuming" << std::endl;
+#else
+			// don't halt
+#endif
+		}
 	};
 
 }

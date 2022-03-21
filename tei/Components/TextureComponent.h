@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tei/resource.h>
+#include <tei/internal/ecs.h>
 #include "RefComponent.h"
 #include "Transform.h"
 
@@ -19,5 +20,5 @@ namespace tei::external::components
 	using tei::internal::components::SpriteRenderComponent;
 }
 
-void OnRender(tei::internal::components::TextureRenderComponent const&);
-void OnRender(tei::internal::components::SpriteRenderComponent const&);
+void OnRender(tei::internal::Internal, tei::internal::components::TextureRenderComponent const&);
+void OnRender(tei::internal::Internal, tei::internal::components::SpriteRenderComponent const&);
