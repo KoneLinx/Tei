@@ -1,13 +1,10 @@
+#pragma once
 
-#include <concepts>
+#include <type_traits>
 #include <memory>
 
 namespace tei::internal::utility
 {
-
-	//template <typename Registerer, typename Served>
-	//concept ServiceRegisterer = std::invocable<Registerer, std::remove_const_t<Served>*, std::remove_const_t<Served>*> && std::is_default_constructible_v<Registerer>;
-	//ServiceRegisterer<Served>
 
 	struct Registerer
 	{
@@ -37,34 +34,6 @@ namespace tei::internal::utility
 	private:
 
 		std::unique_ptr<Mutable> m_Service;
-
-	};
-
-	template <typename Object>
-	class Static final
-	{
-		using Mutable = std::remove_const_t<Object>;
-
-	public:
-
-		template <typename ... Arg>
-		explicit Static(Arg&& ... arg)
-			: m_Object{ std::forward<Arg>(arg) ... }
-		{}
-
-		explicit Static() requires std::default_initializable<Object>
-			: m_Object{}
-		{}
-
-		Object* operator -> () const;
-		Object& operator *  () const;
-
-		Mutable* operator -> ();
-		Mutable& operator *  ();
-
-	private:
-
-		Mutable m_Object;
 
 	};
 
@@ -123,30 +92,6 @@ namespace tei::internal::utility
 		Registerer{}(std::to_address(m_Service), service);
 		m_Service.reset(service);
 		return *service;
-	}
-
-	template<typename Object>
-	inline Object* Static<Object>::operator->() const
-	{
-		return &m_Object;
-	}
-
-	template<typename Object>
-	inline Object& Static<Object>::operator*() const
-	{
-		return m_Object;
-	}
-
-	template<typename Object>
-	inline Static<Object>::Mutable* Static<Object>::operator->()
-	{
-		return &m_Object;
-	}
-
-	template<typename Object>
-	inline Static<Object>::Mutable& Static<Object>::operator*()
-	{
-		return m_Object;
 	}
 
 }

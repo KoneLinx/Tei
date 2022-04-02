@@ -1,6 +1,8 @@
 
 #include "Renderer.h"
 
+#include <tei/internal/Utility/TypeHelpers.h>
+#include <tei/internal/Utility/Error.h>
 #include <tei/application.h>
 #include <tei/time.h>
 #include <SDL.h>

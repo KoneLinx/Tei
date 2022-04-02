@@ -5,6 +5,7 @@
 # Visual Studio
 .vs
 **/*.aps
+package*
 
 # Build data
 **/*log

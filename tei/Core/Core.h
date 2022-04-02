@@ -1,6 +1,6 @@
 #pragma once
 
-#include <tei/internal/utility.h>
+#include <tei/internal/Utility/Static.h>
 
 namespace tei::internal::core
 {

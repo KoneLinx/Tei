@@ -5,7 +5,7 @@
 #include <functional>
 #include <variant>
 #include <any>
-#include <tei/internal/utility.h>
+#include <tei/internal/Utility/Error.h>
 #include "InputType.h"
 
 namespace tei::internal::input

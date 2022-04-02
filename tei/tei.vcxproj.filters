@@ -48,12 +48,6 @@
     <ClCompile Include="Audio\SDLAudio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utility\Helpers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ECS\Object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Scenes\SceneManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -105,6 +99,15 @@
     <ClCompile Include="Steam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\tei\internal\Utility\Projector_as_const.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\Object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\RefComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Time\Chrono.h">
@@ -119,25 +122,13 @@
     <ClInclude Include="Utility\Error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\Helpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Utility\Service.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\tei\internal\utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\tei\time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Time\Clock.impl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Utility\Metrics\Metrics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Utility\Metrics\Metrics.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Units\Units.h">
@@ -195,9 +186,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Audio\SDLAudio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ECS\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Scenes\SceneManager.h">
@@ -275,5 +263,92 @@
     <ClInclude Include="Steam.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\Static.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Projector_to_address.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Projector_as_const.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Projector_addressof.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Projector_get.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Observed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\SubrangeHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\AnyReference.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Random.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\TypeHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\Metrics\Metrics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\Metrics\Metrics.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\AnyReference.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\Error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\Observed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\Projector_addressof.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\Projector_as_const.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\Projector_get.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\Projector_to_address.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\Random.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\Service.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\Static.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\SubrangeHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\TypeErasedView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\TypeHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\Utility\UniqueVectorIterator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\ObjectHierarchy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

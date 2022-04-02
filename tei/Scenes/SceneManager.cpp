@@ -4,7 +4,8 @@
 #include <ranges>
 #include <algorithm>
 
-#include <tei/internal/utility.h>
+#include <tei/internal/Utility/Projector_addressof.h>
+#include <tei/internal/Utility/Error.h>
 
 namespace tei::internal::scene
 {
@@ -26,13 +27,13 @@ namespace tei::internal::scene
 		m_Object.RemoveChild(scene);
 	}
 
-	void SceneManager::SetSceneState(Scene const& scene, bool active)
+	void SceneManager::SetSceneState(Scene const&, bool)
 	{
-		auto children{ m_Object.GetAllChildren() };
-		auto it{ std::ranges::find(children, &scene, utility::addressof_projector{}) };
-		if (it == std::ranges::end(children))
-			throw utility::TeiRuntimeError{ "This scene does not exist" };
-		(*it).SetState(active);
+		//auto children{ m_Object.GetAllChildren() };
+		//auto it{ std::ranges::find(children, &scene, utility::projectors::addressof{}) };
+		//if (it == std::ranges::end(children))
+		//	throw utility::TeiRuntimeError{ "This scene does not exist" };
+		//(*it).SetState(active);
 	}
 
 }

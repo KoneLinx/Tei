@@ -2,26 +2,56 @@
 
 #include <tei.h>
 
-struct Player
-{
+using namespace tei::common;
 
-	struct Event
+class Player
+{
+	struct _Event;
+public:
+
+	using Event = _Event;
+
+	Player(int playerID);
+
+	void OnInitialize(Object&);
+	void OnEnable();
+	void OnDisable();
+
+	void TakeDamage();
+	void Score();
+
+	int GetID() const noexcept
+	{ return m_Playerid; }
+
+	tei::components::Subject& GetSubject()
+	{ return m_Subject;	}
+
+private:
+
+	tei::components::Subject m_Subject;
+	tei::components::InputComponent m_Input;
+	int m_Playerid;
+	int m_Lives;
+	Object* m_pParent;
+
+	struct _Event
 	{
 		enum struct ID
 		{
 			SPAWN,
+			DAMAGED,
 			DEATH,
 			SCORE //tmp
 		};
 
-		using enum ID;
-
 		ID event;
 		Player const* player;
 	};
+	
+	using enum Player::Event::ID;
 
-	int playerid;
-	int lives;
+	void Notify(Event::ID);
+
 };
 
 struct PlayerInfo
@@ -35,12 +65,12 @@ struct PlayerTracker
 	int playerAliveCount;
 };
 
-tei::ecs::Object& CreatePlayer(tei::ecs::Object&, int playerid);
+//tei::ecs::Object& CreatePlayer(tei::ecs::Object&, int playerid);
 tei::ecs::Object& CreatePlayerTracker(tei::ecs::Object&);
 tei::ecs::Object& CreatePlayerInfo(tei::ecs::Object&, int playerid);
 
 void OnInitialize(PlayerTracker&, tei::ecs::Object&);
 void OnInitialize(PlayerInfo&, tei::ecs::Object&);
 
-void OnEnable(Player&, tei::ecs::Object&);
+//void OnEnable(Player&, tei::ecs::Object&);
 void OnEnable(PlayerInfo&, tei::ecs::Object&);

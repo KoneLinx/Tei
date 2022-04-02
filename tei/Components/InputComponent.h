@@ -1,9 +1,8 @@
 #pragma once
 
-#include <unordered_map>
 #include <typeindex>
 #include <tei/input.h>
-#include <tei/internal/ecs.h>
+#include <tei/internal/Utility/AnyReference.h>
 
 namespace tei::internal::input::detail
 {
@@ -30,9 +29,11 @@ namespace tei::internal::input::detail
 
 		void Clear();
 
+		~InputComponent();
+
 	private:
 
-		std::vector<utility::AnyRef> m_Commands{};
+		std::vector<utility::AnyReference> m_Commands{};
 
 	};
 
@@ -48,4 +49,3 @@ namespace tei::external::components
 	using tei::internal::components::InputComponent;
 }
 
-void OnDisable(tei::internal::Internal, tei::internal::input::detail::InputComponent&);

@@ -1,22 +1,19 @@
 #pragma once
 
 #include <tei/unit.h>
-#include <tei/internal/ecs.h>
+#include <tei/internal/Utility/Observed.h>
+
+namespace tei::internal::ecs
+{
+	class Object;
+}
 
 namespace tei::internal::components
 {
 
-	//struct TransformData : unit::Transform
-	//{
-	//	using unit::Transform::Transform;
-	//	using unit::Transform::operator=;
-
-	//	unit::Transform world{};
-	//};
-
 	struct TransformAccess;
 
-	class ObjectTransform : public utility::Observed<unit::Transform>
+	class ObjectTransform : public tei::internal::utility::Observed<unit::Transform>
 	{
 	public:
 
@@ -39,5 +36,5 @@ namespace tei::external::components
 	using tei::internal::components::ObjectTransform;
 }
 
-void OnEnable(tei::internal::Internal, tei::internal::components::ObjectTransform&, tei::internal::ecs::Object const&);
-void OnUpdate(tei::internal::Internal, tei::internal::components::ObjectTransform&);
+void OnEnable(std::nullptr_t, tei::internal::components::ObjectTransform&, tei::internal::ecs::Object const&);
+void OnUpdate(std::nullptr_t, tei::internal::components::ObjectTransform&);

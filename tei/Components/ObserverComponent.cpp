@@ -8,7 +8,7 @@ void tei::internal::components::ObserverComponent::Clear()
 	m_Observers.clear();
 }
 
-void OnDisable(tei::internal::Internal, tei::internal::components::ObserverComponent& comp)
+void OnDisable(std::nullptr_t, tei::internal::components::ObserverComponent& comp)
 {
 	comp.Clear();
 }

@@ -19,7 +19,7 @@ struct tei::internal::components::TransformAccess
 		transform.world.checkout();
 		if (transform.parent)
 		{
-			if (transform.parent->world.check() | transform.checkout())
+			if (transform.parent->world.check() | transform.checkout()) // we want bitwise or
 				transform.world = *transform.parent->world * *transform;
 		}
 		else
@@ -31,12 +31,12 @@ struct tei::internal::components::TransformAccess
 };
 
 
-void OnEnable(tei::internal::Internal, ObjectTransform& transform, Object const& object)
+void OnEnable(std::nullptr_t, ObjectTransform& transform, Object const& object)
 {
 	TransformAccess::Enable(transform, object);
 }
 
-void OnUpdate(tei::internal::Internal, ObjectTransform& transform)
+void OnUpdate(std::nullptr_t, ObjectTransform& transform)
 {
 	TransformAccess::Update(transform);
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <tei/resource.h>
+#include "../Resources/Textures.h"
 
 namespace tei::internal::extra::resources
 {

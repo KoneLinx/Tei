@@ -1,10 +1,15 @@
 
 #pragma once
 
-#include <tei/internal/utility.h>
-#include <tei/resource.h>
+#include <tei/internal/Utility/Service.h>
 
 #include <span>
+#include <vector>
+
+namespace tei::internal::resource
+{
+	struct Sound;
+}
 
 namespace tei::internal::audio
 {

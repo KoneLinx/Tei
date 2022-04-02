@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ResourceManager.h"
+#include <memory>
+#include <filesystem>
 #include <tei/time.h>
 #include <tei/unit.h>
 
@@ -28,25 +29,6 @@ namespace tei::internal::resource
 		bool loop;
 	};
 
-	//namespace prefab
-	//{
-
-	//	class TextureLoader final : public ResourceManager::template Loader<Texture>
-	//	{
-	//	public:
-
-	//		TextureLoader();
-
-	//	private:
-
-	//		Texture* OnLoad(std::filesystem::path const& path, ResourceManager const& resources, std::optional<Texture> init) const override;
-
-	//		void OnFree(ResourceManager const& resources, Texture* init) const override;
-
-	//	};
-
-	//}
-
 }
 
 namespace tei::external::resource
@@ -55,18 +37,17 @@ namespace tei::external::resource
 	using tei::internal::resource::Sprite;
 }
 
-tei::external::Resource<tei::external::resource::Texture>
-Load(
-	tei::external::resource::ToLoad<tei::external::resource::Texture>,
+void Load(
+	std::shared_ptr<tei::external::resource::Texture>&,
 	std::filesystem::path const&
 );
 
-tei::external::Resource<tei::external::resource::Texture>
-Load(tei::external::resource::ToLoad<tei::external::resource::Texture>);
+void Load(
+	std::shared_ptr<tei::external::resource::Texture>&
+);
 
-tei::external::Resource<tei::external::resource::Sprite> 
-Load(
-	tei::external::resource::ToLoad<tei::external::resource::Sprite>, 
+void Load(
+	std::shared_ptr<tei::external::resource::Sprite>&, 
 	std::filesystem::path const&,
 	tei::external::Clock::duration frameduration,
 	int cols,

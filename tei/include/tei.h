@@ -21,3 +21,18 @@ extern void TeiClientInit();
 
 // Called after the engine has stopped the game loop and is cleaning up client data
 extern void TeiClientCleanup();
+
+namespace tei::common
+{
+
+	using namespace tei::literals;
+
+	using tei::ecs::Object;
+	using tei::Clock;
+
+	using tei::Time;
+	using tei::Application;
+	using tei::Audio;
+	using tei::Resources;
+
+}

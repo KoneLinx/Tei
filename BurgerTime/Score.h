@@ -5,7 +5,7 @@
 struct Score : tei::components::Observed<long>
 {};
 
-struct ScoreDisplay : tei::components::RefComponent<"score", tei::components::Observed<std::string>, Score>
+struct ScoreDisplay : tei::components::RefComponent<tei::components::Observed<std::string>, Score>
 {};
 
 tei::ecs::Object& CreateScore(tei::ecs::Object&);

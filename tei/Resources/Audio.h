@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ResourceManager.h"
+#include <memory>
+#include <filesystem>
 
 namespace tei::internal::resource
 {
@@ -27,14 +28,14 @@ namespace tei::external::resource
 	using tei::internal::resource::Sound;
 }
 
-tei::external::Resource<tei::external::resource::Sound>
-Load(
-	tei::external::resource::ToLoad<tei::external::resource::Sound>,
+void Load(
+	std::shared_ptr<tei::external::resource::Sound>&,
 	std::filesystem::path const&,
 	bool loop = false,
 	float volume = .1f,
 	std::string_view name = {}
 );
 
-tei::external::Resource<tei::external::resource::Sound>
-Load(tei::external::resource::ToLoad<tei::external::resource::Sound>);
+void Load(
+	std::shared_ptr<tei::external::resource::Sound>&
+);

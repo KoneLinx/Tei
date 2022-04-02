@@ -1,19 +1,20 @@
 #pragma once
 
 #include <tei/resource.h>
-#include <tei/internal/ecs.h>
+#include <tei/internal/Utility/Observed.h>
 #include "RefComponent.h"
 #include "Transform.h"
 
 namespace tei::internal::components
 {
 
-	using TextRenderComponent = RefComponent<"trc", 
+	struct TextRenderComponent : RefComponent< 
 		utility::Observed<std::string>,
 		resource::Resource<resource::Font>,
 		resource::Resource<resource::Texture>,
 		components::ObjectTransform
-	>;
+	>
+	{};
 
 }
 
@@ -26,5 +27,5 @@ namespace tei::external
 	}
 }
 
-void OnUpdate(tei::internal::Internal, tei::internal::components::TextRenderComponent const&);
-void OnRender(tei::internal::Internal, tei::internal::components::TextRenderComponent const&);
+void OnUpdate(std::nullptr_t, tei::internal::components::TextRenderComponent const&);
+void OnRender(std::nullptr_t, tei::internal::components::TextRenderComponent const&);

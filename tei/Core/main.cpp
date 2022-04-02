@@ -4,6 +4,7 @@
 #include <SDL.h>
 
 #include <tei/application.h>
+#include <tei/internal/Utility/Error.h>
 
 #if defined(DEBUG) || defined(_DEBUG)
 #include <vld.h>
@@ -15,7 +16,7 @@ int main(int argc, char** argv)
 	{
 		{
 
-			METRICS_INITLOG("_metrics.json");
+			//METRICS_INITLOG("_metrics.json");
 			METRICS_TIMEBLOCK;
 
 			//puts("Tei engine - starting");
@@ -30,22 +31,23 @@ int main(int argc, char** argv)
 		}
 		return 0;
 	}
+	catch (const tei::internal::utility::TeiRuntimeError&)
+	{
+		fputs("[FATAL] Uncaught engine exception!", stderr);
+		fputc('\n', stderr);
+	}
 	catch (const std::exception& e)
 	{
-		fputs("[Error] Uncaught exception!", stderr);
+		fputs("[FATAL] Uncaught exception!", stderr);
 		fputc('\n', stderr);
 		fputs(e.what(), stderr);
-		fputc('\n', stderr);
-		fputs("[Error] Quitting...", stderr);
 		fputc('\n', stderr);
 	}
 	catch (...)
 	{
-		fputs("[Error] Uncaught exception!", stderr);
+		fputs("[FATAL] Uncaught exception!", stderr);
 		fputc('\n', stderr);
-		fputs("[Error] exception Unknown", stderr);
-		fputc('\n', stderr);
-		fputs("[Error] Quitting...", stderr);
+		fputs("Error unknown", stderr);
 		fputc('\n', stderr);
 	}
 	return -1;

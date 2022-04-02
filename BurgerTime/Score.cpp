@@ -12,10 +12,8 @@ tei::ecs::Object& CreateScore(tei::ecs::Object& parent)
 	
 	scoreObject.AddComponent<tei::components::ObserverComponent>();
 
-	scoreObject.AddComponent<tei::components::Observed<std::string>>();
 	scoreObject.AddComponent<tei::components::TextRenderComponent>();
 	scoreObject.AddComponent(tei::Resources->LoadShared<tei::resource::Font>("resources/Lingua.otf", 12));
-	scoreObject.AddComponent(tei::Resources->LoadUnique<tei::resource::Texture>());
 
 	return scoreObject;
 }
@@ -29,7 +27,7 @@ void OnEnable(Score& score, tei::ecs::Object const& object)
 		subject,
 		[&score] (Player::Event event)
 		{
-			if (event.event == Player::Event::SCORE)
+			if (event.event == Player::SCORE)
 				score.get() += 73;
 		}
 	);

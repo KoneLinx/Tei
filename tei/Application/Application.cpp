@@ -4,6 +4,8 @@
 
 #include <tei/render.h>
 #include <tei/internal/core.h>
+#include <tei/internal/Utility/Error.h>
+#include <tei/internal/Utility/TypeHelpers.h>
 #include <tei/time.h>
 #include <tei/event.h>
 
@@ -11,7 +13,6 @@
 #include <SDL_mixer.h>
 #include <SDL_image.h>
 #include <ImGui.h>
-#include <steam_api.h>
 
 #include "../Steam.h"
 
@@ -50,7 +51,7 @@ Application::Application(int argc, char const* const* argv)
 	OpenWindow();
 
 	if (!SteamInitialize())
-		std::cerr << utility::TeiRuntimeError{ "Could not initialize Steam API" }.what() << std::endl;
+		utility::TeiRuntimeError{ "Could not initialize Steam API" };
 }
 
 Application::~Application()

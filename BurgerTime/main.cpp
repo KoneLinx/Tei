@@ -7,8 +7,8 @@
 
 void TeiClientInit()
 {
-	auto& scene = tei::Scenes->AddScene();
-	tei::Scenes->SetSceneState(scene, true);
+	auto& scene = tei::Scenes->AddScene(true);
+	//tei::Scenes->SetSceneState(scene, true);
 
 	auto& visual = scene.AddChild();
 	visual.AddComponent<tei::components::ObjectTransform>(tei::unit::Scale{ 2 });

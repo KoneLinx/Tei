@@ -3,6 +3,8 @@
 #include <tei/render.h>
 #include <tei/resource.h>
 
+#include <tei/internal/Utility/Error.h>
+
 #include <SDL.h>
 #include <SDL_ttf.h>
 
@@ -11,7 +13,7 @@ using namespace tei::internal::components;
 using namespace tei::internal::resource;
 using namespace tei::internal::utility;
 
-void OnUpdate(tei::internal::Internal, TextRenderComponent const& comp)
+void OnUpdate(std::nullptr_t, TextRenderComponent const& comp)
 {
 	if (auto& [text, font, texture, transform] = comp.refs; text.checkout())
 	{
@@ -37,7 +39,7 @@ void OnUpdate(tei::internal::Internal, TextRenderComponent const& comp)
 	}
 }
 
-void OnRender(tei::internal::Internal, TextRenderComponent const& comp)
+void OnRender(std::nullptr_t, TextRenderComponent const& comp)
 {
 	auto& [text, font, texture, transform] = comp.refs;
 	Renderer->DrawTexture(*texture, transform.world);

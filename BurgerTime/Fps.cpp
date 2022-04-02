@@ -6,11 +6,9 @@ tei::ecs::Object& CreateFps(tei::ecs::Object& parent)
 
 	fps.AddComponent<tei::components::ObjectTransform>(tei::unit::Position{ tei::Renderer->GetRenderTraget().size / -2.f + 16.f});
 	fps.AddComponent<FpsComponent>();
-	fps.AddComponent<tei::components::Observed<std::string>>();
 	fps.AddComponent<tei::components::ObserverComponent>();
 	fps.AddComponent<tei::components::TextRenderComponent>();
 	fps.AddComponent(tei::Resources->LoadUnique<tei::resource::Font>("resources/Lingua.otf", 12));
-	fps.AddComponent(tei::Resources->LoadUnique<tei::resource::Texture>());
 
 	return fps;
 }

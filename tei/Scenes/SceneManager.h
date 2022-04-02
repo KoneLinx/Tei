@@ -5,7 +5,7 @@
 #include <ranges>
 
 #include <tei/internal/ecs.h>
-#include <tei/internal/utility.h>
+#include <tei/internal/Utility/Service.h>
 
 namespace tei::internal::scene
 {
@@ -18,7 +18,7 @@ namespace tei::internal::scene
 
 		SceneManager();
 
-		bool IsActive() const;
+		bool IsActive() const noexcept;
 
 		// Add a Scene
 		Scene& AddScene(bool active = false);
@@ -28,16 +28,16 @@ namespace tei::internal::scene
 
 		void SetSceneState(Scene const& scene, bool active);
 
-		// View of all Scenes
-		std::ranges::view auto GetAllScenes() const;
-		
-		// View of all active Scenes
-		std::ranges::view auto GetActiveScenes() const;
-		
-		// View of all inactive Scenes
-		std::ranges::view auto GetInactiveScenes() const;
+		//// View of all Scenes
+		//auto GetAllScenes() const;
+		//
+		//// View of all active Scenes
+		//auto GetActiveScenes() const;
+		//
+		//// View of all inactive Scenes
+		//auto GetInactiveScenes() const;
 
-		void Do(ecs::Message);
+		void Do(ecs::detail::MessageKind auto);
 
 	private:
 
@@ -56,30 +56,29 @@ namespace tei::external
 namespace tei::internal::scene
 {
 
-	inline bool SceneManager::IsActive() const
+	inline bool SceneManager::IsActive() const noexcept
 	{
-		return false;
+		return m_Object.IsActive();
 	}
 
-	inline void SceneManager::Do(ecs::Message message)
+	inline void SceneManager::Do(ecs::detail::MessageKind auto message)
 	{
 		m_Object.Do(message);
 	}
 
-
-	inline std::ranges::view auto SceneManager::GetAllScenes() const
-	{
-		return m_Object.GetAllChildren();
-	}
-
-	inline std::ranges::view auto SceneManager::GetActiveScenes() const
-	{
-		return m_Object.GetActiveChildren();
-	}
-
-	inline std::ranges::view auto SceneManager::GetInactiveScenes() const
-	{
-		return m_Object.GetInactiveChildren();
-	}
+	//inline auto SceneManager::GetAllScenes() const
+	//{
+	//	return m_Object.GetAllChildren();
+	//}
+	//
+	//inline auto SceneManager::GetActiveScenes() const
+	//{
+	//	return m_Object.GetActiveChildren();
+	//}
+	//
+	//inline auto SceneManager::GetInactiveScenes() const
+	//{
+	//	return m_Object.GetInactiveChildren();
+	//}
 
 }

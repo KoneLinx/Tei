@@ -1,11 +1,17 @@
 #include "InputManager.h"
 
+#include <algorithm>
 #include <optional>
+#include <variant>
+#include <utility>
 #include <limits>
 #include <ranges>
 #include <array>
 
 #include "Controller.h"
+
+#include <tei/internal/Utility/SubrangeHelper.h>
+#include <tei/internal/Utility/Error.h>
 
 #include <SDL.h>
 
@@ -188,7 +194,7 @@ InputManager::InputManager()
 InputManager::~InputManager()
 {}
 
-void InputManager::RemoveCommand(utility::AnyRef some)
+void InputManager::RemoveCommand(utility::AnyReference some)
 {
 	auto it = m_CommandByData.find(some);
 	if (it != std::ranges::end(m_CommandByData))

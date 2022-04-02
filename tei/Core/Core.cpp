@@ -1,14 +1,13 @@
 #include "Core.h"
 
 #include <thread>
+#include <latch>
 
 #include <tei.h>
 
 #include <SDL.h>
-
 #include <ImGui.h>
 
-#include <latch>
 
 using namespace tei::internal::core;
 
@@ -120,21 +119,21 @@ void CoreFunction::Run()
 	{
 		std::latch sync{ 2 };
 
-		std::jthread fixed{
-			[&isRunning, &sync]
-			{
-				METRICS_TIMEBLOCK;
-				time::Time->thread = &time::Time->fixed;
-				sync.arrive_and_wait();
-				GameLoop(isRunning, time::Time->fixed, FrameUpdateType::FIXED);
-			}
-		};
+		//std::jthread fixed{
+		//	[&isRunning, &sync]
+		//	{
+		//		METRICS_TIMEBLOCK;
+		//		time::Time->thread = &time::Time->fixed;
+		//		sync.arrive_and_wait();
+		//		GameLoop(isRunning, time::Time->fixed, FrameUpdateType::FIXED);
+		//	}
+		//};
 		
 		// render
 		[&isRunning, &sync]
 		{
 			METRICS_TIMEBLOCK;
-			sync.arrive_and_wait();
+			//sync.arrive_and_wait();
 			time::Time->thread = &time::Time->frame;
 			GameLoop(isRunning, time::Time->frame, FrameUpdateType::FRAME);
 		}

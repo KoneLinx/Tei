@@ -9,7 +9,8 @@
 #include "InputType.h"
 #include "Command.h"
 
-#include <tei/internal/utility.h>
+#include <tei/internal/Utility/AnyReference.h>
+#include <tei/internal/Utility/Service.h>
 
 namespace tei::internal::input
 {
@@ -30,7 +31,7 @@ namespace tei::internal::input
 		template <typename InputType>
 		void RemoveCommand(Command<InputType> const&);
 
-		void RemoveCommand(utility::AnyRef);
+		void RemoveCommand(utility::AnyReference);
 
 		void ProcessInput();
 
@@ -48,7 +49,7 @@ namespace tei::internal::input
 		void InvokeInputImpl(SomeCommonInputTypeRef, SomeCommonInputDataRef) const;
 
 		std::unordered_multimap<std::type_index, std::any> m_Commands;
-		std::unordered_multimap<utility::AnyRef, decltype(m_Commands)::const_iterator> m_CommandByData;
+		std::unordered_multimap<utility::AnyReference, decltype(m_Commands)::const_iterator> m_CommandByData;
 
 		struct PollData;
 		std::unique_ptr<PollData> m_PollData;
@@ -85,7 +86,7 @@ namespace tei::internal::input
 	template<typename InputType>
 	inline void InputManager::RemoveCommand(Command<InputType> const& toRemove)
 	{
-		RemoveCommand(utility::AnyRef{ toRemove });
+		RemoveCommand(utility::AnyReference{ toRemove });
 	}
 
 	template<typename InputType>

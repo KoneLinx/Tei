@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.props" Condition="Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -77,32 +78,34 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(SolutionDir)libs\steam\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Utility;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(SolutionDir)libs\steam\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Utility;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(SolutionDir)libs\steam\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Utility;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(SolutionDir)libs\steam\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Utility;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);METRICS_TIMEBLOCK</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,13 +131,15 @@
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);METRICS_TIMEBLOCK</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,12 +165,14 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);METRICS_TIMEBLOCK</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -191,12 +198,14 @@
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);METRICS_TIMEBLOCK</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -225,11 +234,13 @@
     <ClCompile Include="Audio\AudioHandler.cpp" />
     <ClCompile Include="Audio\DebugAudio.cpp" />
     <ClCompile Include="Audio\SDLAudio.cpp" />
+    <ClCompile Include="Components\RefComponent.cpp" />
+    <ClCompile Include="ECS\Object.cpp" />
     <ClCompile Include="Events\Events.cpp" />
     <ClCompile Include="Components\InputComponent.cpp" />
+    <ClCompile Include="include\tei\internal\Utility\Projector_as_const.cpp" />
     <ClCompile Include="Input\Controller.cpp" />
     <ClCompile Include="Input\Command.cpp" />
-    <ClCompile Include="ECS\Object.cpp" />
     <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="Core\main.cpp" />
     <ClCompile Include="Input\InputManager.cpp" />
@@ -250,7 +261,6 @@
     <ClCompile Include="Time\Clock.cpp" />
     <ClCompile Include="Time\Time.cpp" />
     <ClCompile Include="Components\Transform.cpp" />
-    <ClCompile Include="Utility\Helpers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Application.h" />
@@ -259,14 +269,31 @@
     <ClInclude Include="Audio\SDLAudio.h" />
     <ClInclude Include="Components\ComponentHelpers.h" />
     <ClInclude Include="Components\RefComponent.h" />
+    <ClInclude Include="ECS\Object.h" />
+    <ClInclude Include="ECS\ObjectHierarchy.h" />
     <ClInclude Include="Events\Events.h" />
     <ClInclude Include="include\tei\event.h" />
     <ClInclude Include="include\tei\input.h" />
     <ClInclude Include="Components\InputComponent.h" />
+    <ClInclude Include="include\tei\internal\Utility\AnyReference.h" />
+    <ClInclude Include="include\tei\internal\Utility\Error.h" />
+    <ClInclude Include="include\tei\internal\Utility\Metrics\Metrics.h" />
+    <ClInclude Include="include\tei\internal\Utility\Metrics\Metrics.hpp" />
+    <ClInclude Include="include\tei\internal\Utility\Observed.h" />
+    <ClInclude Include="include\tei\internal\Utility\Projector_addressof.h" />
+    <ClInclude Include="include\tei\internal\Utility\Projector_as_const.h" />
+    <ClInclude Include="include\tei\internal\Utility\Projector_get.h" />
+    <ClInclude Include="include\tei\internal\Utility\Projector_to_address.h" />
+    <ClInclude Include="include\tei\internal\Utility\Random.h" />
+    <ClInclude Include="include\tei\internal\Utility\Service.h" />
+    <ClInclude Include="include\tei\internal\Utility\Static.h" />
+    <ClInclude Include="include\tei\internal\Utility\SubrangeHelper.h" />
+    <ClInclude Include="include\tei\internal\Utility\TypeErasedView.h" />
+    <ClInclude Include="include\tei\internal\Utility\TypeHelpers.h" />
+    <ClInclude Include="include\tei\internal\Utility\UniqueVectorIterator.h" />
     <ClInclude Include="Input\Controller.h" />
     <ClInclude Include="Input\Command.h" />
     <ClInclude Include="Components\Components.h" />
-    <ClInclude Include="ECS\Object.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="External\Client.h" />
     <ClInclude Include="include\tei\components.h" />
@@ -303,14 +330,31 @@
     <ClInclude Include="Components\Transform.h" />
     <ClInclude Include="Units\glm.h" />
     <ClInclude Include="Units\Units.h" />
+    <ClInclude Include="Utility\AnyReference.h" />
     <ClInclude Include="Utility\Error.h" />
-    <ClInclude Include="Utility\Helpers.h" />
-    <ClInclude Include="Utility\Metrics\Metrics.h" />
-    <ClInclude Include="Utility\Metrics\Metrics.hpp" />
+    <ClInclude Include="Utility\Observed.h" />
+    <ClInclude Include="Utility\Projector_addressof.h" />
+    <ClInclude Include="Utility\Projector_as_const.h" />
+    <ClInclude Include="Utility\Projector_get.h" />
+    <ClInclude Include="Utility\Projector_to_address.h" />
+    <ClInclude Include="Utility\Random.h" />
     <ClInclude Include="Utility\Service.h" />
-    <ClInclude Include="include\tei\internal\utility.h" />
+    <ClInclude Include="Utility\Static.h" />
+    <ClInclude Include="Utility\SubrangeHelper.h" />
+    <ClInclude Include="Utility\TypeHelpers.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets" Condition="Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets'))" />
+  </Target>
 </Project>

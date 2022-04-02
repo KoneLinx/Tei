@@ -39,23 +39,30 @@ namespace tei::internal::components
 
 		std::tuple<std::reference_wrapper<Components>...> m_Data;
 
+	private:
+
 	};
 
-	template <size_t N>
-	struct Name
+	namespace detail
 	{
-		constexpr Name(char const (&name)[N + 1]) noexcept
-		{
-			for (size_t i{}; i < N; ++i)
-				_name[i] = name[i];
-		}
-		char _name[N]{};
-	};
+		void ExceptRefNotValid(std::type_info const&);
+	}
 
-	template <size_t N>
-	Name(char const (&)[N]) -> Name<N - 1>;
+	//template <size_t N>
+	//struct Name
+	//{
+	//	constexpr Name(char const (&name)[N + 1]) noexcept
+	//	{
+	//		for (size_t i{}; i < N; ++i)
+	//			_name[i] = name[i];
+	//	}
+	//	char _name[N]{};
+	//};
 
-	template <Name = "", typename ... Components>
+	//template <size_t N>
+	//Name(char const (&)[N]) -> Name<N - 1>;
+
+	template <typename ... Components>
 	class RefComponent
 	{
 	public:
@@ -80,8 +87,8 @@ struct std::tuple_element<INDEX, tei::internal::components::Refs<Components...>>
 {};
 
 
-template <tei::internal::components::Name NAME, typename ... Components>
-static inline void OnEnable(tei::internal::Internal, tei::internal::components::RefComponent<NAME, Components...>& refcomp, tei::internal::ecs::Object& object)
+template <typename ... Components>
+inline void OnEnable(std::nullptr_t, tei::internal::components::RefComponent<Components...>& refcomp, tei::internal::ecs::Object& object)
 {
 	auto const getter = [&object] <typename Component> (std::reference_wrapper<Component>& ref)
 	{
@@ -94,7 +101,7 @@ static inline void OnEnable(tei::internal::Internal, tei::internal::components::
 			if constexpr (std::default_initializable<Component>)
 				ref = object.AddComponent<Component>();
 			else
-				throw tei::internal::utility::TeiRuntimeError{ "Cannot find or create required component", typeid(Component).name() };
+				tei::internal::components::detail::ExceptRefNotValid(typeid(Component));
 		}
 	};
 	(getter(std::get<std::reference_wrapper<Components>>(refcomp.refs.as_tuple())), ...);

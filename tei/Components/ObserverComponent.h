@@ -21,7 +21,7 @@ namespace tei::internal::components
 
 	private:
 
-		std::unordered_map<Subject*, std::vector<utility::AnyRef>> m_Observers{};
+		std::unordered_map<Subject*, std::vector<utility::AnyReference>> m_Observers{};
 	
 	};
 
@@ -32,4 +32,4 @@ namespace tei::external::components
 	using tei::internal::components::ObserverComponent;
 }
 
-void OnDisable(tei::internal::Internal, tei::internal::components::ObserverComponent&);
+void OnDisable(std::nullptr_t, tei::internal::components::ObserverComponent&);

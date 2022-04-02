@@ -2,7 +2,7 @@
 
 #include <SDL_mixer.h>
 
-#include <ranges>
+#include "../Resources/Audio.h"
 
 namespace tei::internal::audio
 {

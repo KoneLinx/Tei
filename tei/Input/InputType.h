@@ -1,7 +1,7 @@
 #pragma once
 
 #include <variant>
-#include <tei/internal/utility.h>
+#include <tei/internal/Utility/TypeHelpers.h>
 
 namespace tei::internal::input
 {

@@ -2,7 +2,7 @@
 
 #include <tei.h>
 
-struct FpsComponent : tei::components::RefComponent<"fps", tei::components::Observed<std::string>, tei::components::ObjectTransform>
+struct FpsComponent : tei::components::RefComponent<tei::components::Observed<std::string>, tei::components::ObjectTransform>
 {
 	tei::Clock::duration average{ 1 };
 };

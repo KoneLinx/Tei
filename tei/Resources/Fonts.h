@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ResourceManager.h"
+#include <memory>
+#include <filesystem>
 
 namespace tei::internal::resource
 {
@@ -14,25 +15,6 @@ namespace tei::internal::resource
 		{ return this != nullptr && pData != nullptr; }
 	};
 
-	//namespace prefab
-	//{
-
-	//	class FontsLoader final : public ResourceManager::template Loader<Font>
-	//	{
-	//	public:
-
-	//		FontsLoader();
-
-	//	private:
-
-	//		Font* OnLoad(std::filesystem::path const& path, ResourceManager const& resources, std::optional<Font> init) const override;
-
-	//		void OnFree(ResourceManager const& resources, Font* font) const override;
-
-	//	};
-
-	//}
-
 }
 
 namespace tei::external::resource
@@ -40,9 +22,8 @@ namespace tei::external::resource
 	using tei::internal::resource::Font;
 }
 
-tei::external::Resource<tei::external::resource::Font>
-Load(
-	tei::external::resource::ToLoad<tei::external::resource::Font>,
+void Load(
+	std::shared_ptr<tei::external::resource::Font>&,
 	std::filesystem::path const&,
 	int ptSize = 11
 );

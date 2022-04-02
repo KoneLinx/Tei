@@ -1,5 +1,8 @@
 #include "Textures.h"
 
+#include <mutex>
+
+#include <tei/internal/Utility/Error.h>
 #include <tei/render.h>
 #include <SDL_image.h>
 #include "Textures.h"
@@ -7,63 +10,18 @@
 using namespace tei::internal::resource;
 using namespace tei::internal;
 
-//prefab::TextureLoader::TextureLoader()
-//{
-//	METRICS_TIMEBLOCK;
-//
-//	int init{
-//		bool(IMG_Init(IMG_INIT_JPG) & IMG_INIT_JPG) &
-//		bool(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) 
-//	};
-//	if (!init)
-//		throw utility::TeiRuntimeError{ "Could not properly initialize SDL_image", SDL_GetError() };
-//}
-//
-//Texture* prefab::TextureLoader::OnLoad(std::filesystem::path const& path, ResourceManager const& resources, std::optional<Texture> init) const
-//{
-//	METRICS_TIMEBLOCK;
-//
-//	auto const file = resources.GetExisting(path);
-//
-//	auto const pathStr{ file.string() };
-//
-//	if (!init) init = Texture{};
-//
-//	SDL_Texture* pTexture = IMG_LoadTexture(
-//		static_cast<SDL_Renderer*>(render::Renderer->GetRenderTraget().pData),
-//		pathStr.c_str()
-//	);
-//	init->pData = pTexture;
-//
-//	if (pTexture == nullptr ||
-//		SDL_QueryTexture(
-//			pTexture, 
-//			nullptr,
-//			nullptr, 
-//			&init->w, 
-//			&init->h
-//		) != 0
-//	)
-//		throw utility::TeiRuntimeError{ "Could not load texture: " + pathStr, SDL_GetError() };
-//
-//	return new Texture{ *std::move(init) };
-//}
-//
-//void prefab::TextureLoader::OnFree(ResourceManager const&, Texture* texture) const
-//{
-//	METRICS_TIMEBLOCK;
-//
-//	SDL_DestroyTexture(static_cast<SDL_Texture*>(texture->pData));
-//	delete texture;
-//}
-
 Texture LoadTexture(std::filesystem::path const& path)
 {
-	//static bool init{
-	//	bool(IMG_Init(IMG_INIT_JPG) & IMG_INIT_JPG) &&
-	//	bool(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) ||
-	//	(throw utility::TeiRuntimeError{ "Could not properly initialize SDL_image", SDL_GetError() }, false)
-	//};
+	//static std::once_flag once{};
+	//std::call_once(
+	//	once,
+	//	[]
+	//	{
+	//		bool(IMG_Init(IMG_INIT_JPG) & IMG_INIT_JPG) &&
+	//		bool(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) ||
+	//		(throw utility::TeiRuntimeError{ "Could not properly initialize SDL_image", SDL_GetError() }, false);
+	//	}
+	//);
 
 	Texture texture{};
 
@@ -99,17 +57,17 @@ static constexpr auto  DELETER = [] (auto* pTexture) // Texture or Sprite
 	delete pTexture;
 };
 
-Resource<Texture> Load(ToLoad<Texture>, std::filesystem::path const& path)
+void Load(std::shared_ptr<Texture>& ref, std::filesystem::path const& path)
 {
-	return { std::shared_ptr<Texture>{ new Texture{ LoadTexture(path) }, DELETER } };
+	ref = { std::shared_ptr<Texture>{ new Texture{ LoadTexture(path) }, DELETER } };
 }
-Resource<Texture> Load(ToLoad<Texture>)
+void Load(std::shared_ptr<Texture>& ref)
 {
-	return { std::shared_ptr<Texture>{ new Texture{ LoadTexture({}) }, DELETER } };
+	ref = { std::shared_ptr<Texture>{ new Texture{ LoadTexture({}) }, DELETER } };
 }
 
-Resource<Sprite> Load(ToLoad<Sprite>, std::filesystem::path const& path, time::Clock::duration frameduration, int cols, int rows, bool loop, time::Clock::time_point origin)
+void Load(std::shared_ptr<Sprite>& ref, std::filesystem::path const& path, time::Clock::duration frameduration, int cols, int rows, bool loop, time::Clock::time_point origin)
 {
-	return { std::shared_ptr<Sprite>{ new Sprite{ LoadTexture(path), frameduration, cols, rows, loop, origin }, DELETER } };
+	ref = { std::shared_ptr<Sprite>{ new Sprite{ LoadTexture(path), frameduration, cols, rows, loop, origin }, DELETER } };
 }
 

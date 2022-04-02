@@ -21,7 +21,7 @@ void OnRender(Timer)
 	std::cout << "  " << tei::Time->frame.now << '\r';
 }
 
-struct FpsComponent : tei::components::RefComponent<"fps", tei::components::Observed<std::string>, tei::components::ObjectTransform>
+struct FpsComponent : tei::components::RefComponent<tei::components::Observed<std::string>, tei::components::ObjectTransform>
 {
 	tei::Clock::duration average{ 1_s };
 };
@@ -55,10 +55,10 @@ void OnFixedUpdate(FpsComponent const&)
 	std::cout.flush();
 }
 
-struct RootComponent : tei::components::RefComponent<"root", tei::components::ObjectTransform>
+struct RootComponent : tei::components::RefComponent<tei::components::ObjectTransform>
 {};
 
-void OnFixedUpdate(RootComponent& comp)
+void OnUpdate(RootComponent& comp)
 {
 	auto& [transform] = comp.refs;
 	float scale{ 1 + std::sin(tei::Time->thread->now.count() * 2) / 5 };
@@ -66,13 +66,13 @@ void OnFixedUpdate(RootComponent& comp)
 	transform.get().scale = { scale, scale };
 }
 
-struct SplashText : tei::components::RefComponent<"splash", tei::components::Observed<std::string>>
+struct SplashText : tei::components::RefComponent<tei::components::Observed<std::string>>
 {};
 
 void OnUpdate(SplashText& comp)
 {
 	auto& [text] = comp.refs;
-	text.get() = (std::stringstream{} << "0x" << std::hex << tei::RNG()).view();
+	text.get() = (std::stringstream{} << "0x" << std::hex << std::random_device()()).view();
 }
 
 void TeiClientInit()

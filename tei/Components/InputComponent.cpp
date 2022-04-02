@@ -7,7 +7,12 @@ void tei::internal::input::detail::InputComponent::Clear()
 	m_Commands.clear();
 }
 
-void OnDisable(tei::internal::Internal, tei::internal::input::detail::InputComponent& comp)
+tei::internal::input::detail::InputComponent::~InputComponent()
+{
+	Clear();
+}
+
+void OnDisable(std::nullptr_t, tei::internal::input::detail::InputComponent& comp)
 {
 	comp.Clear();
 }

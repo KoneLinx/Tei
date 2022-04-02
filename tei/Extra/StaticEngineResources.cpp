@@ -6,6 +6,7 @@
 #include <SDL_image.h>
 
 #include <tei/render.h>
+#include <tei/resource.h>
 
 tei::internal::resource::Texture tei::internal::extra::resources::EngineLoaderBackground()
 {

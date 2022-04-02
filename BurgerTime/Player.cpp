@@ -2,21 +2,66 @@
 #include "Level.h"
 
 using namespace tei;
+using namespace tei::components;
 
-ecs::Object& CreatePlayer(ecs::Object& parent, int id)
+Player::Player(int id)
+	: m_Playerid{ id }
+	, m_Lives{ 3 }
+	, m_Subject{}
+	, m_Input{}
+	, m_pParent{}
+{}
+
+void Player::OnInitialize(Object& object)
 {
-	auto& playerObject = parent.AddChild();
-
-	playerObject.AddComponent<components::ObjectTransform>(tei::unit::Position{ 0, 64 });
-	playerObject.AddComponent<components::InputComponent>();
-	playerObject.AddComponent<components::Subject>();
-
-	auto& player = playerObject.AddComponent<Player>();
-	player.playerid = id;
-	player.lives = 3;
-
-	return playerObject;
+	m_pParent = &object;
+	auto [transform, input] = object.AddComponents(
+		ObjectTransform{ unit::Position{0, 64} },
+		InputComponent{}
+	);
 }
+
+void Player::OnEnable()
+{
+	m_Input.AddCommand(
+		m_Playerid ? tei::input::KeyboardInput::Arrow::DOWN : tei::input::KeyboardInput::Home::PAGEDOWN,
+		[this] { TakeDamage(); }
+	);
+	m_Input.AddCommand(
+		m_Playerid ? tei::input::KeyboardInput::Arrow::UP : tei::input::KeyboardInput::Home::PAGEUP,
+		[this] { Score(); }
+	);
+	Notify(SPAWN);
+}
+
+void Player::OnDisable()
+{
+	m_Input.Clear();
+}
+
+void Player::TakeDamage()
+{
+	--m_Lives;
+	Notify(DAMAGED);
+	if (m_Lives == 0)
+	{
+		Notify(DEATH);
+        puts("Player died!");
+		m_pParent->SetState(false);
+	}
+}
+
+typename void Player::Notify(Event::ID id)
+{
+	m_Subject.Notify(Event{ id, this });
+}
+
+void Player::Score()
+{
+	Notify(SCORE);
+}
+
+
 
 tei::ecs::Object& CreatePlayerTracker(tei::ecs::Object& parent)
 {
@@ -38,42 +83,7 @@ tei::ecs::Object& CreatePlayerInfo(tei::ecs::Object& parent, int id)
 	return infoObject;
 }
 
-void OnEnable(Player& player, ecs::Object& object)
-{
-	auto& input = object.GetComponent<components::InputComponent>();
-	auto& subject = object.GetComponent<components::Subject>();
-	input.AddCommand(
-		player.playerid ? tei::input::KeyboardInput::Arrow::DOWN : tei::input::KeyboardInput::Home::PAGEDOWN,
-		[&]
-		{
-			--player.lives;
-			subject.Notify<Player::Event>({
-				Player::Event::DEATH,
-				&player
-			});
-			if (player.lives == 0)
-			{
-                puts("Player died!");
-				tei::Event->Notify(Level::Event::FAILED);
-				object.SetState(false);
-			}
-		}
-	);
-	input.AddCommand(
-		player.playerid ? tei::input::KeyboardInput::Arrow::UP : tei::input::KeyboardInput::Home::PAGEUP,
-		[&]
-		{
-			subject.Notify<Player::Event>({ 
-				Player::Event::SCORE, 
-				&player
-			});
-		}
-	);
-	subject.Notify<Player::Event>({
-		Player::Event::SPAWN,
-		&player
-	});
-}
+
 
 void OnInitialize(PlayerTracker& tracker, tei::ecs::Object& object)
 {
@@ -86,10 +96,10 @@ void OnInitialize(PlayerTracker& tracker, tei::ecs::Object& object)
 		levelSubject,
 		[&](Player::Event event)
 		{
-			if (event.event == Player::Event::SPAWN)
+			if (event.event == Player::SPAWN)
 			{
 				++tracker.playerAliveCount;
-				CreatePlayerInfo(parent, event.player->playerid);
+				CreatePlayerInfo(parent, event.player->GetID());
 			}
 		}
 	);
@@ -97,7 +107,7 @@ void OnInitialize(PlayerTracker& tracker, tei::ecs::Object& object)
 		levelSubject,
 		[&](Player::Event event)
 		{
-			if (event.event == Player::Event::DEATH && event.player->lives == 0)
+			if (event.event == Player::DEATH)
 			{
 				if (--tracker.playerAliveCount == 0)
 					levelSubject.Notify(Level::Event::FAILED);
@@ -111,17 +121,20 @@ void OnInitialize(PlayerInfo& info, tei::ecs::Object& object)
 	auto& scoreDisplay = object.AddChild();
 	auto& livesDisplay = object.AddChild();
 	
-	scoreDisplay.AddComponent<tei::components::ObjectTransform>(tei::unit::Position{ 0, info.playerid * 96 + 0 });
+	auto font = tei::Resources->LoadShared<tei::resource::Font>("resources/Lingua.otf", 12);
+	scoreDisplay.AddComponents(
+		ObjectTransform{ tei::unit::Position{ 0, info.playerid * 96 + 0 } },
+		TextRenderComponent{},
+		font
+	);
 	auto& scoreText = scoreDisplay.AddComponent<tei::components::Observed<std::string>>();
-	scoreDisplay.AddComponent<tei::components::TextRenderComponent>();
-	scoreDisplay.AddComponent(tei::Resources->LoadShared<tei::resource::Font>("resources/Lingua.otf", 12));
-	scoreDisplay.AddComponent(tei::Resources->LoadUnique<tei::resource::Texture>());
 	
-	livesDisplay.AddComponent<tei::components::ObjectTransform>(tei::unit::Position{ 0, info.playerid * 96 + 16 });
+	scoreDisplay.AddComponents(
+		ObjectTransform{ tei::unit::Position{ 0, info.playerid * 96 + 16 } },
+		TextRenderComponent{},
+		font
+	);
 	auto& livesText = livesDisplay.AddComponent<tei::components::Observed<std::string>>();
-	livesDisplay.AddComponent<tei::components::TextRenderComponent>();
-	livesDisplay.AddComponent(tei::Resources->LoadShared<tei::resource::Font>("resources/Lingua.otf", 12));
-	livesDisplay.AddComponent(tei::Resources->LoadUnique<tei::resource::Texture>());
 
 	auto& parent = object.GetParent();
 
@@ -146,13 +159,13 @@ void OnInitialize(PlayerInfo& info, tei::ecs::Object& object)
 		levelSubject,
 		[&] (Player::Event event)
 		{
-			if (event.player->playerid != info.playerid)
+			if (event.player->GetID() != info.playerid)
 				return;
 			else
-			if (event.event == Player::Event::DEATH)
-				livesText = makeLivesText(event.player->lives);
+			if (event.event == Player::DAMAGED)
+				livesText = makeLivesText(3);
 			else
-			if (event.event == Player::Event::SCORE)
+			if (event.event == Player::SCORE)
 			{
 				scoreText = makeScoreText(info.score += 73);
 				if (info.score >= 500)

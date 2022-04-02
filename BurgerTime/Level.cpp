@@ -8,11 +8,12 @@ tei::ecs::Object& CreateLevel(tei::ecs::Object& parent)
     auto& levelObject = parent.AddChild();
 
     levelObject.AddComponent<Level>();
-    levelObject.AddComponent<tei::components::Subject>();
+    auto& sub = levelObject.AddComponent<tei::components::Subject>();
 
     CreatePlayerTracker(levelObject);
-    CreatePlayer(levelObject, 0);
-    CreatePlayer(levelObject, 1);
+
+    levelObject.AddChild().AddComponent<Player>(0);
+    auto& player = levelObject.AddChild().AddComponent<Player>(1);
 
     //CreateScore(levelObject);
 

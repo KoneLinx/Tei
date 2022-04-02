@@ -1,12 +1,13 @@
 #include "Audio.h"
 
 #include <SDL_mixer.h>
+#include <tei/internal/Utility/Error.h>
 
 using namespace tei::internal::resource;
 using namespace tei::internal;
 using namespace std::literals;
 
-Resource<Sound> Load(ToLoad<Sound>, std::filesystem::path const& path, bool loop, float volume, [[maybe_unused]] std::string_view name)
+void Load(std::shared_ptr<Sound>& out, std::filesystem::path const& path, bool loop, float volume, [[maybe_unused]] std::string_view name)
 {
     //struct Audio
     //{
@@ -49,7 +50,7 @@ Resource<Sound> Load(ToLoad<Sound>, std::filesystem::path const& path, bool loop
         };
 #endif
 
-    return { 
+    out = { 
         std::shared_ptr<Sound>{ 
             new Sound{
                 pChunk, 
@@ -64,7 +65,7 @@ Resource<Sound> Load(ToLoad<Sound>, std::filesystem::path const& path, bool loop
     };
 }
 
-Resource<Sound> Load(ToLoad<Sound> d)
+void Load(std::shared_ptr<Sound>& out)
 {
-    return Load(d, {});
+    Load(out, {});
 }

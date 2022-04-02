@@ -6,8 +6,7 @@
 #include <variant>
 #include <memory>
 
-#include <tei/internal/utility.h>
-#include <tei/internal/ecs.h>
+#include <tei/internal/Utility/Service.h>
 
 namespace tei::internal::resource
 {
@@ -19,15 +18,15 @@ namespace tei::internal::resource
 	class ToLoad;
 	
 	template <typename Data, typename ... Args>
-	concept LoadableResource = requires (ToLoad<Data> d, std::filesystem::path path, Args ... args)
+	concept LoadableResource = requires (std::shared_ptr<Data>& d, std::filesystem::path const& path, Args ... args)
 	{
-		{ ::Load(d, path, std::forward<Args>(args)...) } -> std::same_as<Resource<Data>>;
+		::Load(d, path, std::forward<Args>(args)...);
 	};
 	
 	template <typename Data>
-	concept DefaultResource = requires (ToLoad<Data> d)
+	concept DefaultResource = requires (std::shared_ptr<Data>& d)
 	{
-		{ ::Load(d) } -> std::same_as<Resource<Data>>;
+		::Load(d);
 	};
 
 	class ResourceManager
@@ -126,13 +125,17 @@ namespace tei::internal::resource
 	inline Resource<Data> ResourceManager::LoadUnique(std::filesystem::path const& filepath, Args && ... args)
 	{
 		auto abs = std::filesystem::absolute(filepath);
-		return ::Load(ToLoad<Data>{}, abs, std::forward<Args>(args)...);
+		std::shared_ptr<Data> out{};
+		::Load(out, abs, std::forward<Args>(args)...);
+		return out;
 	}
 
 	template<typename Data> requires DefaultResource<Data>
 	inline Resource<Data> ResourceManager::LoadUnique()
 	{
-		return ::Load(ToLoad<Data>{});
+		std::shared_ptr<Data> out{};
+		::Load(out);
+		return out;
 	}
 
 	template<typename Data, typename Creator>
