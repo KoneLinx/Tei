@@ -1,6 +1,7 @@
 #pragma once
 
 #include "InputType.h"
+#include <string_view>
 
 namespace tei::internal::input
 {
@@ -208,6 +209,8 @@ namespace tei::internal::input
             static Type const COMMA;
             static Type const EQUALS;
 		};
+
+        SomeCommonInputTypeRef InputByName(std::string_view name);
 
 	};
 

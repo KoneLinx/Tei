@@ -28,9 +28,10 @@ namespace tei::internal::input
 
 		constexpr InputType() = default;
 		constexpr InputType(DeviceId deviceId, uint32_t keyId, bool onChange = true, State state = {}, uint16_t deviceIndex = {});
-		constexpr InputType(InputType const&, bool onChange, State state = {}, uint16_t deviceIndex = {});
-		constexpr InputType(InputType const&, State state, uint16_t deviceIndex = {});
-		constexpr InputType(InputType const&, uint16_t deviceIndex);
+
+		constexpr InputType WithChange(bool onChange) const;
+		constexpr InputType WithState(State state) const;
+		constexpr InputType WithIndex(uint16_t deviceIndex) const;
 
 		constexpr bool operator == (InputType const& other) const;
 	};
@@ -104,19 +105,28 @@ namespace tei::internal::input
 	{}
 
 	template<typename Data_t, typename State_t>
-	inline constexpr InputType<Data_t, State_t>::InputType(InputType const& toCopy, bool onChange, State_t state, uint16_t deviceIndex)
-		: InputType{ toCopy.deviceId, toCopy.keyId, onChange, state, deviceIndex }
-	{}
+	inline constexpr InputType<Data_t, State_t> InputType<Data_t, State_t>::WithChange(bool ponChange) const
+	{
+		auto out = *this;
+		out.onChange = ponChange;
+		return out;
+	}
 
 	template<typename Data_t, typename State_t>
-	inline constexpr InputType<Data_t, State_t>::InputType(InputType const& other, State state, uint16_t deviceIndex)
-		: InputType{ other.deviceId, other.keyId, true, state, deviceIndex }
-	{}
+	inline constexpr InputType<Data_t, State_t> InputType<Data_t, State_t>::WithState(State pstate) const
+	{
+		auto out = *this;
+		out.state = pstate;
+		return out;
+	}
 
 	template<typename Data_t, typename State_t>
-	inline constexpr InputType<Data_t, State_t>::InputType(InputType const& other, uint16_t deviceIndex)
-		: InputType{ other.deviceId, other.keyId, true, State{}, deviceIndex }
-	{}
+	inline constexpr InputType<Data_t, State_t> InputType<Data_t, State_t>::WithIndex(uint16_t pdeviceIndex) const
+	{
+		auto out = *this;
+		out.deviceIndex = pdeviceIndex;
+		return out;
+	}
 
 	template<typename Data_t, typename State_t>
 	inline constexpr bool InputType<Data_t, State_t>::operator==(InputType const& other) const

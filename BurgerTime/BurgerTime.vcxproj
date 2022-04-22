@@ -20,18 +20,26 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Achievements.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="Fps.h" />
+    <ClInclude Include="Json.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Score.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Achievements.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Fps.cpp" />
+    <ClCompile Include="Json.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Score.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\FilesPlayer.json" />
+    <None Include="resources\Level1.json" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

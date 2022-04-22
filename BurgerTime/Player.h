@@ -13,6 +13,8 @@ public:
 
 	Player(int playerID);
 
+	tei::ecs::Object& Create(tei::ecs::Object& parent, int id);
+
 	void OnInitialize(Object&);
 	void OnEnable();
 	void OnDisable();
@@ -33,6 +35,7 @@ private:
 	int m_Playerid;
 	int m_Lives;
 	Object* m_pParent;
+	tei::components::ObjectTransform* m_pTransform;
 
 	struct _Event
 	{

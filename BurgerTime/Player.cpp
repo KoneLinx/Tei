@@ -12,6 +12,14 @@ Player::Player(int id)
 	, m_pParent{}
 {}
 
+tei::ecs::Object& Player::Create(tei::ecs::Object& parent, int id)
+{
+	auto& playerObject = parent.AddChild();
+
+	auto& player = playerObject.AddComponent(Player{ id });
+	m_pTransform = &playerObject.AddComponent(ObjectTransform{});
+}
+
 void Player::OnInitialize(Object& object)
 {
 	m_pParent = &object;

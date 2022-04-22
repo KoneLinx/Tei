@@ -11,10 +11,13 @@ namespace tei::internal::utility
 	{
 	public:
 
-		constexpr Observed() = default;
+		constexpr Observed(bool initial = true) requires std::default_initializable<Data>
+			: Observed(Data{}, initial)
+		{}
 
-		constexpr Observed(Data data) requires std::movable<Data>
+		constexpr Observed(Data data, bool initial = true) requires std::movable<Data>
 			: m_Data{ std::move(data) }
+			, m_Updated{ initial }
 		{}
 
 		constexpr Data& operator = (Data const& data) requires std::copyable<Data>
@@ -80,5 +83,9 @@ namespace tei::internal::utility
 		Data m_Data;
 		bool m_Updated{ true };
 	};
+
+	template <>
+	class Observed<void> : Observed<std::nullopt_t>
+	{};
 
 }

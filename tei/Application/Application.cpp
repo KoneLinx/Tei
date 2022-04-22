@@ -51,7 +51,7 @@ Application::Application(int argc, char const* const* argv)
 	OpenWindow();
 
 	if (!SteamInitialize())
-		utility::TeiRuntimeError{ "Could not initialize Steam API" };
+		0;//utility::TeiRuntimeError{ "Could not initialize Steam API" };
 }
 
 Application::~Application()
