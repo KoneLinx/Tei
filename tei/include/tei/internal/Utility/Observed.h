@@ -85,7 +85,7 @@ namespace tei::internal::utility
 	};
 
 	template <>
-	class Observed<void> : Observed<std::nullopt_t>
+	class Observed<void> : Observed<std::nullptr_t>
 	{};
 
 }

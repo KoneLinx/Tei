@@ -288,6 +288,7 @@
     <ClInclude Include="include\tei\internal\Utility\Service.h" />
     <ClInclude Include="include\tei\internal\Utility\Static.h" />
     <ClInclude Include="include\tei\internal\Utility\SubrangeHelper.h" />
+    <ClInclude Include="Time\TimeUtils.h" />
     <ClInclude Include="include\tei\internal\Utility\TypeErasedView.h" />
     <ClInclude Include="include\tei\internal\Utility\TypeHelpers.h" />
     <ClInclude Include="include\tei\internal\Utility\UniqueVectorIterator.h" />

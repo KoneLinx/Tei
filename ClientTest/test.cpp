@@ -9,8 +9,16 @@ using namespace tei::literals;
 
 struct Timer {};
 
-void OnUpdate(Timer)
+void OnUpdate(Timer, tei::ecs::Object const& object)
 {
+	static tei::time::TimeTimes timer{ 1_s, 5, tei::Time->frame.now + 3_s };
+	static tei::time::TimeTimes timer2{ 1_s, 5, tei::Time->frame.now + 2_s + 100_ms  };
+	if (timer || timer2)
+	{
+		if (auto* p{ object.HasComponent<tei::Resource<tei::resource::Sound>>() })
+			tei::Audio->Play(*p);
+	}
+
 	if (tei::Time->frame.now > 5_s)
 		0;
 		//tei::Application->Quit();
@@ -141,6 +149,8 @@ void TeiClientInit()
 			tei::Application->Quit(); 
 		}
 	);
+
+	scene.AddComponent(tei::Resources->LoadUnique<tei::resource::Sound>("resources/spin.mp3"));
 
 }
 

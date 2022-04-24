@@ -91,6 +91,9 @@ namespace tei::internal::resource
 		Data* operator -> () const
 		{ return m_Data.operator->(); }
 
+		operator Data& () const
+		{ return this->operator*(); }
+
 	private:
 
 		std::shared_ptr<Data> m_Data{};

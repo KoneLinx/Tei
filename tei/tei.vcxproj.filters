@@ -347,6 +347,9 @@
     <ClInclude Include="ECS\ObjectHierarchy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Time\TimeUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
