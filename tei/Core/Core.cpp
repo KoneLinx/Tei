@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <latch>
+#include <future>
 
 #include <tei.h>
 
@@ -23,9 +24,11 @@ enum struct FrameUpdateType : size_t
 	FREE_UPDATE   = 1ull << 1,
 	FIXED_UPDATE  = 1ull << 2,
 	EVENTS        = 1ull << 3,
+	AUDIO         = 1ull << 4,
 
 	FRAME         = RENDER | EVENTS | FREE_UPDATE,
 	FIXED         = FIXED_UPDATE,
+	BACKGROUND    = AUDIO
 };
 
 bool operator == (FrameUpdateType a, FrameUpdateType b)
@@ -47,11 +50,15 @@ void FrameUpdate(bool& isRunning, FrameUpdateType updateType)
 	if (isRunning && updateType == FrameUpdateType::FREE_UPDATE)
 	{
 		scene::Scenes->Do(ecs::Message::UPDATE);
-		audio::Audio->Update();
 	}
 	if (isRunning && updateType == FrameUpdateType::FIXED_UPDATE)
 	{
 		scene::Scenes->Do(ecs::Message::FIXEDUPDATE);
+	}
+	if (isRunning && updateType == FrameUpdateType::AUDIO)
+	{
+		events::Event->Notify(0);
+		audio::Audio->Update();
 	}
 	if (isRunning && updateType == FrameUpdateType::RENDER)
 	{
@@ -118,27 +125,36 @@ void CoreFunction::Run()
 
 	// Game
 	{
-		std::latch sync{ 2 };
+		std::latch sync{ 3 };
 
-		//std::jthread fixed{
-		//	[&isRunning, &sync]
-		//	{
-		//		METRICS_TIMEBLOCK;
-		//		time::Time->thread = &time::Time->fixed;
-		//		sync.arrive_and_wait();
-		//		GameLoop(isRunning, time::Time->fixed, FrameUpdateType::FIXED);
-		//	}
-		//};
-		
-		// render
-		[&isRunning, &sync]
+		auto fixed = [&isRunning, &sync]
 		{
 			METRICS_TIMEBLOCK;
-			//sync.arrive_and_wait();
+			time::Time->thread = &time::Time->fixed;
+			sync.arrive_and_wait();
+			GameLoop(isRunning, time::Time->fixed, FrameUpdateType::FIXED);
+		};
+		
+		auto frame = [&isRunning, &sync]
+		{
+			METRICS_TIMEBLOCK;
 			time::Time->thread = &time::Time->frame;
+			sync.arrive_and_wait();
 			GameLoop(isRunning, time::Time->frame, FrameUpdateType::FRAME);
-		}
-		();
+		};
+
+		auto background = [&isRunning, &sync]
+		{
+			METRICS_TIMEBLOCK;
+			time::Time->thread = &time::Time->background;
+			sync.arrive_and_wait();
+			GameLoop(isRunning, time::Time->background, FrameUpdateType::BACKGROUND);
+		};
+
+		[[maybe_unused]] std::jthread ft{ fixed };
+		[[maybe_unused]] std::jthread bgt{ background };
+		frame();
+
 	}
 
 	// Clear scenes

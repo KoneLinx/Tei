@@ -17,14 +17,14 @@ namespace tei::internal::audio
 		puts("Debug audio disabled");
 	}
 
-	void DebugAudio::OnUpdate(std::span<std::reference_wrapper<resource::Sound const>> log)
+	void DebugAudio::OnUpdate(std::span<resource::Sound const*> log)
 	{
-		for (resource::Sound const& sound : log)
+		for (resource::Sound const* pSound : log)
 			std::cout << "[audio] " <<
 #if defined(DEBUG) || defined(_DEBUG)
-				sound._name 
+				pSound->_name 
 #else
-				sound.pData
+				pSound->pData
 #endif
 			<< '\n';
 	}

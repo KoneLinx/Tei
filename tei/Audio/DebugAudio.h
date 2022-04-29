@@ -8,7 +8,7 @@ namespace tei::internal::audio
 	{
 		virtual void OnEnable() override;
 		virtual void OnDisable() override;
-		virtual void OnUpdate(std::span<std::reference_wrapper<resource::Sound const>>) override;
+		virtual void OnUpdate(std::span<resource::Sound const*>) override;
 		virtual void OnMute(bool) override;
 	};
 

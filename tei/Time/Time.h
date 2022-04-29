@@ -26,7 +26,7 @@ namespace tei::internal::time
 			bool fixed;
 			bool allow_drop;
 		}
-		frame, fixed;
+		frame, fixed, background;
 
 		static thread_local Thread const* thread;
 

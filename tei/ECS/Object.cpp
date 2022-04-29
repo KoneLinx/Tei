@@ -262,37 +262,12 @@ Object::Object(Object const& other)
 	);
 }
 
-void Object::ExceptComponentNotFound(std::type_info const& type) const
+void Object::ExceptComponentNotFound(std::type_info const& type)
 {
 	throw utility::TeiRuntimeError{ "No such component found in object", type.name() };
 }
 
-void Object::ComponentBase::ExceptCannotCopy(std::type_info const& type) const
+void Object::ComponentBase::ExceptCannotCopy(std::type_info const& type)
 {
 	throw utility::TeiRuntimeError{ "Cannot copy object component", type.name() };
 }
-
-//utility::ForwardView<Object> Object::GetAllChildren()
-//{
-//	return std::views::transform(m_Children, utility::projectors::to_address<true>{});
-//}
-//
-//utility::ForwardView<Object const> tei::internal::ecs::Object::GetAllChildren() const
-//{
-//	return std::views::transform(m_Children, utility::projectors::to_address<true, true>{});
-//}
-//
-//utility::ForwardView<Object> tei::internal::ecs::Object::GetActiveChildren()
-//{
-//	return std::views::filter(std::views::transform(m_Children, utility::projectors::to_address<true>{}), std::identity{});
-//}
-//
-//utility::ForwardView<Object const> tei::internal::ecs::Object::GetActiveChildren() const
-//{
-//	return std::views::filter(std::views::transform(m_Children, utility::projectors::to_address<true, true>{}), std::identity{});
-//}
-//
-//utility::ForwardView<Object> tei::internal::ecs::Object::GetInactiveChildren() const
-//{
-//	return std::views::filter(std::views::transform(m_Children, utility::projectors::to_address<true>{}), std::logical_not{});
-//}

@@ -20,6 +20,9 @@ namespace tei::internal::components
 
 	namespace detail
 	{
+		
+		template <typename Ret, typename Event>
+		std::remove_cvref_t<Event> EventTypeDetector(Ret(*)(Event));
 
 		template <typename Observer, typename Ret, typename Event>
 		std::remove_cvref_t<Event> EventTypeDetector(Ret(Observer::*)(Event));
@@ -28,7 +31,10 @@ namespace tei::internal::components
 		std::remove_cvref_t<Event> EventTypeDetector(Ret(Observer::*)(Event) const);
 
 		template <typename Observer>
-		using ObserverEvent_t = decltype(EventTypeDetector(&Observer::operator()));
+		decltype(EventTypeDetector(&Observer::operator())) EventTypeDetector(Observer&&);
+
+		template <typename Observer>
+		using ObserverEvent_t = decltype(EventTypeDetector(std::declval<Observer>()));
 
 		template <typename>
 		concept Event = true;

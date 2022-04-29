@@ -2,6 +2,7 @@
 
 #if defined(DEBUG) || defined(_DEBUG)
 #include <typeinfo>
+#include <cassert>
 #endif // DEBUG
 
 #include <memory>

@@ -10,7 +10,7 @@ namespace tei::internal::audio
 		virtual void OnEnable() override;
 		virtual void OnDisable() override;
 		virtual void OnMute(bool) override;
-		virtual void OnUpdate(std::span<std::reference_wrapper<resource::Sound const>> requests) override;
+		virtual void OnUpdate(std::span<resource::Sound const*> requests) override;
 
 	};
 

@@ -125,7 +125,7 @@ namespace tei::internal::ecs
 		ComponentBase* GetComponent(std::type_info const&) const;
 		std::unique_ptr<ComponentBase> ExtractComponent(std::type_info const&);
 
-		void ExceptComponentNotFound(std::type_info const&) const;
+		static void ExceptComponentNotFound(std::type_info const&);
 
 	};
 
@@ -240,7 +240,7 @@ namespace tei::internal::ecs
 
 	protected:
 
-		void ExceptCannotCopy(std::type_info const&) const;
+		static void ExceptCannotCopy(std::type_info const&);
 
 	};
 
@@ -285,7 +285,8 @@ namespace tei::internal::ecs
 			if constexpr (std::copyable<Data>)
 				return std::unique_ptr<ComponentBase>{ new Component{ m_Data } };
 			else
-				ComponentBase::CannotCopyException(typeid(Data));
+				ComponentBase::ExceptCannotCopy(typeid(Data));
+			return {};
 		}
 
 		virtual void Do(Message::Init, Object& parent) override

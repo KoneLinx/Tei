@@ -41,7 +41,7 @@ void OnUpdate(FpsComponent& fps)
 
 	std::stringstream out{};
 	out << "                \r[Frame]\tdelta:\t" << std::chrono::milliseconds{tei::Time->thread->delta}
-		<< "\tlag:\t" << std::chrono::microseconds{tei::Time->thread->lag}
+		<< "\tlag:\t" << std::chrono::milliseconds{tei::Time->thread->lag}
 		<< std::endl;
 	std::cout << out.view();
 	std::cout.flush();
@@ -56,7 +56,17 @@ void OnFixedUpdate(FpsComponent const&)
 {
 	std::stringstream out{};
 	out << "                \r[Fixed]\tdelta:\t" << std::chrono::milliseconds{tei::Time->thread->delta}
-		<< "\tlag:\t" << std::chrono::microseconds{tei::Time->thread->lag}
+		<< "\tlag:\t" << std::chrono::milliseconds{tei::Time->thread->lag}
+		<< std::endl;
+	std::cout << out.view();
+	std::cout.flush();
+}
+
+void OnBGUpdate(int)
+{
+	std::stringstream out{};
+	out << "                \r[Backg]\tdelta:\t" << std::chrono::milliseconds{tei::Time->thread->delta}
+		<< "\tlag:\t" << std::chrono::milliseconds{tei::Time->thread->lag}
 		<< std::endl;
 	std::cout << out.view();
 	std::cout.flush();
@@ -137,6 +147,8 @@ void TeiClientInit()
 			fps.AddComponent<ObjectTransform>(Position{ windowScale / -2.f + 12.f });
 			fps.AddComponent<FpsComponent>();
 			fps.AddComponent<TextRenderComponent>();
+			
+			fps.AddComponent(tei::Event->AddObserver(OnBGUpdate));
 		}
 
 	}

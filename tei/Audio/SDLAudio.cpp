@@ -20,13 +20,13 @@ namespace tei::internal::audio
             Mix_HaltChannel(-1);
     }
 
-    void SDLAudio::OnUpdate(std::span<std::reference_wrapper<resource::Sound const>> requests)
+    void SDLAudio::OnUpdate(std::span<resource::Sound const*> requests)
     {
-        for (resource::Sound const& sound : requests)
+        for (resource::Sound const* pSound : requests)
         {
-            auto chunk = static_cast<Mix_Chunk*>(sound.pData);
-            Mix_VolumeChunk(chunk, int(sound.volume * MIX_MAX_VOLUME));
-            if (int c = Mix_PlayChannel(-1, chunk, sound.loop); c == -1)
+            auto chunk = static_cast<Mix_Chunk*>(pSound->pData);
+            Mix_VolumeChunk(chunk, int(pSound->volume * MIX_MAX_VOLUME));
+            if (int c = Mix_PlayChannel(-1, chunk, pSound->loop); c == -1)
                 puts("[WARNING] playing too many audio chunks, skipping current call"); //throw utility::TeiRuntimeError{ "Sound could not be played on any channel", SDL_GetError() };
         }
     }

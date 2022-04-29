@@ -15,6 +15,11 @@ namespace tei::internal::time
 				.step = 1_s / 20,
 				.fixed = true,
 				.allow_drop = false,
+			},
+			.background = {
+				.step = 1_s / 20,
+				.fixed = true,
+				.allow_drop = true,
 			}
 		}
 	};

@@ -17,8 +17,8 @@ namespace tei::internal::audio
 	{
 	public:
 
-		AudioHandler() = default;
-		virtual ~AudioHandler() = default;
+		AudioHandler();
+		virtual ~AudioHandler();
 
 		virtual void Play(resource::Sound const& sound) const final;
 
@@ -35,13 +35,16 @@ namespace tei::internal::audio
 		virtual void OnDisable() {}
 		virtual void OnMute(bool mute) { (void)mute; }
 
-		virtual void OnUpdate(std::span<std::reference_wrapper<resource::Sound const>> requests) = 0;
+		virtual void OnUpdate(std::span<resource::Sound const*> requests) = 0;
 
 		bool m_Muted{};
 
 		// TODO Fix!
 		mutable bool m_SetMuted{};
-		mutable std::vector<std::reference_wrapper<resource::Sound const>> m_Requests{};
+
+		using RequestQueue = std::vector<resource::Sound const*>;
+
+		std::atomic<std::shared_ptr<RequestQueue>> m_pRequests{};
 
 		struct ServiceRegisterer
 		{
@@ -67,12 +70,6 @@ namespace tei::external
 
 namespace tei::internal::audio
 {
-
-	inline void AudioHandler::Play(resource::Sound const& sound) const
-	{
-		if (!m_Muted)
-			m_Requests.push_back(sound);
-	}
 
 	inline void AudioHandler::Mute(bool mute = true) const
 	{
