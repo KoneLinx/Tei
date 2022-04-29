@@ -1,7 +1,7 @@
+#include "teipch.h"
 #include "Audio.h"
 
 #include <SDL_mixer.h>
-#include <tei/internal/Utility/Error.h>
 
 using namespace tei::internal::resource;
 using namespace tei::internal;

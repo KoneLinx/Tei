@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Clock.impl.h"
-#include <tei/internal/Utility/Static.h>
+#include <tei/utility.h>
 
 namespace tei::internal::time
 {

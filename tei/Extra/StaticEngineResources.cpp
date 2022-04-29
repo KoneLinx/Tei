@@ -1,3 +1,4 @@
+#include "teipch.h"
 #include "StaticEngineResources.h"
 
 #include <span>

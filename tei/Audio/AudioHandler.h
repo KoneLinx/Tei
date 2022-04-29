@@ -1,7 +1,6 @@
-
 #pragma once
 
-#include <tei/internal/Utility/Service.h>
+#include <tei/utility.h>
 
 #include <span>
 #include <vector>

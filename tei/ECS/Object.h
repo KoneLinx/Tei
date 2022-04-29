@@ -3,6 +3,8 @@
 #include <vector>
 #include <memory>
 #include <typeindex>
+#include <ranges>
+#include <functional>
 
 namespace tei::internal::scene
 {
@@ -82,16 +84,16 @@ namespace tei::internal::ecs
 		Object& GetParent();
 		Object const& GetParent() const;
 
-		//// View of all children
-		//auto GetAllChildren();
-		//auto GetAllChildren() const;
+		// View of all children
+		auto GetAllChildren();
+		auto GetAllChildren() const;
 
-		//// View of all active children
-		//auto GetActiveChildren();
-		//auto GetActiveChildren() const;
+		// View of all active children
+		auto GetActiveChildren();
+		auto GetActiveChildren() const;
 
-		//// View of all inactive children
-		//auto GetInactiveChildren() const;
+		// View of all inactive children
+		auto GetInactiveChildren() const;
 
 		void Do(Message::Init);
 		void Do(Message::Cleanup);
@@ -433,5 +435,33 @@ namespace tei::internal::ecs
 				::OnRender(m_Data); 
 		}
 	};
+
+	inline auto Object::GetAllChildren()
+	{
+		namespace v = std::views;
+		return v::transform(m_Children, utility::projectors::to_address<true>{});
+	}
+	inline auto Object::GetAllChildren() const
+	{
+		namespace v = std::views;
+		return v::transform(m_Children, utility::projectors::to_address<true, true>{});
+	}
+
+	inline auto Object::GetActiveChildren()		
+	{
+		namespace v = std::views;
+		return v::filter(GetAllChildren(), std::identity{});
+	}
+	inline auto Object::GetActiveChildren() const		
+	{
+		namespace v = std::views;
+		return v::filter(GetAllChildren(), std::identity{});
+	}
+
+	inline auto Object::GetInactiveChildren() const		
+	{
+		namespace v = std::views;
+		return m_Children | v::transform(utility::projectors::to_address<true, true>{}) | v::filter(std::logical_not{});
+	}
 
 }

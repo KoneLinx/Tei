@@ -1,9 +1,8 @@
+#include "teipch.h"
 #include "TextComponent.h"
 
 #include <tei/render.h>
 #include <tei/resource.h>
-
-#include <tei/internal/Utility/Error.h>
 
 #include <SDL.h>
 #include <SDL_ttf.h>

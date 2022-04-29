@@ -1,12 +1,9 @@
+#include "teipch.h"
 #include "Object.h"
 
 #include <algorithm>
 #include <cassert>
 #include <ranges>
-
-#include <tei/internal/Utility/SubrangeHelper.h>
-#include <tei/internal/Utility/Projector_to_address.h>
-#include <tei/internal/Utility/Error.h>
 
 using namespace tei::internal::ecs;
 using namespace tei::internal;

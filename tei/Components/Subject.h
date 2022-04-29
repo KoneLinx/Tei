@@ -4,8 +4,7 @@
 #include <typeindex>
 #include <functional>
 #include <unordered_map>
-#include <tei/internal/Utility/AnyReference.h>
-#include <tei/internal/Utility/SubrangeHelper.h>
+#include <tei/utility.h>
 
 namespace tei::internal::components
 {
@@ -15,8 +14,6 @@ namespace tei::internal::ecs
 {
 	class Object;
 }
-
-void OnEnable(std::nullptr_t, tei::internal::components::Subject&, tei::internal::ecs::Object const&);
 
 namespace tei::internal::components
 {
@@ -44,61 +41,78 @@ namespace tei::internal::components
 	class Subject
 	{
 
+		class ObserverHandle;
+
 	public:
 
+		Subject();
+		Subject(Subject const&) = delete;
+		Subject(Subject &&) = default;
+		Subject& operator = (Subject const&) = delete;
+		Subject& operator = (Subject &&) = default;
+		
 		template <detail::Event Event>
-		void Notify(Event const& = {}, bool ascend = true);
-
+		void Notify(Event const& = {});
+		
 		template <detail::Observer Observer, detail::Event Event = detail::ObserverEvent_t<Observer>>
-		Observer& AddObserver(Observer = {});
+		[[nodiscard]] ObserverHandle AddObserver(Observer = {});
 
-		template <detail::Observer Observer, detail::Event Event = detail::ObserverEvent_t<Observer>>
-		void RemoveObserver(Observer const&);
-
-		void RemoveObserver(utility::AnyReference const&);
+		static void RemoveObserver(ObserverHandle&);
 
 	private:
 
-		Subject* m_pParent{};
+		using ObserverContainer = std::unordered_multimap<std::type_index, std::function<void(utility::AnyReference event)>>;
 
-		std::unordered_multimap<std::type_index, std::pair<std::any, std::function<void(utility::AnyReference, std::any&)>>> m_Observers{};
-		std::unordered_map<utility::AnyReference, decltype(m_Observers)::const_iterator> m_ObserverByData{};
+		ObserverHandle AddObserver(ObserverContainer::value_type);
 
-		friend void ::OnEnable(std::nullptr_t, tei::internal::components::Subject&, tei::internal::ecs::Object const&);
+		std::shared_ptr<ObserverContainer> m_Observers;
+
+		class ObserverHandle
+		{
+		public:
+
+			ObserverHandle() = default;
+			~ObserverHandle();
+
+			ObserverHandle(ObserverHandle &&) = default;
+			ObserverHandle& operator = (ObserverHandle &&);
+			
+			ObserverHandle(ObserverHandle const&) = delete;
+			ObserverHandle& operator = (ObserverHandle const&) = delete;
+
+			bool Alive();
+			void Clear();
+			void Detach();
+
+		private:
+
+			friend Subject;
+
+			ObserverHandle(std::weak_ptr<ObserverContainer>, ObserverContainer::iterator);
+
+			std::weak_ptr<ObserverContainer> m_Container{};
+			ObserverContainer::iterator m_Position{};
+		};
 
 	};
-	
-	template <detail::Event Event>
-	void Subject::Notify(Event const& event, bool ascend)
+
+	template<detail::Event Event>
+	inline void Subject::Notify(Event const& event)
 	{
-		for (auto& [observer, handle] : utility::SubrangeFromPair(m_Observers.equal_range(typeid(event))) | std::views::values)
-			handle(event, observer);
-		if (ascend && m_pParent)
-			m_pParent->Notify(event, ascend);
-	}
-	
-	template<detail::Observer Observer, detail::Event Event>
-	inline Observer& Subject::AddObserver(Observer observer)
-	{
-		auto it = m_Observers.insert({
-			typeid(Event),
-			{ 
-				std::move(observer),
-				[](utility::AnyReference event, std::any& observer)
-				{
-					std::any_cast<Observer&>(observer)(event);
-				}
-			}
-		});
-		Observer& data{ std::any_cast<Observer&>(it->second.first) };
-		m_ObserverByData.insert({ data, it });
-		return data;
+		for (auto& observer : utility::SubrangeFromPair(m_Observers->equal_range(typeid(event))) | std::views::values)
+			observer(event);
 	}
 
 	template<detail::Observer Observer, detail::Event Event>
-	inline void Subject::RemoveObserver(Observer const& observer)
+	inline Subject::ObserverHandle Subject::AddObserver(Observer observer)
 	{
-		RemoveObserver(utility::AnyReference{ observer });
+		return AddObserver({
+			typeid(Event),
+			[observer = std::move(observer)] (utility::AnyReference event)
+			{
+				observer(event);
+			}
+		});
 	}
 
 }

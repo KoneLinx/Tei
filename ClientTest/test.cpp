@@ -1,5 +1,4 @@
-
-#include <tei.h>
+#include "pch.h"
 
 #include <iostream>
 #include <sstream>
@@ -91,7 +90,7 @@ void TeiClientInit()
 	
 	//tei::Application->SetWindowProperty(tei::application::WindowProperty::FULLSCREEN_FAKE);
 
-	auto& scene{ tei::Scenes->AddScene(true) };
+	auto& scene{ tei::Scenes->AddScene() };
 
 	scene.AddComponent<Timer>();
 
@@ -148,9 +147,11 @@ void TeiClientInit()
 		{ 
 			tei::Application->Quit(); 
 		}
-	);
+	).Detach();
 
 	scene.AddComponent(tei::Resources->LoadUnique<tei::resource::Sound>("resources/spin.mp3"));
+
+	tei::Scenes->SetSceneState(scene, true);
 
 }
 

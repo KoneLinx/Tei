@@ -1,8 +1,7 @@
+#include "teipch.h"
 #include "Fonts.h"
 
 #include <SDL_ttf.h>
-
-#include <tei/internal/Utility/Error.h>
 
 using namespace tei::internal::resource;
 using namespace tei::internal;

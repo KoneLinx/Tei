@@ -1,3 +1,4 @@
+#include "teipch.h"
 #include "Transform.h"
 #include "ComponentHelpers.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <tei/resource.h>
-#include <tei/internal/Utility/Observed.h>
+#include <tei/utility.h>
 #include "RefComponent.h"
 #include "Transform.h"
 

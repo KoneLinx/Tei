@@ -1,7 +1,7 @@
 #pragma once
 
 #include <tei/components.h>
-#include <tei/internal/Utility/Service.h>
+#include <tei/utility.h>
 
 namespace tei::internal::events
 {

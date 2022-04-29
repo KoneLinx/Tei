@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <vector>
@@ -9,29 +8,28 @@
 #include "InputType.h"
 #include "Command.h"
 
-#include <tei/internal/Utility/AnyReference.h>
-#include <tei/internal/Utility/Service.h>
+#include <tei/utility.h>
 
 namespace tei::internal::input
 {
 
 	class InputManager
 	{
+
+		class CommandHandle;
+
 	public:
 
 		InputManager();
 		~InputManager();
 
 		template <typename InputType>
-		Command<InputType>& AddCommand(Command<InputType> command = {});
+		[[nodiscard]] CommandHandle AddCommand(Command<InputType> command = {});
 		
 		template <typename InputType, typename Action> requires std::constructible_from<Command<InputType>, InputType, Action>
-		Command<InputType>& AddCommand(InputType input, Action action);
+		[[nodiscard]] CommandHandle AddCommand(InputType input, Action action);
 
-		template <typename InputType>
-		void RemoveCommand(Command<InputType> const&);
-
-		void RemoveCommand(utility::AnyReference);
+		static void RemoveCommand(CommandHandle&);
 
 		void ProcessInput();
 
@@ -45,14 +43,45 @@ namespace tei::internal::input
 
 	private:
 
+		using CommandContainer = std::unordered_multimap<std::type_index, std::any>;
+
+		CommandHandle AddCommand(CommandContainer::value_type);
+
 		SomeCommonInputData GetInputImpl(SomeCommonInputTypeRef) const;
 		void InvokeInputImpl(SomeCommonInputTypeRef, SomeCommonInputDataRef) const;
 
-		std::unordered_multimap<std::type_index, std::any> m_Commands;
-		std::unordered_multimap<utility::AnyReference, decltype(m_Commands)::const_iterator> m_CommandByData;
+		std::shared_ptr<CommandContainer> m_Commands;
+
 
 		struct PollData;
 		std::unique_ptr<PollData> m_PollData;
+
+		class CommandHandle
+		{
+		public:
+
+			CommandHandle() = default;
+			~CommandHandle();
+			
+			CommandHandle(CommandHandle &&) = default;
+			CommandHandle& operator = (CommandHandle &&);
+
+			CommandHandle(CommandHandle const&) = delete;
+			CommandHandle& operator = (CommandHandle const&) = delete;
+
+			bool Alive();
+			void Clear();
+			void Detach();
+
+		private:
+
+			friend InputManager;
+			
+			CommandHandle(std::weak_ptr<CommandContainer>, CommandContainer::iterator);
+
+			std::weak_ptr<CommandContainer> m_Container{};
+			CommandContainer::iterator m_Position{};
+		};
 
 	public:
 
@@ -63,30 +92,18 @@ namespace tei::internal::input
 	extern InputManager::Service Input;
 
 	template <typename InputType>
-	inline Command<InputType>& InputManager::AddCommand(Command<InputType> command)
+	inline InputManager::CommandHandle InputManager::AddCommand(Command<InputType> command)
 	{
-		auto it = m_Commands.insert({
+		return AddCommand({
 			typeid(InputType),
-			std::move(command)
+			std::move(command) 
 		});
-		auto& data = std::any_cast<Command<InputType>&>(it->second);
-		m_CommandByData.insert({
-			data,
-			it
-		});
-		return data;
 	}
 
 	template <typename InputType, typename Action> requires std::constructible_from<Command<InputType>, InputType, Action>
-	inline Command<InputType>& InputManager::AddCommand(InputType input, Action action)
+	inline InputManager::CommandHandle InputManager::AddCommand(InputType input, Action action)
 	{
 		return AddCommand(Command<InputType>{ input, std::move(action) });
-	}
-
-	template<typename InputType>
-	inline void InputManager::RemoveCommand(Command<InputType> const& toRemove)
-	{
-		RemoveCommand(utility::AnyReference{ toRemove });
 	}
 
 	template<typename InputType>

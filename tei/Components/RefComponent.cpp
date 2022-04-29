@@ -1,7 +1,6 @@
+#include "teipch.h"
 
 #include "RefComponent.h"
-
-#include <tei/internal/Utility/Error.h>
 
 void tei::internal::components::detail::ExceptRefNotValid(std::type_info const& type)
 {

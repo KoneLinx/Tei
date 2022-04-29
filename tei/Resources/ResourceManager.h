@@ -6,7 +6,7 @@
 #include <variant>
 #include <memory>
 
-#include <tei/internal/Utility/Service.h>
+#include <tei/utility.h>
 
 namespace tei::internal::resource
 {

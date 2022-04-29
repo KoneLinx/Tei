@@ -1,11 +1,8 @@
-
+#include "teipch.h"
 #include "SceneManager.h"
 
 #include <ranges>
 #include <algorithm>
-
-#include <tei/internal/Utility/Projector_addressof.h>
-#include <tei/internal/Utility/Error.h>
 
 namespace tei::internal::scene
 {
@@ -27,13 +24,13 @@ namespace tei::internal::scene
 		m_Object.RemoveChild(scene);
 	}
 
-	void SceneManager::SetSceneState(Scene const&, bool)
+	void SceneManager::SetSceneState(Scene const& scene, bool active)
 	{
-		//auto children{ m_Object.GetAllChildren() };
-		//auto it{ std::ranges::find(children, &scene, utility::projectors::addressof{}) };
-		//if (it == std::ranges::end(children))
-		//	throw utility::TeiRuntimeError{ "This scene does not exist" };
-		//(*it).SetState(active);
+		auto children{ m_Object.GetAllChildren() };
+		auto it{ std::ranges::find(children, &scene, utility::projectors::addressof{}) };
+		if (it == std::ranges::end(children))
+			throw utility::TeiRuntimeError{ "This scene does not exist" };
+		(*it).SetState(active);
 	}
 
 }

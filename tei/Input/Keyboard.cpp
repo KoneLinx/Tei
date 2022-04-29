@@ -1,10 +1,8 @@
+#include "teipch.h"
 #include "Keyboard.h"
 
 #include <unordered_map>
 #include <ranges>
-
-#include <tei/internal/Utility/Error.h>
-#include <tei/internal/Utility/SubrangeHelper.h>
 
 #include <SDL.h>
 

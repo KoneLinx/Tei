@@ -78,22 +78,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(SolutionDir)libs\steam\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)Utility;$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)pch;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(SolutionDir)libs\steam\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)Utility;$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)pch;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(SolutionDir)libs\steam\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)Utility;$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)pch;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExternalIncludePath>$(SolutionDir)libs\glm;$(SolutionDir)libs\SDL2\include\;$(SolutionDir)libs\SDL2_image\include\;$(SolutionDir)libs\SDL2_ttf\include\;$(SolutionDir)libs\ImGui\include\;$(SolutionDir)libs\SDL2_mixer\include\;$(SolutionDir)libs\steam\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform);$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)Utility;$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)pch;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -106,6 +106,8 @@
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <EnableModules>true</EnableModules>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>teipch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,6 +142,8 @@
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <EnableModules>true</EnableModules>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>teipch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -173,6 +177,8 @@
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <EnableModules>true</EnableModules>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>teipch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -206,6 +212,8 @@
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <EnableModules>true</EnableModules>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>teipch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -237,8 +245,6 @@
     <ClCompile Include="Components\RefComponent.cpp" />
     <ClCompile Include="ECS\Object.cpp" />
     <ClCompile Include="Events\Events.cpp" />
-    <ClCompile Include="Components\InputComponent.cpp" />
-    <ClCompile Include="include\tei\internal\Utility\Projector_as_const.cpp" />
     <ClCompile Include="Input\Controller.cpp" />
     <ClCompile Include="Input\Command.cpp" />
     <ClCompile Include="Core\Core.cpp" />
@@ -246,7 +252,12 @@
     <ClCompile Include="Input\InputManager.cpp" />
     <ClCompile Include="Input\InputType.cpp" />
     <ClCompile Include="Input\Keyboard.cpp" />
-    <ClCompile Include="Components\ObserverComponent.cpp" />
+    <ClCompile Include="pch\teipch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Renderer\Renderer.cpp" />
     <ClCompile Include="Resources\Audio.cpp" />
     <ClCompile Include="Resources\Fonts.cpp" />
@@ -270,11 +281,10 @@
     <ClInclude Include="Components\ComponentHelpers.h" />
     <ClInclude Include="Components\RefComponent.h" />
     <ClInclude Include="ECS\Object.h" />
-    <ClInclude Include="ECS\ObjectHierarchy.h" />
     <ClInclude Include="Events\Events.h" />
     <ClInclude Include="include\tei\event.h" />
     <ClInclude Include="include\tei\input.h" />
-    <ClInclude Include="Components\InputComponent.h" />
+    <ClInclude Include="include\tei\internal\utility.h" />
     <ClInclude Include="include\tei\internal\Utility\AnyReference.h" />
     <ClInclude Include="include\tei\internal\Utility\Error.h" />
     <ClInclude Include="include\tei\internal\Utility\Metrics\Metrics.h" />
@@ -288,6 +298,8 @@
     <ClInclude Include="include\tei\internal\Utility\Service.h" />
     <ClInclude Include="include\tei\internal\Utility\Static.h" />
     <ClInclude Include="include\tei\internal\Utility\SubrangeHelper.h" />
+    <ClInclude Include="include\tei\utility.h" />
+    <ClInclude Include="pch\teipch.h" />
     <ClInclude Include="Time\TimeUtils.h" />
     <ClInclude Include="include\tei\internal\Utility\TypeErasedView.h" />
     <ClInclude Include="include\tei\internal\Utility\TypeHelpers.h" />
@@ -302,7 +314,6 @@
     <ClInclude Include="Input\InputManager.h" />
     <ClInclude Include="Input\InputType.h" />
     <ClInclude Include="Input\Keyboard.h" />
-    <ClInclude Include="Components\ObserverComponent.h" />
     <ClInclude Include="Renderer\Renderer.h" />
     <ClInclude Include="Resources\Audio.h" />
     <ClInclude Include="Resources\Fonts.h" />
@@ -343,6 +354,8 @@
     <ClInclude Include="Utility\Static.h" />
     <ClInclude Include="Utility\SubrangeHelper.h" />
     <ClInclude Include="Utility\TypeHelpers.h" />
+    <ClInclude Include="Utility\UtilityAll.h" />
+    <ClInclude Include="Utility\UtilitySkimmed.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

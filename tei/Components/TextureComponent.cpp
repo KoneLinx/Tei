@@ -1,3 +1,4 @@
+#include "teipch.h"
 #include "TextureComponent.h"
 
 #include <tei/render.h>

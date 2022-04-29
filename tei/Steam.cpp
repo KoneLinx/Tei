@@ -1,3 +1,4 @@
+#include "teipch.h"
 #include "Steam.h"
 
 #include <iostream>
@@ -6,8 +7,6 @@
 #pragma warning(disable : 4996)
 #include <steam_api.h>
 #pragma warning(pop)
-
-//#include <tei/internal/utility.h>
 
 void OutputDebugString(std::string_view msg)
 {

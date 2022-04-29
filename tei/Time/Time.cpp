@@ -1,3 +1,4 @@
+#include "teipch.h"
 #include "Time.h"
 
 namespace tei::internal::time

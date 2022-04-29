@@ -1,10 +1,9 @@
-
+#include "teipch.h"
 #include "Core.h"
 
 #include <SDL.h>
 
 #include <tei/application.h>
-#include <tei/internal/Utility/Error.h>
 
 #if defined(DEBUG) || defined(_DEBUG)
 #include <vld.h>
@@ -21,7 +20,7 @@ int main(int argc, char** argv)
 
 			//puts("Tei engine - starting");
 
-			srand(unsigned(time(nullptr)));
+			srand(unsigned(::time(nullptr)));
 			tei::internal::application::StartApplication(argc, argv);
 			tei::internal::core::Core->Run();
 			tei::internal::application::StopApplication();

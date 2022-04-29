@@ -1,12 +1,10 @@
+#include "teipch.h"
 #include "Application.h"
 
 #include <iostream>
 
 #include <tei/render.h>
 #include <tei/internal/core.h>
-#include <tei/internal/Utility/Error.h>
-#include <tei/internal/Utility/TypeHelpers.h>
-#include <tei/time.h>
 #include <tei/event.h>
 
 #include <SDL.h>

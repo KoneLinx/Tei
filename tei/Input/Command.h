@@ -5,11 +5,16 @@
 #include <functional>
 #include <variant>
 #include <any>
-#include <tei/internal/Utility/Error.h>
+#include <tei/utility.h>
 #include "InputType.h"
 
 namespace tei::internal::input
 {
+
+	namespace detail
+	{
+		void CommandNoUserDataError();
+	}
 
 	template <typename InputType_t = void, typename Data = typename InputType_t::Data>
 	class Command
@@ -120,7 +125,7 @@ namespace tei::internal::input
 	inline void Command<InputType, Data>::SetData(UserData&& data)
 	{
 		if (!HasData())
-			throw utility::TeiRuntimeError{ "Command has no user data" };
+			detail::CommandNoUserDataError();
 		else
 			m_Data = std::forward<UserData>(data);
 	}

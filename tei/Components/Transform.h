@@ -1,7 +1,7 @@
 #pragma once
 
 #include <tei/unit.h>
-#include <tei/internal/Utility/Observed.h>
+#include <tei/utility.h>
 
 namespace tei::internal::ecs
 {

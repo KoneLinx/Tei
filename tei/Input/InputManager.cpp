@@ -1,3 +1,4 @@
+#include "teipch.h"
 #include "InputManager.h"
 
 #include <algorithm>
@@ -9,9 +10,6 @@
 #include <array>
 
 #include "Controller.h"
-
-#include <tei/internal/Utility/SubrangeHelper.h>
-#include <tei/internal/Utility/Error.h>
 
 #include <SDL.h>
 
@@ -187,22 +185,16 @@ void Update(InputManager::PollData const& data, auto const& commands)
 
 InputManager::InputManager()
 	: m_PollData{ std::make_unique<PollData>() }
-	, m_Commands{}
+	, m_Commands{ std::make_shared<CommandContainer>() }
 {}
 
 // in .cpp: important! PollData destructor
 InputManager::~InputManager()
 {}
 
-void InputManager::RemoveCommand(utility::AnyReference some)
+void InputManager::RemoveCommand(CommandHandle& handle)
 {
-	auto it = m_CommandByData.find(some);
-	if (it != std::ranges::end(m_CommandByData))
-	{
-		m_Commands.erase(it->second);
-		m_CommandByData.erase(it);
-	}
-	else throw utility::TeiRuntimeError{ "Command not present" };
+	handle = {};
 }
 
 void InputManager::ProcessInput()
@@ -220,7 +212,7 @@ void InputManager::ProcessInput()
 
 	auto updater = [&] <typename InputType> ()
 	{
-		auto subrange = utility::SubrangeFromPair(m_Commands.equal_range(typeid(InputType)));
+		auto subrange = utility::SubrangeFromPair(m_Commands->equal_range(typeid(InputType)));
 		Update<InputType>(data, subrange);
 	};
 
@@ -233,6 +225,11 @@ void InputManager::ProcessInput()
 bool InputManager::IsPressed(InputBinary const& button) const
 {
 	return TestInput(*m_PollData, button).value_or(false);
+}
+
+InputManager::CommandHandle InputManager::AddCommand(CommandContainer::value_type value)
+{
+	return { m_Commands, m_Commands->insert(std::move(value)) };
 }
 
 SomeCommonInputData tei::internal::input::InputManager::GetInputImpl(SomeCommonInputTypeRef input) const
@@ -253,7 +250,7 @@ void InputManager::InvokeInputImpl(SomeCommonInputTypeRef input, SomeCommonInput
 		[this, &dataref] <typename InputType> (std::reference_wrapper<InputType const> invoked)
 		{
 			auto& data = std::get<std::reference_wrapper<typename InputType::Data const>>(dataref).get();
-			for (auto& [type, any] : utility::SubrangeFromPair(m_Commands.equal_range(typeid(InputType))))
+			for (auto& [type, any] : utility::SubrangeFromPair(m_Commands->equal_range(typeid(InputType))))
 			{
 				auto& command = std::any_cast<Command<InputType> const&>(any);
 				if (auto& input{ command.GetInput() }; invoked.get() == input && input & data)
@@ -263,3 +260,39 @@ void InputManager::InvokeInputImpl(SomeCommonInputTypeRef input, SomeCommonInput
 		input
 	);
 }
+
+InputManager::CommandHandle::~CommandHandle()
+{
+	if (auto ptr{ m_Container.lock() })
+		ptr->erase(m_Position);
+}
+
+InputManager::CommandHandle& InputManager::CommandHandle::operator=(CommandHandle&& other)
+{
+	if (auto ptr{ std::exchange(m_Container, std::move(other.m_Container)).lock() })
+		ptr->erase(m_Position);
+	m_Position = std::move(other.m_Position);
+	return *this;
+}
+
+bool InputManager::CommandHandle::Alive()
+{
+	return !m_Container.expired();
+}
+
+void InputManager::CommandHandle::Clear()
+{
+	*this = {};
+}
+
+void InputManager::CommandHandle::Detach()
+{
+	m_Container = {};
+	m_Position = {};
+}
+
+
+InputManager::CommandHandle::CommandHandle(std::weak_ptr<CommandContainer> container, CommandContainer::iterator at)
+	: m_Container{ container }
+	, m_Position{ at }
+{}

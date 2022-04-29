@@ -90,22 +90,16 @@
     <ClCompile Include="Events\Events.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Components\InputComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\ObserverComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Steam.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="include\tei\internal\Utility\Projector_as_const.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ECS\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Components\RefComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch\teipch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -251,12 +245,6 @@
     <ClInclude Include="include\tei\event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Components\InputComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\ObserverComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Components\ComponentHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -344,10 +332,22 @@
     <ClInclude Include="include\tei\internal\Utility\UniqueVectorIterator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\ObjectHierarchy.h">
+    <ClInclude Include="Time\TimeUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Time\TimeUtils.h">
+    <ClInclude Include="pch\teipch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\internal\utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\UtilityAll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\UtilitySkimmed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tei\utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

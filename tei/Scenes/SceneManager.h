@@ -5,7 +5,7 @@
 #include <ranges>
 
 #include <tei/internal/ecs.h>
-#include <tei/internal/Utility/Service.h>
+#include <tei/utility.h>
 
 namespace tei::internal::scene
 {
@@ -28,14 +28,14 @@ namespace tei::internal::scene
 
 		void SetSceneState(Scene const& scene, bool active);
 
-		//// View of all Scenes
-		//auto GetAllScenes() const;
-		//
-		//// View of all active Scenes
-		//auto GetActiveScenes() const;
-		//
-		//// View of all inactive Scenes
-		//auto GetInactiveScenes() const;
+		// View of all Scenes
+		auto GetAllScenes() const;
+		
+		// View of all active Scenes
+		auto GetActiveScenes() const;
+		
+		// View of all inactive Scenes
+		auto GetInactiveScenes() const;
 
 		void Do(ecs::detail::MessageKind auto);
 
@@ -66,19 +66,19 @@ namespace tei::internal::scene
 		m_Object.Do(message);
 	}
 
-	//inline auto SceneManager::GetAllScenes() const
-	//{
-	//	return m_Object.GetAllChildren();
-	//}
-	//
-	//inline auto SceneManager::GetActiveScenes() const
-	//{
-	//	return m_Object.GetActiveChildren();
-	//}
-	//
-	//inline auto SceneManager::GetInactiveScenes() const
-	//{
-	//	return m_Object.GetInactiveChildren();
-	//}
+	inline auto SceneManager::GetAllScenes() const
+	{
+		return m_Object.GetAllChildren();
+	}
+	
+	inline auto SceneManager::GetActiveScenes() const
+	{
+		return m_Object.GetActiveChildren();
+	}
+	
+	inline auto SceneManager::GetInactiveScenes() const
+	{
+		return m_Object.GetInactiveChildren();
+	}
 
 }

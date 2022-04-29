@@ -1,8 +1,8 @@
+#include "teipch.h"
 #include "Textures.h"
 
 #include <mutex>
 
-#include <tei/internal/Utility/Error.h>
 #include <tei/render.h>
 #include <SDL_image.h>
 #include "Textures.h"
