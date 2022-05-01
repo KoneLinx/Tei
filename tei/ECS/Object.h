@@ -236,7 +236,7 @@ namespace tei::internal::ecs
 		virtual void Do(Message::FixedUpdate, Object&) = 0;
 		virtual void Do(Message::Render, Object&) = 0;
 
-		//virtual std::unique_ptr<ComponentBase> Clone() const = 0;
+		virtual std::unique_ptr<ComponentBase> Clone() const = 0;
 
 	protected:
 
