@@ -23,7 +23,7 @@ namespace tei::internal::audio
 #if defined(DEBUG) || defined(_DEBUG)
 			sound._name
 #else
-			Sound.pData
+			sound.pData
 #endif
 		<< '\n';
 	}

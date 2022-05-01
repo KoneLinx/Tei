@@ -14,6 +14,10 @@ void OnUpdate(Timer, tei::ecs::Object const& object)
 	static tei::time::TimeTimes timer2{ 1_s, 5, tei::Time->frame.now + 2_s + 250_ms  };
 	if (timer || timer2)
 	{
+
+		// Example sound is being played here
+		// vvv
+
 		if (auto* p{ object.HasComponent<tei::Resource<tei::resource::Sound>>() })
 			tei::Audio->Play(*p);
 	}
