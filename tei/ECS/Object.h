@@ -102,10 +102,10 @@ namespace tei::internal::ecs
 		void Do(Message::Update);
 		void Do(Message::FixedUpdate);
 		void Do(Message::Render);
-
 	private:
 
-		Object(const Object& other) = delete;
+
+		Object(const Object& other);
 		Object& operator = (const Object& other) = delete;
 
 		class ComponentBase;
@@ -280,13 +280,14 @@ namespace tei::internal::ecs
 
 		constexpr inline static std::true_type INTERNAL{};
 
-		//virtual std::unique_ptr<ComponentBase> Clone() const override
-		//{
-		//	if constexpr (std::copyable<Data>)
-		//		return std::unique_ptr<ComponentBase>{ new Component{ m_Data } };
-		//	else
-		//		ComponentBase::ExceptCannotCopy(typeid(Data));
-		//}
+		virtual std::unique_ptr<ComponentBase> Clone() const override
+		{
+			if constexpr (std::copyable<Data>)
+				return std::unique_ptr<ComponentBase>{ new Component{ m_Data } };
+			else
+				ComponentBase::ExceptCannotCopy(typeid(Data));
+			return {};
+		}
 
 		virtual void Do(Message::Init, Object& parent) override
 		{
