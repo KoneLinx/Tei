@@ -17,21 +17,34 @@ namespace tei::internal::audio
 		puts("Debug audio disabled");
 	}
 
-	void DebugAudio::OnUpdate(std::span<resource::Sound const*> log)
+	void DebugAudio::OnPlay(resource::Sound const& sound)
 	{
-		for (resource::Sound const* pSound : log)
-			std::cout << "[audio] " <<
+		std::cout << "[audio] " <<
 #if defined(DEBUG) || defined(_DEBUG)
-				pSound->_name 
+			sound._name
 #else
-				pSound->pData
+			Sound.pData
 #endif
-			<< '\n';
+		<< '\n';
 	}
 
 	void DebugAudio::OnMute(bool muted)
 	{
 		puts(muted ? "Debug audio muted" : "Debug audio unmuted");
+	}
+
+	Chunk* DebugAudio::Load(std::filesystem::path const& path)
+	{
+		static size_t id{};
+
+		std::cout << "[audio] Loading audio chunk " << id++ << ": " << path.filename() << '\n';
+
+		return std::bit_cast<Chunk*>(id);
+	}
+
+	void DebugAudio::Free(Chunk* id)
+	{
+		std::cout << "[audio] Freeing audio chunk " << std::bit_cast<size_t>(id) << '\n';
 	}
 
 }

@@ -3,12 +3,17 @@
 #include <memory>
 #include <filesystem>
 
+namespace tei::internal::audio
+{
+	struct Chunk;
+}
+
 namespace tei::internal::resource
 {
 
 	struct Sound
 	{
-		void* pData;
+		audio::Chunk* pData;
 		float volume;
 		bool loop;
 #if defined(DEBUG) || defined(_DEBUG)

@@ -1,6 +1,8 @@
 #include "teipch.h"
 #include "Audio.h"
 
+#include <tei/audio.h>
+
 #include <SDL_mixer.h>
 
 using namespace tei::internal::resource;
@@ -9,45 +11,44 @@ using namespace std::literals;
 
 void Load(std::shared_ptr<Sound>& out, std::filesystem::path const& path, bool loop, float volume, [[maybe_unused]] std::string_view name)
 {
-    struct Audio
-    {
-        Audio()
-        {
-            if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0)
-                throw utility::TeiRuntimeError{ "Could not open audio", SDL_GetError() };
-        }
-        ~Audio()
-        {
-            Mix_CloseAudio();
-        }
-    };
-    static std::weak_ptr<Audio> s_Audio{};
 
-    auto audio = s_Audio.lock();
-    if (!audio)
-        s_Audio = audio = std::make_shared<Audio>();
+    //struct Audio
+    //{
+    //    Audio()
+    //    {
+    //        if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0)
+    //            throw utility::TeiRuntimeError{ "Could not open audio", SDL_GetError() };
+    //    }
+    //    ~Audio()
+    //    {
+    //        Mix_CloseAudio();
+    //    }
+    //};
+    //static std::weak_ptr<Audio> s_Audio{};
 
-    auto const DELETER = [audio = std::move(audio)] (Sound* pSound)
+    //auto audio = s_Audio.lock();
+    //if (!audio)
+    //    s_Audio = audio = std::make_shared<Audio>();
+
+    auto const DELETER = [] (Sound* pSound)
     {
-        if (pSound->pData)
-            Mix_FreeChunk(static_cast<Mix_Chunk*>(pSound->pData));
+        audio::Audio->Free(pSound->pData);
         delete pSound;
     };
 
-    Mix_Chunk* pChunk{};
+    audio::Chunk* pChunk{};
     if (!path.empty())
-    {
-        if (pChunk = Mix_LoadWAV(path.string().c_str()));
-        else
-            throw utility::TeiRuntimeError{ "Sound chunk could not be loaded", SDL_GetError() };
-    }
+        pChunk = audio::Audio->Load(path);
+        //if (pChunk = Mix_LoadWAV(path.string().c_str()));
+        //else
+        //    throw utility::TeiRuntimeError{ "Sound chunk could not be loaded", SDL_GetError() };
 
 #if defined(DEBUG) || defined(_DEBUG)
-        std::string sname{
-            name.empty()
-            ? path.filename().string()
-            : name
-        };
+    std::string sname{
+        name.empty()
+        ? path.filename().string()
+        : name
+    };
 #endif
 
     out = { 
