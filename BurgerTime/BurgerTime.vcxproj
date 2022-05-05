@@ -19,28 +19,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Achievements.h" />
-    <ClInclude Include="Entity.h" />
-    <ClInclude Include="Fps.h" />
-    <ClInclude Include="Hitbox.h" />
-    <ClInclude Include="Json.h" />
-    <ClInclude Include="Level.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="Score.h" />
+    <ClInclude Include="Application\FPS.h" />
+    <ClInclude Include="Level\Hitbox.h" />
+    <ClInclude Include="Loader\LevelLoader.h" />
+    <ClInclude Include="pch\pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Achievements.cpp" />
-    <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="Fps.cpp" />
-    <ClCompile Include="Hitbox.cpp" />
-    <ClCompile Include="Json.cpp" />
-    <ClCompile Include="Level.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Score.cpp" />
+    <ClCompile Include="Application\main.cpp" />
+    <ClCompile Include="Application\FPS.cpp" />
+    <ClCompile Include="Level\Hitbox.cpp" />
+    <ClCompile Include="Loader\LevelLoader.cpp" />
+    <ClCompile Include="pch\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\FilesPlayer.json" />
+    <None Include="resources\EntityData.json" />
     <None Include="resources\Level1.json" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -103,21 +100,25 @@
     <LinkIncremental>true</LinkIncremental>
     <ExternalIncludePath>$(SolutionDir)libs\ImGui\include;$(SolutionDir)libs\glm;$(SolutionDir)tei\include;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform)\;$(SolutionDir)libs\steam\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)pch;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <ExternalIncludePath>$(SolutionDir)libs\ImGui\include;$(SolutionDir)libs\glm;$(SolutionDir)tei\include;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform)\;$(SolutionDir)libs\steam\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)pch;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <ExternalIncludePath>$(SolutionDir)libs\ImGui\include;$(SolutionDir)libs\glm;$(SolutionDir)tei\include;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform)\;$(SolutionDir)libs\steam\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)pch;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <ExternalIncludePath>$(SolutionDir)libs\ImGui\include;$(SolutionDir)libs\glm;$(SolutionDir)tei\include;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)libs\SDL2_mixer\lib\$(Platform)\;$(SolutionDir)libs\SDL2_ttf\lib\$(Platform)\;$(SolutionDir)libs\SDL2_image\lib\$(Platform)\;$(SolutionDir)libs\SDL2\lib\$(Platform)\;$(SolutionDir)libs\ImGui\lib\$(Platform)\;$(SolutionDir)libs\steam\lib\$(Platform)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)pch;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -125,6 +126,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,6 +146,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -161,6 +166,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -176,6 +183,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

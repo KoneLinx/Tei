@@ -1,8 +1,0 @@
-{
-  "body": {
-    "body": {
-      "state": [ "standing", "walking", "climbing", "attacking" ],
-      "source": [ "standing", "walking", "climbing", "attacking" ], 
-    }
-  }
-}

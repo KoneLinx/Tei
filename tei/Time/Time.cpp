@@ -7,8 +7,8 @@ namespace tei::internal::time
 		TimeOject{
 			.global = {},
 			.frame = {
-				.step = 1_s / 180,
-				.fixed = false,
+				.step = 1_s / 60,
+				.fixed = true,
 				.allow_drop = true
 			},
 			.fixed = {

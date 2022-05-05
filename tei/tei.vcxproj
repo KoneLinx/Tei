@@ -272,6 +272,7 @@
     <ClCompile Include="Time\Clock.cpp" />
     <ClCompile Include="Time\Time.cpp" />
     <ClCompile Include="Components\Transform.cpp" />
+    <ClCompile Include="Components\WindowAlignment.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Application.h" />
@@ -356,6 +357,7 @@
     <ClInclude Include="Utility\TypeHelpers.h" />
     <ClInclude Include="Utility\UtilityAll.h" />
     <ClInclude Include="Utility\UtilitySkimmed.h" />
+    <ClInclude Include="Components\WindowAlignment.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

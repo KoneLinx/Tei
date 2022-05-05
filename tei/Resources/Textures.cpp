@@ -59,7 +59,7 @@ static constexpr auto  DELETER = [] (auto* pTexture) // Texture or Sprite
 
 void Load(std::shared_ptr<Texture>& ref, std::filesystem::path const& path)
 {
-	ref = { std::shared_ptr<Texture>{ new Texture{ LoadTexture(path) }, DELETER } };
+	ref = { std::shared_ptr<Texture>{ new Texture{ LoadTexture(path)}, DELETER } };
 }
 void Load(std::shared_ptr<Texture>& ref)
 {
@@ -68,6 +68,10 @@ void Load(std::shared_ptr<Texture>& ref)
 
 void Load(std::shared_ptr<Sprite>& ref, std::filesystem::path const& path, time::Clock::duration frameduration, int cols, int rows, bool loop, time::Clock::time_point origin)
 {
-	ref = { std::shared_ptr<Sprite>{ new Sprite{ LoadTexture(path), frameduration, cols, rows, loop, origin }, DELETER } };
+	ref = { std::shared_ptr<Sprite>{ new Sprite{ LoadTexture(path), frameduration, cols, rows, loop, origin}, DELETER } };
 }
 
+void Load(std::shared_ptr<Sprite>& ref)
+{
+	Load(ref, {}, time::Clock::duration::max(), {}, {}, {}, {});
+}

@@ -5,7 +5,9 @@
 namespace burger
 {
 
-	class Hitbox : public tei::components::RefComponent<tei::components::ObjectTransform>, public tei::components::Subject
+	using Box = tei::unit::Dimentions;
+
+	class Hitbox : public tei::components::RefComponent<tei::components::ObjectTransform, Box>, public tei::components::Subject
 	{
 	public:
 
@@ -19,7 +21,7 @@ namespace burger
 
 		bool CollidesWith(Hitbox const& other) const;
 
-		auto OverlappingObjects() const;
+		//auto OverlappingObjects() const;
 
 		struct Hit
 		{
@@ -30,8 +32,7 @@ namespace burger
 			};
 			using enum State;
 
-			tei::ecs::Object& object1;
-			tei::ecs::Object& object2;
+			std::pair<tei::ecs::Object&, tei::ecs::Object&> objects;
 
 			State state;
 		};
@@ -46,15 +47,15 @@ namespace burger
 		std::vector<Hitbox*> m_Overlaps;
 	};
 	
-	auto Hitbox::OverlappingObjects() const
-	{
-		return std::views::transform(
-			m_Overlaps, 
-			[] (Hitbox* p) -> tei::ecs::Object& 
-			{
-				return *p->m_pParent; 
-			}
-		);
-	}
+	//auto Hitbox::OverlappingObjects() const
+	//{
+	//	return std::views::transform(
+	//		m_Overlaps, 
+	//		[] (Hitbox* p) -> tei::ecs::Object& 
+	//		{
+	//			return *p->m_pParent; 
+	//		}
+	//	);
+	//}
 
 }

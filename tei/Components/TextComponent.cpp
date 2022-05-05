@@ -14,14 +14,23 @@ using namespace tei::internal::utility;
 
 void OnUpdate(std::nullptr_t, TextRenderComponent const& comp)
 {
-	if (auto& [text, font, texture, transform] = comp.refs; text.checkout())
+	if (auto& [text, font, texture, colour, transform] = comp.Refs(); text.checkout() | colour.checkout()) // Non short-circuiting!
 	{
 		if (auto data = std::exchange(texture->pData, {}))
 			SDL_DestroyTexture(static_cast<SDL_Texture*>(data));
 
 		if (!text->empty())
 		{
-			const auto surf = TTF_RenderText_Blended(static_cast<TTF_Font*>(font->pData), text->c_str(), { 255, 255, 255 });
+			const auto surf = TTF_RenderText_Blended(
+				static_cast<TTF_Font*>(font->pData),
+				text->c_str(), 
+				SDL_Colour{ 
+					.r = Uint8(colour->r * 0xFF),
+					.g = Uint8(colour->g * 0xFF),
+					.b = Uint8(colour->b * 0xFF), 
+					.a = Uint8(colour->a * 0xFF)
+				}
+			);
 			if (surf == nullptr)
 				throw TeiRuntimeError{ "Rendering text failed", SDL_GetError() };
 
@@ -40,6 +49,12 @@ void OnUpdate(std::nullptr_t, TextRenderComponent const& comp)
 
 void OnRender(std::nullptr_t, TextRenderComponent const& comp)
 {
-	auto& [text, font, texture, transform] = comp.refs;
+	auto& [text, font, texture, colour, transform] = comp.Refs();
 	Renderer->DrawTexture(*texture, transform.world);
+}
+
+void OnInitialize(std::nullptr_t, tei::internal::components::TextRenderComponent const&, tei::internal::ecs::Object& object)
+{
+	if (object.HasComponent<Observed<unit::Colour>>() == nullptr) 
+		object.AddComponent(Observed{ unit::Colour{ 1, 1, 1, 1 } });
 }

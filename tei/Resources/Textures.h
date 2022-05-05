@@ -55,3 +55,7 @@ void Load(
 	bool loop = true,
 	tei::external::Clock::time_point origin = tei::external::Time->frame.now
 );
+
+void Load(
+	std::shared_ptr<tei::external::resource::Sprite>&
+);

@@ -1,0 +1,190 @@
+{
+
+  "spriteseparator": "_",
+  "spriteextention": ".png",
+  "spritefrequency": 10,
+
+  "modes": [
+    "Single player",
+    "Co-op",
+    "Versus"
+  ],
+
+  "anima": {
+
+    "box": [ 1, 2 ],
+
+    "entities": [
+      {
+        "mode": null,
+        "type": "player",
+        "name": "Mr. Pepper",
+        "src": "Peter"
+      },
+      {
+        "mode": null,
+        "type": "enemy",
+        "name": "Mr. Hot dog",
+        "score": 100,
+        "flips": false,
+        "src": "Hotdog"
+      },
+      {
+        "mode": null,
+        "type": "enemy",
+        "name": "Mr. Egg",
+        "score": 300,
+        "flips": false,
+        "src": "Egg"
+      },
+      {
+        "mode": null,
+        "type": "enemy",
+        "name": "Mr. Pickle's",
+        "score": 200,
+        "flips": true,
+        "src": "Pickle"
+      },
+      {
+        "mode": "Co-op",
+        "type": "player",
+        "name": "Mrs. Salt",
+        "src": "Salt"
+      },
+      {
+        "mode": "Versus",
+        "type": "player",
+        "name": "Mr. Evil Hot dog",
+        "src": "Hotdog"
+      }
+    ],
+
+    "states": [
+      {
+        "type": null,
+        "src": "Stationary",
+        "loop": false,
+        "frames": 1
+      },
+      {
+        "type": null,
+        "src": "Walking",
+        "loop": true,
+        "frames": 4,
+
+        "states": [
+          "Left", "Right", "Down", "Up"
+        ]
+      },
+      {
+        "type": [ "player" ],
+        "src": "Attack",
+        "loop": false,
+        "frames": 1
+      },
+      {
+        "type": null,
+        "src": "Death",
+        "loop": false,
+        "frames": 6
+      },
+      {
+        "type": [ "enemy" ],
+        "src": "Hit",
+        "loop": true,
+        "frames": 2
+      }
+    ]
+
+  },
+
+  "ingredients": {
+
+    "box": [ 3, 1 ],
+
+    "entities": [
+      {
+        "name": "Top bun",
+        "src": "Bun_Top",
+        "unique": true,
+        "position": -1
+      },
+      {
+        "name": "Bottom bun",
+        "src": "Bun_Bottom",
+        "unique": true,
+        "position": 0
+      },
+      {
+        "name": "Patty",
+        "src": "Patty",
+        "unique": null
+      },
+      {
+        "name": "Lettuce",
+        "src": "Lettuce",
+        "unique": null
+      },
+      {
+        "name": "Cheese",
+        "src": "Cheese",
+        "unique": null
+      },
+      {
+        "name": "Tomato",
+        "src": "Tomato",
+        "unique": null
+      }
+    ]
+
+  },
+
+  "other": {
+
+    "entities": {
+      "plate": {
+        "name": "Plate",
+        "src": "Plate",
+        "box": [ 3, 0 ]
+      },
+      "ladder": {
+        "name": "Ladder",
+        "src": "Ladder",
+        "box": [ 1, 2 ]
+      },
+      "platform": {
+        "name": "Platform",
+        "src": "Platform",
+        "box": [ 1, 0 ]
+      },
+      "shelf": {
+        "name": "Shelf",
+        "src": "Shelf",
+        "box": [ 3, 0 ]
+      }
+    }
+
+  },
+
+  "UI": [
+
+    {
+      "text": "Score",
+      "colour": [ 255, 0, 0 ]
+    },
+    {
+      "text": "Hi-score",
+      "colour": [ 255, 0, 0 ]
+    },
+    {
+      "text": "Pepper",
+      "colour": [ 0, 255, 255 ]
+    },
+    {
+      "text": "Pepper",
+      "colour": [ 0, 255, 255 ]
+    }
+
+  ]
+
+}

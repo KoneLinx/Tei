@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Hitbox.h"
 
 burger::Hitbox::Hitbox(std::shared_ptr<std::vector<Hitbox*>> others)
@@ -31,7 +32,7 @@ void burger::Hitbox::OnUpdate()
 		{
 			if (!CollidesWith(*pMatch))
 			{
-				Hit hit{ *m_pParent, *std::exchange(pMatch, {})->m_pParent, Hit::LEAVE };
+				Hit hit{ { *m_pParent, *std::exchange(pMatch, {})->m_pParent }, Hit::LEAVE };
 				this->Notify(hit);
 				pMatch->Notify(hit);
 			}
@@ -45,7 +46,7 @@ void burger::Hitbox::OnUpdate()
 			if (CollidesWith(*pMatch) && std::ranges::find(overlaps, pMatch) == overlaps.end())
 			{
 				m_Overlaps.push_back(pMatch);
-				Hit hit{ *m_pParent, *pMatch->m_pParent, Hit::ENTER };
+				Hit hit{ { *m_pParent, *pMatch->m_pParent }, Hit::ENTER };
 				this->Notify(hit);
 				pMatch->Notify(hit);
 			}
@@ -66,11 +67,27 @@ bool IsOverlapping(tei::unit::Transform const& a, tei::unit::Transform const& b)
 #endif
 }
 
+bool IsOverlapping(tei::unit::Transform const& amat, tei::unit::Dimentions adim, tei::unit::Transform const& bmat, tei::unit::Dimentions bdim)
+{
+	tei::unit::Rectangle 
+		arect{
+			amat.position + adim * amat.scale / 2.f,
+			amat.position - adim * amat.scale / 2.f
+		},
+		brect{
+			bmat.position + bdim * bmat.scale / 2.f,
+			bmat.position - bdim * bmat.scale / 2.f
+		};
+
+	return arect[1].x > brect[0].x && arect[0].x < brect[1].x
+		&& arect[1].y > brect[0].y && arect[0].y < brect[1].y;
+}
+
 bool burger::Hitbox::CollidesWith(Hitbox const& other) const
 {
-	auto& [selfTransform] = refs;
-	auto& [otherTransform] = other.refs;
-	return IsOverlapping(selfTransform, otherTransform);
+	auto& [selfTransform, selfBox] = Refs();
+	auto& [otherTransform, otherBox] = other.Refs();
+	return IsOverlapping(selfTransform, selfBox, otherTransform, otherBox);
 }
 
 void burger::Hitbox::DelistSelf()

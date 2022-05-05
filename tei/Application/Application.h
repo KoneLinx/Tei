@@ -41,7 +41,7 @@ namespace tei::internal::application
 		~Application();
 
 		void Update();
-		void UpdateProps();
+		void UpdateProps(bool changed);
 
 		inline auto const& GetWindow() const
 		{ return m_Window; }

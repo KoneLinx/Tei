@@ -8,21 +8,21 @@ namespace tei::internal::components
 {
 
 	template <typename ... Components>
-	class Refs
+	class RefTuple
 	{
 	public:
 
-		constexpr Refs() noexcept
+		constexpr RefTuple() noexcept
 			: m_Data{ *static_cast<Components*>(nullptr) ... }
 		{}
 
-		template <typename Component>
+		template <typename Component> requires (std::same_as<Component, Components> || ...)
 		constexpr Component& get() const noexcept
 		{
 			return std::get<std::reference_wrapper<Component>>(as_tuple());
 		}
 		
-		template <size_t INDEX>
+		template <size_t INDEX> requires (INDEX < sizeof...(Components))
 		constexpr auto& get() const noexcept
 		{
 			return std::get<INDEX>(as_tuple()).get();
@@ -37,9 +37,15 @@ namespace tei::internal::components
 			return m_Data;
 		}
 
-		std::tuple<std::reference_wrapper<Components>...> m_Data;
+		template <typename Component> requires (std::same_as<Component, Components> || ...)
+		constexpr operator Component& () const noexcept
+		{
+			return get<Component>();
+		}
 
 	private:
+
+		std::tuple<std::reference_wrapper<Components>...> m_Data;
 
 	};
 
@@ -67,7 +73,21 @@ namespace tei::internal::components
 	{
 	public:
 
-		Refs<Components...> refs{};
+		constexpr RefComponent() noexcept = default;
+
+		constexpr RefTuple<Components...>& Refs() noexcept
+		{
+			return m_Refs;
+		}
+		
+		constexpr RefTuple<Components...> const& Refs() const noexcept
+		{
+			return m_Refs;
+		}
+
+	private:
+
+		RefTuple<Components...> m_Refs{};
 
 	};
 
@@ -79,11 +99,11 @@ namespace tei::external::components
 }
 
 template <typename ... Components>
-struct std::tuple_size<tei::internal::components::Refs<Components...>> : std::integral_constant<size_t, sizeof...(Components)>
+struct std::tuple_size<tei::internal::components::RefTuple<Components...>> : std::integral_constant<size_t, sizeof...(Components)>
 {};
 
 template <size_t INDEX, typename ... Components>
-struct std::tuple_element<INDEX, tei::internal::components::Refs<Components...>> : std::tuple_element<INDEX, std::tuple<Components&...>>
+struct std::tuple_element<INDEX, tei::internal::components::RefTuple<Components...>> : std::tuple_element<INDEX, std::tuple<Components&...>>
 {};
 
 
@@ -104,5 +124,5 @@ inline void OnEnable(std::nullptr_t, tei::internal::components::RefComponent<Com
 				tei::internal::components::detail::ExceptRefNotValid(typeid(Component));
 		}
 	};
-	(getter(std::get<std::reference_wrapper<Components>>(refcomp.refs.as_tuple())), ...);
+	(getter(std::get<std::reference_wrapper<Components>>(refcomp.Refs().as_tuple())), ...);
 }

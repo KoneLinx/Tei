@@ -70,13 +70,13 @@ namespace tei::internal::utility
 				).str()
 			}
 		{
-			std::cerr << what() << std::endl;
+			//std::cerr << what() << std::endl;
 #if defined(DEBUG) || defined(_DEBUG)
-			std::cerr << "[DEBUG] Halt? [Y/n] ";
-			fflush(stdin);
-			if(char(getc(stdin)) != 'n')
-				abort();
-			std::cerr << "[DEBUG] Resuming" << std::endl;
+			//std::cerr << "[DEBUG] Halt? [Y/n] ";
+			//fflush(stdin);
+			//if(char(getc(stdin)) != 'n')
+			//	abort();
+			//std::cerr << "[DEBUG] Resuming" << std::endl;
 #endif
 		}
 	};

@@ -64,18 +64,21 @@ Application::~Application()
 	SDL_Quit();
 }
 
-void Application::UpdateProps()
+void Application::UpdateProps(bool changed)
 {
 	int x{}, y{};
 	SDL_GetWindowSize(m_SDLWindow, &x, &y);
+	changed |= m_Window.transform.scale.x != float(x) && m_Window.transform.scale.y != float(y);
 	m_Window.transform.scale.x = float(x), m_Window.transform.scale.y = float(y);
+
 	SDL_GetWindowPosition(m_SDLWindow, &x, &y);
+	changed |= m_Window.transform.position.x != float(x) && m_Window.transform.position.x != float(y);
 	m_Window.transform.position.x = float(x), m_Window.transform.position.y = float(y);
 	
 	if (render::Renderer)
 		render::Renderer->Update();
 	
-	if (events::Event)
+	if (changed && events::Event)
 		events::Event->Notify<WindowPropertyChangedEvent>();
 }
 
@@ -87,20 +90,20 @@ void Application::SetWindowProperty(unit::Scale size)
 	SDL_GetWindowSize(m_SDLWindow, &x, &y);
 	m_Window.transform.scale.x = float(x), m_Window.transform.scale.y = float(y);
 	SDL_SetWindowPosition(m_SDLWindow, int(old.position.x + (old.scale.x - m_Window.transform.scale.x) / 2), int(old.position.y + (old.scale.y - m_Window.transform.scale.y) / 2));
-	UpdateProps();
+	UpdateProps(true);
 }
 
 void Application::SetWindowProperty(unit::Position pos)
 {
 	SDL_SetWindowPosition(m_SDLWindow, int(pos.x), int(pos.y));
-	UpdateProps();
+	UpdateProps(true);
 }
 
 void Application::SetWindowProperty(unit::Transform transform)
 {
 	SDL_SetWindowSize(m_SDLWindow, int(transform.scale.x), int(transform.scale.y));
 	SDL_SetWindowPosition(m_SDLWindow, int(transform.position.x), int(transform.position.y));
-	UpdateProps();
+	UpdateProps(true);
 }
 
 void Application::SetWindowProperty(WindowProperty property)
@@ -140,7 +143,7 @@ void Application::SetWindowProperty(WindowProperty property)
 		break;
 	}
 	
-	UpdateProps();
+	UpdateProps(true);
 }
 
 void Application::Quit() const
@@ -215,10 +218,16 @@ void Application::Update()
 {
 	for (SDL_Event event{}; SDL_PollEvent(&event);)
 	{
-		if (event.type == SDL_QUIT)
-			Quit();
-		else
-			events::Event->Notify(event);
+		switch (event.type)
+		{
+		case SDL_QUIT:
+			Quit(); 
+			continue;
+		case SDL_WINDOWEVENT:
+			UpdateProps(true);
+			break;
+		}
+		events::Event->Notify(event);
 	}
 	SteamUpdate();
 }

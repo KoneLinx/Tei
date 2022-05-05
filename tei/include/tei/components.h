@@ -6,3 +6,4 @@
 #include "../../Components/TextureComponent.h"
 #include "../../Components/TextComponent.h"
 #include "../../Components/Subject.h"
+#include "../../Components/WindowAlignment.h"

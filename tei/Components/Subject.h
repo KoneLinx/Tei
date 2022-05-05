@@ -46,10 +46,9 @@ namespace tei::internal::components
 
 	class Subject
 	{
+	public:
 
 		class ObserverHandle;
-
-	public:
 
 		Subject();
 		Subject(Subject const&) = delete;
@@ -72,6 +71,8 @@ namespace tei::internal::components
 		ObserverHandle AddObserver(ObserverContainer::value_type);
 
 		std::shared_ptr<ObserverContainer> m_Observers;
+
+	public:
 
 		class ObserverHandle
 		{

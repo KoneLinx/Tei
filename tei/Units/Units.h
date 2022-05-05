@@ -35,6 +35,7 @@ namespace tei::internal::unit
 	using Vec1              = glm::tvec1<Unit, PRECISION>;
 	using Vec2              = glm::tvec2<Unit, PRECISION>;
 	using Vec3              = glm::tvec3<Unit, PRECISION>;
+	using Vec4              = glm::tvec4<Unit, PRECISION>;
 
 	using Mat2              = glm::tmat2x2<Unit, PRECISION>;
 	using Mat3              = glm::tmat3x3<Unit, PRECISION>;
@@ -51,7 +52,7 @@ namespace tei::internal::unit
 	using Dimentions        = detail::Unique_t<__LINE__>::type<Vec2>;
 	using Rectangle         = detail::Unique_t<__LINE__>::type<Mat2>;
 
-	using Colour            = detail::Unique_t<__LINE__>::type<Vec3>;
+	using Colour            = detail::Unique_t<__LINE__>::type<Vec4>;
 
 	static_assert(!std::convertible_to<Position, Scale>, "Shouldn't be possible"); // May fail with intellisense, build succeeds
 	static_assert(!std::convertible_to<RotationMatrix, ScaleMatrix>, "Shouldn't be possible");

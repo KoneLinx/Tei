@@ -32,11 +32,18 @@ void Object::SetState(bool state)
 Object& Object::AddChild(bool active)
 {
 	METRICS_TIMEBLOCK;
+
+	if (m_Active)
+		throw utility::TeiRuntimeError{ "Cannot modify object list while active" };
+
 	return *m_Children.emplace_back(new Object{ this, active });
 }
 
 void Object::RemoveChild(Object const& child)
 {
+	if (m_Active)
+		throw utility::TeiRuntimeError{ "Cannot modify object list while active" };
+
 	auto it{ std::ranges::find(m_Children, &child, utility::projectors::to_address{})};
 	m_Children.erase(it);
 }
@@ -44,7 +51,13 @@ void Object::RemoveChild(Object const& child)
 void Object::AddComponent(std::type_info const& type, ComponentBase* pComp)
 {	
 	METRICS_TIMEBLOCK;
+
+	if (m_Active)
+		throw utility::TeiRuntimeError{ "Cannot modify object component list while active" };
+
 	m_Components.push_back({ type, std::unique_ptr<ComponentBase>{ pComp } });
+	if (m_Initialised)
+		pComp->Do(Message::INIT, *this);
 }
 
 Object::ComponentBase* Object::GetComponent(std::type_info const& type) const
@@ -59,12 +72,19 @@ Object::ComponentBase* Object::GetComponent(std::type_info const& type) const
 
 std::unique_ptr<Object::ComponentBase> tei::internal::ecs::Object::ExtractComponent(std::type_info const& type)
 {
+	if (m_Active)
+		throw utility::TeiRuntimeError{ "Cannot modify object list while active" };
+
 	auto it{ r::find(m_Components | v::keys, type).base() };
 	if (it == r::end(m_Components))
 		ExceptComponentNotFound(type);
 
 	auto uptr{ std::move(it->second) };
 	m_Components.erase(it);
+
+	if (m_Initialised)
+		uptr->Do(Message::CLEANUP, *this);
+
 	return uptr;
 }
 
