@@ -19,14 +19,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Level\Anima.h" />
     <ClInclude Include="Application\FPS.h" />
+    <ClInclude Include="HUD.h" />
+    <ClInclude Include="Level\Ingredient.h" />
+    <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Level\Hitbox.h" />
     <ClInclude Include="Loader\LevelLoader.h" />
     <ClInclude Include="pch\pch.h" />
+    <ClInclude Include="Level\StaticEntity.h" />
+    <ClInclude Include="Level\Player.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Level\Anima.cpp" />
     <ClCompile Include="Application\main.cpp" />
     <ClCompile Include="Application\FPS.cpp" />
+    <ClCompile Include="HUD.cpp" />
+    <ClCompile Include="Level\Ingredient.cpp" />
+    <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="Level\Hitbox.cpp" />
     <ClCompile Include="Loader\LevelLoader.cpp" />
     <ClCompile Include="pch\pch.cpp">
@@ -35,6 +45,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Level\StaticEntity.cpp" />
+    <ClCompile Include="Level\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\EntityData.json" />

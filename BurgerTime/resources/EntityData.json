@@ -73,7 +73,10 @@
         "frames": 4,
 
         "states": [
-          "Left", "Right", "Down", "Up"
+          "Left",
+          "Right",
+          "Down",
+          "Up"
         ]
       },
       {
@@ -102,40 +105,40 @@
 
     "box": [ 3, 1 ],
 
-    "entities": [
-      {
+    "entities": {
+      "bun_top": {
         "name": "Top bun",
         "src": "Bun_Top",
         "unique": true,
         "position": -1
       },
-      {
+      "bun_bottom": {
         "name": "Bottom bun",
         "src": "Bun_Bottom",
         "unique": true,
         "position": 0
       },
-      {
+      "patty": {
         "name": "Patty",
         "src": "Patty",
         "unique": null
       },
-      {
+      "lettuce": {
         "name": "Lettuce",
         "src": "Lettuce",
         "unique": null
       },
-      {
+      "cheese": {
         "name": "Cheese",
         "src": "Cheese",
         "unique": null
       },
-      {
+      "tomato": {
         "name": "Tomato",
         "src": "Tomato",
         "unique": null
       }
-    ]
+    }
 
   },
 
@@ -161,6 +164,26 @@
         "name": "Shelf",
         "src": "Shelf",
         "box": [ 3, 0 ]
+      },
+      "Heart": {
+        "name": "Life",
+        "src": "Heart",
+        "box": [ 0, 0 ]
+      },
+      "Level_1": {
+        "name": "Level 1",
+        "src": "Level_1",
+        "box": [ 0, 0 ]
+      },
+      "Level_5": {
+        "name": "Level 5",
+        "src": "Level_5",
+        "box": [ 0, 0 ]
+      },
+      "Level_10": {
+        "name": "Level 10",
+        "src": "Level_10",
+        "box": [ 0, 0 ]
       }
     }
 

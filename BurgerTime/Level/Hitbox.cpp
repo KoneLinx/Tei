@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "Hitbox.h"
 
+burger::Hitbox::Hitbox()
+	: Hitbox{ {} }
+{}
+
 burger::Hitbox::Hitbox(std::shared_ptr<std::vector<Hitbox*>> others)
 	: m_pParent{ nullptr }
 	, m_Objects{ std::move(others) }
@@ -32,9 +36,9 @@ void burger::Hitbox::OnUpdate()
 		{
 			if (!CollidesWith(*pMatch))
 			{
-				Hit hit{ { *m_pParent, *std::exchange(pMatch, {})->m_pParent }, Hit::LEAVE };
-				this->Notify(hit);
-				pMatch->Notify(hit);
+				this->Notify(Hit{ *pMatch->m_pParent, Hit::LEAVE });
+				pMatch->Notify(Hit{ *m_pParent, Hit::LEAVE });
+				pMatch = {};
 			}
 		}
 		auto [from, to] = std::ranges::remove(m_Overlaps, nullptr);
@@ -46,9 +50,8 @@ void burger::Hitbox::OnUpdate()
 			if (CollidesWith(*pMatch) && std::ranges::find(overlaps, pMatch) == overlaps.end())
 			{
 				m_Overlaps.push_back(pMatch);
-				Hit hit{ { *m_pParent, *pMatch->m_pParent }, Hit::ENTER };
-				this->Notify(hit);
-				pMatch->Notify(hit);
+				this->Notify(Hit{ *pMatch->m_pParent, Hit::ENTER });
+				pMatch->Notify(Hit{ *m_pParent, Hit::ENTER });
 			}
 		}
 	}

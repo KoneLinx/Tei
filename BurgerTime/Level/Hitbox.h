@@ -11,8 +11,11 @@ namespace burger
 	{
 	public:
 
+		Hitbox();
 		Hitbox(std::shared_ptr<std::vector<Hitbox*>> others);
 		~Hitbox();
+
+		Hitbox(Hitbox&&) = default;
 
 		void OnEnbale(tei::ecs::Object&);
 		void OnDisable();
@@ -32,7 +35,7 @@ namespace burger
 			};
 			using enum State;
 
-			std::pair<tei::ecs::Object&, tei::ecs::Object&> objects;
+			tei::ecs::Object const& object;
 
 			State state;
 		};
