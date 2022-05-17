@@ -18,19 +18,37 @@ namespace tei::internal::unit
 				using T::T;
 				using T::operator=;
 
-				constexpr type() noexcept = default;
+				constexpr type() noexcept(std::is_nothrow_default_constructible_v<Base>) = default;
+				
+				constexpr type(type const&) noexcept(std::is_nothrow_copy_constructible_v<Base>) = default;
+				constexpr type(type &&) noexcept(std::is_nothrow_move_constructible_v<Base>) = default;
 
-				template <std::same_as<T> Val>
-				constexpr type(Val&& val) noexcept
-					: T{ std::forward<Val>(val) }
+				template <typename Arg> requires std::same_as<Base, typename Arg::Base>
+				constexpr explicit(!std::same_as<type, Arg>) type(Arg&& arg) noexcept(std::is_nothrow_constructible_v<Base, Arg>)
+					: Base{ std::forward<Arg>(arg) }
 				{}
+
+				template <std::same_as<T> Self>
+				constexpr type(Self&& self) noexcept(std::is_nothrow_constructible_v<Base, Self>)
+					: Base{ std::forward<Self>(self) }
+				{}
+				
+				constexpr type& operator = (type const&) noexcept(std::is_nothrow_copy_assignable_v<Base>) = default;
+				constexpr type& operator = (type &&) noexcept(std::is_nothrow_move_assignable_v<Base>) = default;
+				
+				template <typename Arg> requires std::assignable_from<Base, Arg>
+				constexpr type& operator = (Arg&& arg) noexcept(std::is_nothrow_assignable_v<Base, Arg>)
+				{
+					this->Base::operator=(std::forward<Arg>(arg));
+					return *this;
+				}
 			};
 		};
 	}
 
 	using Unit = float;
 
-	constexpr static auto PRECISION = glm::precision::packed_highp;
+	constexpr inline auto PRECISION = glm::precision::packed_highp;
 
 	using Vec1              = glm::tvec1<Unit, PRECISION>;
 	using Vec2              = glm::tvec2<Unit, PRECISION>;
@@ -53,9 +71,13 @@ namespace tei::internal::unit
 	using Rectangle         = detail::Unique_t<__LINE__>::type<Mat2>;
 
 	using Colour            = detail::Unique_t<__LINE__>::type<Vec4>;
+	
+#if !defined(__INTELLISENSE__)
 
-	static_assert(!std::convertible_to<Position, Scale>, "Shouldn't be possible"); // May fail with intellisense, build succeeds
-	static_assert(!std::convertible_to<RotationMatrix, ScaleMatrix>, "Shouldn't be possible");
+	static_assert(!std::convertible_to<Position, Scale>, "Unique type sideways conversion"); // May fail with intellisense, build succeeds
+	static_assert(!std::convertible_to<RotationMatrix, ScaleMatrix>, "Unique type sideways conversion");
+
+#endif
 
 	struct Transform
 	{

@@ -35,7 +35,7 @@ struct FpsComponent : tei::components::RefComponent<tei::components::Observed<st
 
 void OnUpdate(FpsComponent& fps)
 {
-	auto& [text, transform] = fps.refs;
+	auto& [text, transform] = fps.Refs();
 
 	transform.get().position = tei::Application->GetWindow().transform.scale / -2.f + 16.f;
 
@@ -77,7 +77,7 @@ struct RootComponent : tei::components::RefComponent<tei::components::ObjectTran
 
 void OnUpdate(RootComponent& comp)
 {
-	auto& [transform] = comp.refs;
+	auto& [transform] = comp.Refs();
 	float scale{ 1 + std::sin(tei::Time->thread->now.count() * 2) / 5 };
 	transform.get().rotation.r = scale - 1;
 	transform.get().scale = { scale, scale };
@@ -88,7 +88,7 @@ struct SplashText : tei::components::RefComponent<tei::components::Observed<std:
 
 void OnUpdate(SplashText& comp)
 {
-	auto& [text] = comp.refs;
+	auto& [text] = comp.Refs();
 	text.get() = (std::stringstream{} << "0x" << std::hex << std::random_device()()).view();
 }
 
@@ -152,6 +152,8 @@ void TeiClientInit()
 		}
 
 	}
+
+	//[[maybe_unused]] auto sprite = tei::Resources->LoadUnique<Sprite>(".");
 
 	tei::Input->AddCommand(
 		tei::input::KeyboardInput::Main::ESCAPE,

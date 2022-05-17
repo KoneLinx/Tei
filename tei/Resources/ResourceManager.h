@@ -18,16 +18,28 @@ namespace tei::internal::resource
 	class ToLoad;
 	
 	template <typename Data, typename ... Args>
-	concept LoadableResource = requires (std::shared_ptr<Data>& d, std::filesystem::path const& path, Args ... args)
-	{
-		::Load(d, path, std::forward<Args>(args)...);
-	};
+	concept LoadableResource = 	
+#if defined(__INTELLISENSE__) // It really doesn't like this requires clause but the compiler does get it right.
+		true
+#else
+		requires (std::shared_ptr<Data>& d, std::filesystem::path const& path, Args ... args)
+		{
+			::Load(d, path, std::forward<Args>(args)...);
+		}
+#endif
+		;
 	
 	template <typename Data>
-	concept DefaultResource = requires (std::shared_ptr<Data>& d)
-	{
-		::Load(d);
-	};
+	concept DefaultResource =
+#if defined(__INTELLISENSE__)
+		true
+#else
+		requires (std::shared_ptr<Data>& d)
+		{
+			::Load(d);
+		}
+#endif // _MSC_VER
+		;
 
 	class ResourceManager
 	{
@@ -84,6 +96,16 @@ namespace tei::internal::resource
 		Resource(std::shared_ptr<Data> ptr)
 			: m_Data{ std::move(ptr) }
 		{}
+
+		Resource(Resource const&) = default;
+		Resource(Resource &&) = default;
+
+		Resource& operator = (Resource const& other)
+		{
+			if (std::to_address(other.m_Data) != std::to_address(m_Data))
+				m_Data = other.m_Data;
+		}
+		Resource& operator = (Resource &&) = default;
 		
 		Data& operator * () const
 		{ return m_Data.operator*(); }

@@ -144,8 +144,11 @@ namespace tei::external::input
 	using DeviceId = tei::internal::input::DeviceId;
 	using tei::internal::input::InputBinary;
 	using tei::internal::input::BinaryState;
+	using tei::internal::input::BinaryData;
 	using tei::internal::input::InputAnalog;
 	using tei::internal::input::AnalogState;
+	using tei::internal::input::AnalogData;
 	using tei::internal::input::InputAnalog2;
 	using tei::internal::input::Analog2State;
+	using tei::internal::input::Analog2Data;
 }

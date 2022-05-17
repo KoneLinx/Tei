@@ -97,7 +97,7 @@ std::vector<AnimaData> LoadAnima(LevelData const& level, nlohmann::json const& e
 							Resources->LoadShared<resource::Sprite>(
 								std::string{ resourcedir }.append(animasrc).append(spritesep).append<std::string_view>(statedata["src"]).append(spriteext),
 								spritedur, statedata["frames"], 1, statedata["loop"]
-								)
+							)
 						);
 					}
 				}

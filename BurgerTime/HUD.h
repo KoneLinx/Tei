@@ -21,6 +21,12 @@ namespace burger
 
 		std::function<void(int value)> m_Update;
 
+	};
+
+	class BoundText
+	{
+
+		BoundText(tei::unit::Colour colour = { 1, 1, 1, 1 });
 
 	};
 

@@ -26,5 +26,18 @@ struct StaticEntityData
 
 class StaticEntity
 {
+public:
+
+	tei::ecs::Object& Create(tei::ecs::Object& selfObject, StaticEntityData const& data);
+
+	StaticEntityData::Type Type() const
+	{
+		return m_pData->type;
+	}
+
+private:
+
+	StaticEntityData const* m_pData;
+
 };
 

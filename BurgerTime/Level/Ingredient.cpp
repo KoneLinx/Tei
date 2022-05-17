@@ -49,18 +49,18 @@ tei::ecs::Object& IngredientEnity::Create(tei::ecs::Object& parent, IngredientDa
 	{
 		object.AddComponent(Box{});
 		auto& hitbox = object.AddComponent<Hitbox>();
-		Subject::ObserverHandle& handle = object.AddComponent(
+		object.AddComponent(
 			hitbox.AddObserver(
-				[&self, &handle] (Hitbox::Hit const& hit)
+				[&self] (Hitbox::Hit const& hit)
 				{
 					if (hit.state != hit.ENTER || self.m_IsOnPlate || !self.m_Falling)
 						return;
 
-					if (auto pEntity{ hit.object.HasComponent<StaticEntityData>() })
+					if (auto pEntity{ hit.object.HasComponent<StaticEntity>() })
 					{
-						if (pEntity->type == pEntity->PLATE)
+						if (pEntity->Type() == StaticEntityData::PLATE)
 							self.m_Falling = false, self.m_IsOnPlate = true;
-						if (pEntity->type == pEntity->SHELF)
+						if (pEntity->Type() == StaticEntityData::SHELF)
 							self.m_Falling = false;
 					}
 
@@ -70,7 +70,6 @@ tei::ecs::Object& IngredientEnity::Create(tei::ecs::Object& parent, IngredientDa
 						if (pIngredient->m_IsOnPlate)
 						{
 							self.m_IsOnPlate = true;
-							handle.Clear();
 						}
 						else
 							pIngredient->Pressed(-1);

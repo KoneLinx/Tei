@@ -93,14 +93,40 @@ bool burger::Hitbox::CollidesWith(Hitbox const& other) const
 	return IsOverlapping(selfTransform, selfBox, otherTransform, otherBox);
 }
 
+#ifdef _DEBUG
+void burger::Hitbox::OnInitialize(tei::ecs::Object& object)
+{
+	object.AddChild().AddComponents(
+		tei::components::ObjectTransform{ tei::unit::Scale{ object.GetComponent<Box>() } },
+		tei::Resources->LoadShared<tei::resource::Texture>("resources/Box_Debug.png"),
+		tei::components::TextureRenderComponent{}
+	);
+}
+#endif
+
 void burger::Hitbox::DelistSelf()
 {
 	if (auto it{ std::ranges::find(*m_Objects, this) }; it != std::ranges::end(*m_Objects))
+	{
+		std::ranges::for_each(
+			m_Objects->begin(), it,
+			[this](Hitbox* pHitbox)
+			{
+				pHitbox->Delist(*this);
+			}
+		);
 		m_Objects->erase(it);
+	}
 }
 
 void burger::Hitbox::EnlistSelf()
 {
 	if (std::ranges::find(*m_Objects, this) == std::ranges::end(*m_Objects))
 		m_Objects->push_back(this);
+}
+
+void burger::Hitbox::Delist(Hitbox const& other)
+{
+	if (auto it = std::ranges::find(m_Overlaps, &other); it != std::ranges::end(m_Overlaps))
+		m_Overlaps.erase(it);
 }

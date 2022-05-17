@@ -15,36 +15,30 @@ struct LevelData
 	std::vector<StaticEntityData> other;
 };
 
-namespace burger
+class Level : public tei::components::Subject
 {
 
-	class Level : public tei::components::Subject
+public:
+
+	struct Event
 	{
-
-	public:
-
-		struct Event
+		enum struct Type
 		{
-			enum struct Type
-			{
-				LOADED,
-				PAUSED,
-				RESUMED,
-				COMPLETED,
-				FAILED
-			};
-			using enum Type;
-
-			Type type;
-			int levelID;
+			LOADED,
+			PAUSED,
+			RESUMED,
+			COMPLETED,
+			FAILED
 		};
+		using enum Type;
 
-	private:
-
-		int m_ID;
-
+		Type type;
+		int levelID;
 	};
 
+private:
 
+	int m_ID;
 
-}
+};
+

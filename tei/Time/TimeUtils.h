@@ -45,30 +45,36 @@ namespace tei::internal::time
 
 	public:
 
-		TimeOnce(Clock::time_point after = Time->thread->now)
+		TimeOnce()
+			: m_Active{ 2 }
+		{}
+
+		TimeOnce(Clock::time_point at)
 			: m_Current{ time::Time->thread->now }
-			, m_Time{ after }
-			, m_Active{ true }
+			, m_Time{ at }
+		{}
+
+		TimeOnce(Clock::duration delay)
+			: m_Current{ time::Time->thread->now }
+			, m_Time{ m_Current + delay }
 		{}
 
 		operator bool()
 		{
 			if (m_Active <= 1)
 			{
-				if (m_Current != std::exchange(m_Current, Time->thread->now))
-				{
-					return ++m_Active == 1;
-				}
-				else return m_Active == 1;
+				if (m_Current != std::exchange(m_Current, Time->thread->now) && m_Time <= m_Current)
+					++m_Active;
+				return m_Active == 1;
 			}
 			else return false;
 		}
 
 	private:
 
-		time::Clock::time_point m_Current;
-		time::Clock::time_point m_Time;
-		char m_Active;
+		time::Clock::time_point m_Current{};
+		time::Clock::time_point m_Time{};
+		char m_Active{};
 
 	};
 

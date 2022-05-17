@@ -40,10 +40,16 @@ namespace burger
 			State state;
 		};
 
+#ifdef _DEBUG
+		void OnInitialize(tei::ecs::Object& object);
+#endif
+
 	private:
 
 		void DelistSelf();
 		void EnlistSelf();
+
+		void Delist(Hitbox const& other);
 
 		tei::ecs::Object* m_pParent;
 		std::shared_ptr<std::vector<Hitbox*>> m_Objects;
