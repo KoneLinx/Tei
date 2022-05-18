@@ -46,6 +46,7 @@ namespace tei::internal::application
 		inline auto const& GetWindow() const
 		{ return m_Window; }
 
+		void SetWindowTitle(std::string const&);
 		void SetWindowProperty(unit::Scale);
 		void SetWindowProperty(unit::Position);
 		void SetWindowProperty(unit::Transform);

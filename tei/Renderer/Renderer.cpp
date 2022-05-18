@@ -90,8 +90,16 @@ void RendererClass::DrawTexture(resource::Texture const& texture, unit::Transfor
 	if (texture.pData == nullptr)
 		return;
 
-	auto const scale = texture.size * transform.scale;// * (m_TargetScale / 480.f);
-	auto const pos   = m_TargetCenter + transform.position - scale / 2.f;
+	float textureRatio{ texture.size.x / texture.size.y};
+	if (source)
+		textureRatio *= source.value()[1].x / source.value()[1].y;
+
+	unit::Scale const textureScale{ std::min(1.f, textureRatio), std::min(1.f, 1.f / textureRatio)};
+
+	unit::Scale const mainScale{ 1, -1 };
+
+	auto const scale = /*texture.size **/ textureScale * transform.scale;// * (m_TargetScale / 480.f);
+	auto const pos   = m_TargetCenter + transform.position * mainScale - scale / 2.f;
 	auto const angle = glm::degrees(transform.rotation.r);
 
 	constexpr static auto src = [](resource::Texture const& texture, unit::Rectangle const& rect) -> SDL_Rect
@@ -136,6 +144,8 @@ void RendererClass::DrawSprite(resource::Sprite const& sprite, unit::Transform c
 
 	if (sprite.loop == false)
 		frame = std::min<unsigned>(frame, sprite.rows * sprite.cols - 1);
+
+	//float ratio = (sprite.size.x / sprite.rows) / (sprite.size.y / sprite.cols);
 
 	unit::Vec2 const div{
 		1.f / sprite.cols,

@@ -195,6 +195,44 @@ std::vector<StaticEntityData> LoadOther(nlohmann::json const& entitydata)
 	return other;
 }
 
+std::vector<LevelLayoutData> LoadLevelLayout()
+{
+	std::vector<LevelLayoutData> levels{};
+
+	auto const path = std::string{ resourcedir }.append("Level").append("_");
+	auto const ext = ".dat"sv;
+
+	for (int id{ 1 }; id < 4; ++id)
+	{
+		std::ifstream ifs{ path + std::to_string(id).append(ext) };
+
+		LevelLayoutData layout{};
+		layout.field.reserve(170);
+
+		std::string line{};
+		std::getline(ifs, line);
+		layout.width = int(std::size(line));
+
+		do
+		{
+			++layout.height;
+			std::ranges::transform(
+				line,
+				std::back_inserter(layout.field),
+				[] (char c) 
+				{
+					return static_cast<LevelLayoutData::TileType>(c);
+				}
+			);
+		}
+		while (std::getline(ifs, line));
+
+		levels.push_back(std::move(layout));
+	}
+
+	return levels;
+}
+
 LevelData LoadLevel([[maybe_unused]] nlohmann::json const& leveldata)
 {
 	try
@@ -213,6 +251,7 @@ LevelData LoadLevel([[maybe_unused]] nlohmann::json const& leveldata)
 		level.anima = LoadAnima(level, entitydata);
 		level.ingrendients = LoadIngredients(entitydata);
 		level.other = LoadOther(entitydata);
+		level.levels = LoadLevelLayout();
 
 		return level;
 	}
@@ -224,7 +263,14 @@ LevelData LoadLevel([[maybe_unused]] nlohmann::json const& leveldata)
 	}
 }
 
-void test()
+LevelData LoadLevelData(std::filesystem::path const& path)
 {
-	LoadLevel({});
+	//nlohmann::json data{};
+	//std::ifstream{ path } >> data;
+	return LoadLevel(/*data*/{});
+}
+
+void Load(std::shared_ptr<LevelData>& ref, std::filesystem::path const& path)
+{
+	ref = std::make_shared<LevelData>(LoadLevelData(path));
 }

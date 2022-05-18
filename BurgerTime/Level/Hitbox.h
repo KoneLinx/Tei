@@ -2,22 +2,26 @@
 
 #include <tei.h>
 
-namespace burger
-{
-
 	using Box = tei::unit::Dimentions;
+
 
 	class Hitbox : public tei::components::RefComponent<tei::components::ObjectTransform, Box>, public tei::components::Subject
 	{
 	public:
 
-		Hitbox();
-		Hitbox(std::shared_ptr<std::vector<Hitbox*>> others);
+		using List = std::vector<Hitbox*>;
+
+		//Hitbox();
+		Hitbox(/*std::shared_ptr<std::vector<Hitbox*>> others*/);
 		~Hitbox();
 
-		Hitbox(Hitbox&&) = default;
+		Hitbox(Hitbox const&) = delete;
+		Hitbox(Hitbox &&) = default;
+		
+		Hitbox& operator = (Hitbox const&) = delete;
+		Hitbox& operator = (Hitbox &&) = default;
 
-		void OnEnbale(tei::ecs::Object&);
+		void OnEnable(tei::ecs::Object&);
 		void OnDisable();
 
 		void OnUpdate();
@@ -52,19 +56,6 @@ namespace burger
 		void Delist(Hitbox const& other);
 
 		tei::ecs::Object* m_pParent;
-		std::shared_ptr<std::vector<Hitbox*>> m_Objects;
+		List* m_pObjects;
 		std::vector<Hitbox*> m_Overlaps;
 	};
-	
-	//auto Hitbox::OverlappingObjects() const
-	//{
-	//	return std::views::transform(
-	//		m_Overlaps, 
-	//		[] (Hitbox* p) -> tei::ecs::Object& 
-	//		{
-	//			return *p->m_pParent; 
-	//		}
-	//	);
-	//}
-
-}

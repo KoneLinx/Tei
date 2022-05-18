@@ -104,6 +104,7 @@ namespace tei::internal::resource
 		{
 			if (std::to_address(other.m_Data) != std::to_address(m_Data))
 				m_Data = other.m_Data;
+			return *this;
 		}
 		Resource& operator = (Resource &&) = default;
 		

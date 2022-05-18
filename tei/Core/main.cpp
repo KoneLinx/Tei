@@ -30,9 +30,11 @@ int main(int argc, char** argv)
 		}
 		return 0;
 	}
-	catch (const tei::internal::utility::TeiRuntimeError&)
+	catch (const tei::internal::utility::TeiRuntimeError& e)
 	{
 		fputs("[FATAL] Uncaught engine exception!", stderr);
+		fputc('\n', stderr);
+		fputs(e.what(), stderr);
 		fputc('\n', stderr);
 	}
 	catch (const std::exception& e)

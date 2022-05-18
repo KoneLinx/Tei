@@ -37,11 +37,11 @@ struct AnimaData
 
 };
 
-class Anima : tei::components::RefComponent<tei::components::ObjectTransform, tei::Resource<tei::resource::Sprite>>
+class Anima : public tei::components::RefComponent<tei::components::ObjectTransform, tei::Resource<tei::resource::Sprite>>
 {
 public:
 
-	tei::ecs::Object& Create(tei::ecs::Object& object, AnimaData const& data);
+	static tei::ecs::Object& Create(tei::ecs::Object& object, AnimaData const& data);
 
 	void OnEnable(tei::ecs::Object const&);
 	void OnUpdate();
@@ -55,7 +55,8 @@ private:
 
 	tei::unit::Vec2 m_Movement{};
 
-	tei::unit::Vec2 m_AllowedMovement{};
+	int m_AllowX{};
+	int m_AllowY{};
 
 	tei::time::TimeOnce m_Timer{};
 

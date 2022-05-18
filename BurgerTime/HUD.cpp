@@ -3,7 +3,7 @@
 
 using tei::components::ObjectTransform;
 
-void burger::IconbarDisplay::LoadLevel(tei::ecs::Object& object)
+void IconbarDisplay::LoadLevel(tei::ecs::Object& object)
 {
 
 	auto& level10object = object.AddChild();
@@ -66,11 +66,11 @@ void burger::IconbarDisplay::LoadLevel(tei::ecs::Object& object)
 
 }
 
-void burger::IconbarDisplay::OnInitialize(tei::ecs::Object& object)
+void IconbarDisplay::OnInitialize(tei::ecs::Object& object)
 {
 }
 
-void burger::IconbarDisplay::LoadHealth(tei::ecs::Object& object)
+void IconbarDisplay::LoadHealth(tei::ecs::Object& object)
 {
 
 	auto makeChild = [](auto& object, int idx, auto texture) -> auto&

@@ -1,43 +1,54 @@
 #include "pch.h"
 #include "Hitbox.h"
 
-burger::Hitbox::Hitbox()
-	: Hitbox{ {} }
-{}
-
-burger::Hitbox::Hitbox(std::shared_ptr<std::vector<Hitbox*>> others)
+Hitbox::Hitbox(/*std::shared_ptr<std::vector<Hitbox*>> others*/)
 	: m_pParent{ nullptr }
-	, m_Objects{ std::move(others) }
+	, m_pObjects{ /*std::move(others)*/ }
 	, m_Overlaps{ }
 {}
 
-burger::Hitbox::~Hitbox()
+Hitbox::~Hitbox()
 {
-	DelistSelf();
+	if (m_pObjects)
+		DelistSelf();
 }
 
-void burger::Hitbox::OnEnbale(tei::ecs::Object& parent)
+void Hitbox::OnEnable(tei::ecs::Object& parent)
 {
 	m_pParent = &parent;
+
+	List* pVec{};
+	Object const* pParent{ &parent };
+
+	while ((pVec = pParent->HasComponent<std::vector<Hitbox*>>()) == nullptr)
+		pParent = &pParent->GetParent();
+
+	m_pObjects = pVec;
+
 	EnlistSelf();
 }
 
 
-void burger::Hitbox::OnDisable()
+void Hitbox::OnDisable()
 {
-	DelistSelf();
+	if (m_pObjects)
+		DelistSelf();
+	m_pObjects = {};
 }
 
-void burger::Hitbox::OnUpdate()
+void Hitbox::OnUpdate()
 {
-	if (std::ranges::subrange matches{ std::ranges::find(*m_Objects, this), std::ranges::end(*m_Objects) }; matches.size() > 1)
+	if (!m_pObjects)
+		return;
+
+	if (std::ranges::subrange matches{ std::ranges::find(*m_pObjects, this), std::ranges::end(*m_pObjects) }; matches.size() > 1)
 	{
 		for (auto& pMatch : m_Overlaps)
 		{
 			if (!CollidesWith(*pMatch))
 			{
-				this->Notify(Hit{ *pMatch->m_pParent, Hit::LEAVE });
 				pMatch->Notify(Hit{ *m_pParent, Hit::LEAVE });
+				this->Notify(Hit{ *pMatch->m_pParent, Hit::LEAVE });
 				pMatch = {};
 			}
 		}
@@ -50,8 +61,8 @@ void burger::Hitbox::OnUpdate()
 			if (CollidesWith(*pMatch) && std::ranges::find(overlaps, pMatch) == overlaps.end())
 			{
 				m_Overlaps.push_back(pMatch);
-				this->Notify(Hit{ *pMatch->m_pParent, Hit::ENTER });
 				pMatch->Notify(Hit{ *m_pParent, Hit::ENTER });
+				this->Notify(Hit{ *pMatch->m_pParent, Hit::ENTER });
 			}
 		}
 	}
@@ -74,58 +85,60 @@ bool IsOverlapping(tei::unit::Transform const& amat, tei::unit::Dimentions adim,
 {
 	tei::unit::Rectangle 
 		arect{
-			amat.position + adim * amat.scale / 2.f,
-			amat.position - adim * amat.scale / 2.f
+			amat.position - adim * amat.scale / 2.f,
+			amat.position + adim * amat.scale / 2.f
 		},
 		brect{
-			bmat.position + bdim * bmat.scale / 2.f,
-			bmat.position - bdim * bmat.scale / 2.f
+			bmat.position - bdim * bmat.scale / 2.f,
+			bmat.position + bdim * bmat.scale / 2.f
 		};
 
 	return arect[1].x > brect[0].x && arect[0].x < brect[1].x
 		&& arect[1].y > brect[0].y && arect[0].y < brect[1].y;
 }
 
-bool burger::Hitbox::CollidesWith(Hitbox const& other) const
+bool Hitbox::CollidesWith(Hitbox const& other) const
 {
 	auto& [selfTransform, selfBox] = Refs();
 	auto& [otherTransform, otherBox] = other.Refs();
-	return IsOverlapping(selfTransform, selfBox, otherTransform, otherBox);
+	return IsOverlapping(selfTransform.world, selfBox, otherTransform.world, otherBox);
 }
 
 #ifdef _DEBUG
-void burger::Hitbox::OnInitialize(tei::ecs::Object& object)
+void Hitbox::OnInitialize(tei::ecs::Object& object)
 {
-	object.AddChild().AddComponents(
-		tei::components::ObjectTransform{ tei::unit::Scale{ object.GetComponent<Box>() } },
-		tei::Resources->LoadShared<tei::resource::Texture>("resources/Box_Debug.png"),
-		tei::components::TextureRenderComponent{}
-	);
+	//auto& box = object.GetComponent<Box>();
+	//auto texture = tei::Resources->LoadShared<tei::resource::Texture>("resources/Box_Debug.png");
+	//object.AddChild().AddComponents(
+	//	tei::components::ObjectTransform{ tei::unit::Scale{ box.x, box.y } },
+	//	std::move(texture),
+	//	tei::components::TextureRenderComponent{}
+	//);
 }
 #endif
 
-void burger::Hitbox::DelistSelf()
+void Hitbox::DelistSelf()
 {
-	if (auto it{ std::ranges::find(*m_Objects, this) }; it != std::ranges::end(*m_Objects))
+	if (auto it{ std::ranges::find(*m_pObjects, this) }; it != std::ranges::end(*m_pObjects))
 	{
 		std::ranges::for_each(
-			m_Objects->begin(), it,
+			m_pObjects->begin(), it,
 			[this](Hitbox* pHitbox)
 			{
 				pHitbox->Delist(*this);
 			}
 		);
-		m_Objects->erase(it);
+		m_pObjects->erase(it);
 	}
 }
 
-void burger::Hitbox::EnlistSelf()
+void Hitbox::EnlistSelf()
 {
-	if (std::ranges::find(*m_Objects, this) == std::ranges::end(*m_Objects))
-		m_Objects->push_back(this);
+	if (std::ranges::find(*m_pObjects, this) == std::ranges::end(*m_pObjects))
+		m_pObjects->push_back(this);
 }
 
-void burger::Hitbox::Delist(Hitbox const& other)
+void Hitbox::Delist(Hitbox const& other)
 {
 	if (auto it = std::ranges::find(m_Overlaps, &other); it != std::ranges::end(m_Overlaps))
 		m_Overlaps.erase(it);

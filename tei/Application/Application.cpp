@@ -82,6 +82,11 @@ void Application::UpdateProps(bool changed)
 		events::Event->Notify<WindowPropertyChangedEvent>();
 }
 
+void Application::SetWindowTitle(std::string const& title)
+{
+	SDL_SetWindowTitle(m_SDLWindow, std::data(title));
+}
+
 void Application::SetWindowProperty(unit::Scale size)
 {
 	auto old{ m_Window.transform };
@@ -136,6 +141,7 @@ void Application::SetWindowProperty(WindowProperty property)
 		break;
 	case tei::internal::application::WindowProperty::RESTORED:
 		SDL_RestoreWindow(m_SDLWindow);
+		SDL_SetWindowFullscreen(m_SDLWindow, 0);
 		SDL_SetWindowAlwaysOnTop(m_SDLWindow, SDL_FALSE);
 		break;
 	case tei::internal::application::WindowProperty::ALWAYS_IN_FRONT:

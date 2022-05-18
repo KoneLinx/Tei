@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "StaticEntity.h"
-
+#include "Hitbox.h"
 
 using namespace tei;
 using namespace resource;
@@ -14,7 +14,13 @@ tei::ecs::Object& StaticEntity::Create(tei::ecs::Object& selfObject, StaticEntit
 
     selfObject.AddComponents(
         data.box,
-        data.texture, 
+        Hitbox{}
+    );
+
+    auto& visuals = selfObject.AddChild();
+    visuals.AddComponents(
+        ObjectTransform{ unit::Scale{ data.box.x, data.box.y } },
+        data.texture,
         TextureRenderComponent{}
     );
 

@@ -18,7 +18,7 @@ tei::ecs::Object& Anima::Create(tei::ecs::Object& object, AnimaData const& data)
 
 	object.AddComponents(
 		data.box,
-		Hitbox{ {} },
+		Hitbox{},
 		data.state.sprites.front(),
 		SpriteRenderComponent{}
 	);
@@ -36,8 +36,11 @@ void Anima::OnEnable(tei::ecs::Object const& object)
 		{
 			if (input)
 				m_Movement[dim] = float(input) * factor;
-			else if (m_Movement[dim] != 0 && std::signbit(m_Movement[dim]) == std::signbit(factor))
-				m_Movement.x = {};
+			else
+			{
+				if (m_Movement[dim] != 0 && std::signbit(m_Movement[dim]) == std::signbit(factor))
+					m_Movement[dim] = {};
+			}
 		};
 	};
 
@@ -51,10 +54,10 @@ void Anima::OnEnable(tei::ecs::Object const& object)
 					if (auto pEntity{ hit.object.HasComponent<StaticEntity>() })
 					{
 						if (pEntity->Type() == StaticEntityData::PLATFORM || pEntity->Type() == StaticEntityData::SHELF)
-							m_AllowedMovement.x = tei::unit::Unit(bool(hit.state));
+							m_AllowX = std::max(0, m_AllowX + (tei::unit::Unit(bool(hit.state)) ? 1 : -1));
 
 						else if (pEntity->Type() == StaticEntityData::LADDER)
-							m_AllowedMovement.y = tei::unit::Unit(bool(hit.state));
+							m_AllowY = std::max(0, m_AllowY + (tei::unit::Unit(bool(hit.state)) ? 1 : -1));
 					}
 
 					if (hit.state != hit.ENTER)
@@ -89,23 +92,23 @@ void Anima::OnEnable(tei::ecs::Object const& object)
 				}
 			),
 			Input->AddCommand(
-				input::KeyboardInput::Arrow::RIGHT,
-				updateMovement(1, 0)
+				input::KeyboardInput::Arrow::RIGHT.WithState(input::BinaryState::ANY),
+				updateMovement(1.f, 0)
 			),
 			Input->AddCommand(
-				input::KeyboardInput::Arrow::LEFT,
-				updateMovement(-1, 0)
+				input::KeyboardInput::Arrow::LEFT.WithState(input::BinaryState::ANY),
+				updateMovement(-1.f, 0)
 			),
 			Input->AddCommand(
-				input::KeyboardInput::Arrow::UP,
-				updateMovement(1, 1)
+				input::KeyboardInput::Arrow::UP.WithState(input::BinaryState::ANY),
+				updateMovement(1.f, 1)
 			),
 			Input->AddCommand(
-				input::KeyboardInput::Arrow::DOWN,
-				updateMovement(-1, 1)
+				input::KeyboardInput::Arrow::DOWN.WithState(input::BinaryState::ANY),
+				updateMovement(-1.f, 1)
 			),
 			Input->AddCommand(
-				input::ControllerInput::Stick::LEFT.WithState({ { .25, .25 }, { 1, 1 } }),
+				input::ControllerInput::Stick::LEFT.WithState({ { .25f, .25f }, { 1.f, 1.f } }),
 				[this] (input::Analog2Data input)
 				{
 					m_Movement = { input.first, input.second };
@@ -131,11 +134,14 @@ void Anima::OnUpdate()
 
 	if (m_State != DYING || m_State != HIT)
 	{
-		unit::Vec2 velocity{ m_Movement * m_AllowedMovement * Time->frame.delta.count() };
+		unit::Vec2 velocity{ (m_AllowX ? 1.f : 0.001f) * m_Movement.x, (m_AllowY ? 1.f : 0.001f) * m_Movement.y };
+		velocity *= Time->frame.delta.count() * 2.f;
 
-		if (dot(velocity, velocity) > 0.1)
+		if (dot(velocity, velocity) > 0)
 		{
-			if (std::abs(velocity.y) > 0.1)
+			transform.get().position += velocity;
+
+			if (std::abs(velocity.y) > 0)
 				m_State = velocity.y > 0 
 					? WALKING_UP
 					: WALKING_DOWN;

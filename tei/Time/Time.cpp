@@ -8,7 +8,7 @@ namespace tei::internal::time
 			.global = {},
 			.frame = {
 				.step = 1_s / 60,
-				.fixed = true,
+				.fixed = false,
 				.allow_drop = true
 			},
 			.fixed = {

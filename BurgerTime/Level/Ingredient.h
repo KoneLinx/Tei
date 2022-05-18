@@ -25,12 +25,21 @@ struct IngredientData
 	int position{};
 };
 
-class IngredientEnity : tei::components::RefComponent<tei::components::ObjectTransform> 
+class IngredientEnity : public tei::components::RefComponent<tei::components::ObjectTransform> 
 {
+public:
 
 	static tei::ecs::Object& Create(tei::ecs::Object& parent, IngredientData const& data);
 
+	void OnUpdate();
+
+private:
+
 	IngredientData const* m_pData{};
+
+	tei::components::ObjectTransform* m_pVisualTransform{};
+
+	tei::time::TimeOnce m_Timer{};
 
 	std::bitset<3> m_Pressed{};
 	bool m_IsOnPlate : 1 { false };

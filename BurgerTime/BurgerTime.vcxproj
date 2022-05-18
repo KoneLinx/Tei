@@ -31,8 +31,8 @@
     <ClInclude Include="Level\Player.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Level\Anima.cpp" />
     <ClCompile Include="Application\main.cpp" />
+    <ClCompile Include="Level\Anima.cpp" />
     <ClCompile Include="Application\FPS.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Level\Ingredient.cpp" />

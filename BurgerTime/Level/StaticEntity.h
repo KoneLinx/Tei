@@ -28,7 +28,7 @@ class StaticEntity
 {
 public:
 
-	tei::ecs::Object& Create(tei::ecs::Object& selfObject, StaticEntityData const& data);
+	static tei::ecs::Object& Create(tei::ecs::Object& selfObject, StaticEntityData const& data);
 
 	StaticEntityData::Type Type() const
 	{
