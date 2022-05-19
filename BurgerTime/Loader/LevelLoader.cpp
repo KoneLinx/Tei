@@ -43,10 +43,10 @@ bool resembles(nlohmann::json const& data, std::string_view word)
 	return false;
 }
 
-std::vector<AnimaData> LoadAnima(LevelData const& level, nlohmann::json const& entitydata)
+std::vector<AnimaData> LoadAnima(LevelData const& level, nlohmann::json const& allentitydata)
 {
 
-	auto& animadata = entitydata["anima"];
+	auto& animadata = allentitydata["anima"];
 
 	std::vector<AnimaData> anima{};
 	std::vector<AnimaData::State> states{};
@@ -55,18 +55,24 @@ std::vector<AnimaData> LoadAnima(LevelData const& level, nlohmann::json const& e
 	box.x = animadata["box"][0];
 	box.y = animadata["box"][1];
 
-	std::string_view spritesep{ entitydata["spriteseparator"] };
-	std::string_view spriteext{ entitydata["spriteextention"] };
-	Clock::duration spritedur{ 1_s / long(entitydata["spritefrequency"]) };
+	std::string_view spritesep{ allentitydata["spriteseparator"] };
+	std::string_view spriteext{ allentitydata["spriteextention"] };
+	Clock::duration spritedur{ 1_s / long(allentitydata["spritefrequency"]) };
+	
+	std::set const types{
+		AnimaData::PLAYER,
+		AnimaData::ENEMY,
+	};
 
 	for (auto& entitydata : animadata["entities"])
 	{
 		if (resembles(entitydata["mode"], level.mode))
 		{
 			AnimaData entity{
-				.type = entitydata["type"],
+				.type = *types.find(entitydata["type"]),
 				.box = box,
-				.name = entitydata["name"]
+				.name = entitydata["name"],
+				.id = entitydata["id"]
 			};
 			if (resembles(entitydata["type"], AnimaData::ENEMY))
 			{
@@ -111,15 +117,15 @@ std::vector<AnimaData> LoadAnima(LevelData const& level, nlohmann::json const& e
 	return anima;
 }
 
-std::vector<IngredientData> LoadIngredients(nlohmann::json const& entitydata)
+std::vector<IngredientData> LoadIngredients(nlohmann::json const& allentitydata)
 {
-	auto const& ingredientsdata = entitydata["ingredients"];
+	auto const& ingredientsdata = allentitydata["ingredients"];
 	
 	std::vector<IngredientData> ingredients{};
 	ingredients.reserve(6);
 
-	std::string_view spritesep{ entitydata["spriteseparator"] };
-	std::string_view spriteext{ entitydata["spriteextention"] };
+	std::string_view spritesep{ allentitydata["spriteseparator"] };
+	std::string_view spriteext{ allentitydata["spriteextention"] };
 	
 	unit::Dimentions box{};
 	box.x = ingredientsdata["box"][0];
@@ -154,15 +160,15 @@ std::vector<IngredientData> LoadIngredients(nlohmann::json const& entitydata)
 	return ingredients;
 }
 
-std::vector<StaticEntityData> LoadOther(nlohmann::json const& entitydata)
+std::vector<StaticEntityData> LoadOther(nlohmann::json const& allentitydata)
 {
-	auto const& otherdata = entitydata["other"];
+	auto const& otherdata = allentitydata["other"];
 	
 	std::vector<StaticEntityData> other{};
 	other.reserve(4);
 	
-	std::string_view spritesep{ entitydata["spriteseparator"] };
-	std::string_view spriteext{ entitydata["spriteextention"] };
+	std::string_view spritesep{ allentitydata["spriteseparator"] };
+	std::string_view spriteext{ allentitydata["spriteextention"] };
 
 	std::set const types{
 		StaticEntityData::PLATE,
@@ -233,11 +239,11 @@ std::vector<LevelLayoutData> LoadLevelLayout()
 	return levels;
 }
 
-LevelData LoadLevel([[maybe_unused]] nlohmann::json const& leveldata)
+LevelData LoadLevel(std::string_view mode)
 {
 	try
 	{
-		LevelData level{ .mode = "Single player" };
+		LevelData level{ .mode = mode };
 
 		nlohmann::json const entitydata =
 		[] (std::filesystem::path const& path)
@@ -263,14 +269,14 @@ LevelData LoadLevel([[maybe_unused]] nlohmann::json const& leveldata)
 	}
 }
 
-LevelData LoadLevelData(std::filesystem::path const& path)
+LevelData LoadLevelData([[maybe_unused]] std::filesystem::path const& path, std::string_view mode)
 {
 	//nlohmann::json data{};
 	//std::ifstream{ path } >> data;
-	return LoadLevel(/*data*/{});
+	return LoadLevel(mode);
 }
 
-void Load(std::shared_ptr<LevelData>& ref, std::filesystem::path const& path)
+void Load(std::shared_ptr<LevelData>& ref, std::filesystem::path const& path, std::string_view mode)
 {
-	ref = std::make_shared<LevelData>(LoadLevelData(path));
+	ref = std::make_shared<LevelData>(LoadLevelData(path, mode));
 }

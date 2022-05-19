@@ -5,29 +5,31 @@
   "spritefrequency": 10,
 
   "modes": [
-    "Single player",
-    "Co-op",
-    "Versus"
+    "single",
+    "co-op",
+    "versus"
   ],
 
   "anima": {
 
-    "box": [ 1, 2 ],
+    "box": [ 0.75, 0.75 ],
 
     "entities": [
       {
         "mode": null,
         "type": "player",
         "name": "Mr. Pepper",
-        "src": "Peter"
+        "src": "Peter",
+        "id": 0
       },
       {
-        "mode": null,
+        "mode": "single",
         "type": "enemy",
         "name": "Mr. Hot dog",
         "score": 100,
         "flips": false,
-        "src": "Hotdog"
+        "src": "Hotdog",
+        "id": 1
       },
       {
         "mode": null,
@@ -35,7 +37,8 @@
         "name": "Mr. Egg",
         "score": 300,
         "flips": false,
-        "src": "Egg"
+        "src": "Egg",
+        "id": 2
       },
       {
         "mode": null,
@@ -43,19 +46,22 @@
         "name": "Mr. Pickle's",
         "score": 200,
         "flips": true,
-        "src": "Pickle"
+        "src": "Pickle",
+        "id": 3
       },
       {
-        "mode": "Co-op",
+        "mode": "co-op",
         "type": "player",
         "name": "Mrs. Salt",
-        "src": "Salt"
+        "src": "Salt",
+        "id": 1
       },
       {
-        "mode": "Versus",
+        "mode": "versus",
         "type": "player",
         "name": "Mr. Evil hot dog",
-        "src": "Hotdog"
+        "src": "Hotdog",
+        "id": 1
       }
     ],
 

@@ -33,6 +33,8 @@ public:
 
 	void OnUpdate();
 
+	bool IsFalling() const { return m_Falling; };
+
 private:
 
 	IngredientData const* m_pData{};
@@ -44,8 +46,6 @@ private:
 	std::bitset<3> m_Pressed{};
 	bool m_IsOnPlate : 1 { false };
 	bool m_Falling : 1 {false};
-
-	void Update();
 
 	void Pressed(int index);
 

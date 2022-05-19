@@ -40,10 +40,11 @@ tei::ecs::Object& IngredientEnity::Create(tei::ecs::Object& parent, IngredientDa
 				[i, &self] (Hitbox::Hit const& hit)
 				{
 					if (hit.state == hit.ENTER)
-					if (auto pAnima{ hit.object.HasComponent<Anima>() })
-					if (/*is player*/true)
 					{
-						self.Pressed(i);
+						if (hit.object.HasComponent<PlayerController>())
+						{
+							self.Pressed(i);
+						}
 					}
 				}
 			)
@@ -155,17 +156,4 @@ void IngredientEnity::Pressed(int index)
 
 	m_pVisualTransform->get().rotation.r = r;
 	m_pVisualTransform->get().position.y = y;
-}
-
-void IngredientEnity::Update()
-{
-
-	//if (m_Falling)
-	//{
-	//	float const yspeed{ 2.f };
-
-	//	auto& [transform] = Refs();
-	//	transform.get().position.y -= yspeed * Time->thread->delta.count();
-	//}
-
 }

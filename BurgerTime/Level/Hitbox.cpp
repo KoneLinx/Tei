@@ -105,7 +105,7 @@ bool Hitbox::CollidesWith(Hitbox const& other) const
 }
 
 #ifdef _DEBUG
-void Hitbox::OnInitialize(tei::ecs::Object& object)
+void Hitbox::OnInitialize([[maybe_unused]] tei::ecs::Object& object)
 {
 	//auto& box = object.GetComponent<Box>();
 	//auto texture = tei::Resources->LoadShared<tei::resource::Texture>("resources/Box_Debug.png");

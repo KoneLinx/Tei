@@ -66,7 +66,7 @@ void IconbarDisplay::LoadLevel(tei::ecs::Object& object)
 
 }
 
-void IconbarDisplay::OnInitialize(tei::ecs::Object& object)
+void IconbarDisplay::OnInitialize(tei::ecs::Object&)
 {
 }
 

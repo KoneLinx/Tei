@@ -34,7 +34,7 @@ void Level::CreateLayout(tei::ecs::Object& object, int id)
 	Position tileRoot{ layout.width / -2.f, layout.height / 2.f + 1 };
 	Vec2 tileDiff{ 1, -1 };
 
-	object.GetComponent<ObjectTransform>().get().scale = Scale{ 1.f / (std::max(layout.width, layout.height) * 1.33f) };
+	object.GetComponent<ObjectTransform>().get().scale = Scale{ 1.f / (std::max(layout.width, layout.height) * .9f) };
 
 	auto at = [&layout](int x, int y)
 	{

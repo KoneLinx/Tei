@@ -33,7 +33,9 @@ struct AnimaData
 	state{};
 
 	long score{};
+	int id{};
 	bool flips{};
+	bool hostile{};
 
 };
 
@@ -46,6 +48,20 @@ public:
 	void OnEnable(tei::ecs::Object const&);
 	void OnUpdate();
 	void OnDisable();
+
+	void DoAttack();
+	void DoDeath();
+	void DoHit();
+
+	//void SetState(AnimaData::State::ID state, tei::Clock::duration time);
+	
+	void SetInput(tei::unit::Vec2 movement)
+	{ m_Movement = movement; }
+
+	std::pair<bool, bool> GetAllowedAxis() const
+	{ return { m_AllowX > 0, m_AllowY > 0 }; }
+
+	bool IsActive();
 
 private:
 
@@ -60,6 +76,5 @@ private:
 
 	tei::time::TimeOnce m_Timer{};
 
-	std::any m_Storage{};
+	std::any m_Handles{};
 };
-

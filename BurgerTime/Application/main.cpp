@@ -42,10 +42,13 @@ void TeiClientInit()
 		{
 			auto& gameObject = viewport.AddChild();
 		
-			auto& levelData = gameObject.AddComponent(tei::Resources->LoadUnique<LevelData>(""));
+			auto& levelData = gameObject.AddComponent(tei::Resources->LoadUnique<LevelData>("", "versus"));
 			auto& level = Level::Create(gameObject, levelData);
 
-			Anima::Create(level.AddChild(), levelData->anima.front()).AddComponent<ObjectTransform>();
+			Anima::Create(level.AddChild(), levelData->anima[0]).AddComponent<ObjectTransform>(unit::Position{ -.5f,  3.f });
+			Anima::Create(level.AddChild(), levelData->anima[1]).AddComponent<ObjectTransform>(unit::Position{  1.f, -2.f });
+			Anima::Create(level.AddChild(), levelData->anima.back()).AddComponent<ObjectTransform>(unit::Position{  1.f, 2.f });
+
 		}
 
 		// Controls
@@ -64,7 +67,8 @@ void TeiClientInit()
 						[state = false](auto) mutable
 						{
 							using enum tei::application::WindowProperty;
-							tei::Application->SetWindowProperty((state ^= true) ? FULLSCREEN_FAKE : RESTORED);
+							state ^= true;
+							tei::Application->SetWindowProperty(state ? FULLSCREEN_FAKE : RESTORED);
 						}
 					)
 				}
