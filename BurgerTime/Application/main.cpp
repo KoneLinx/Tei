@@ -49,6 +49,12 @@ void TeiClientInit()
 			Anima::Create(level.AddChild(), levelData->anima[1]).AddComponent<ObjectTransform>(unit::Position{  1.f, -2.f });
 			Anima::Create(level.AddChild(), levelData->anima.back()).AddComponent<ObjectTransform>(unit::Position{  1.f, 2.f });
 
+			[[maybe_unused]] auto& score = ScoreDisplay::Create(level);
+
+			auto offset = level.GetComponent<ObjectTransform>()->scale;
+			score.AddComponent(ObjectTransform{ { unit::Position{ -.55f / offset.x, .45f / offset.y }, unit::Scale{.5f} } });
+
+			score.AddComponent<Observed<unit::Colour>>(unit::Colour{ 1, 0, 0, 1 });
 		}
 
 		// Controls

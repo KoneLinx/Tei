@@ -26,7 +26,7 @@ struct tei::internal::components::TransformAccess
 		else
 		{
 			if (transform.checkout())
-				transform.world = unit::Transform{} * *transform;
+				transform.world = /*unit::Transform{} **/ *transform;
 		}
 	}
 };

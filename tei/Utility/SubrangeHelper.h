@@ -15,7 +15,7 @@ namespace tei::internal::utility
 
 		auto const valid = [&rng](Size index) -> bool
 		{
-			return index < size(rng);
+			return index < r::size(rng);
 		};
 		auto const get = [&rng](Size index) -> r::range_reference_t<Rng>
 		{
@@ -24,7 +24,7 @@ namespace tei::internal::utility
 
 		// I use max size_t instead of unreachable_sentinel_t because of compatibility issues
 
-		return v::iota(Size(), std::numeric_limits<Size>::max()) | v::take_while(valid) | v::transform(get);
+		return v::iota(Size()) | v::take_while(valid) | v::transform(get);
 	}
 
 	template <typename It, typename Sentinel>
@@ -42,16 +42,21 @@ namespace tei::internal::utility
 			return it;
 	}
 
-	template <std::ranges::random_access_range Rng>
-	auto SubrangeViewInvalidationSafe(Rng& rng)
-	{
-		namespace r = std::ranges;
-		namespace v = std::views;
+	//template <std::ranges::random_access_range Rng>
+	//auto SubrangeViewInvalidationSafe(Rng& rng)
+	//{
+	//	namespace r = std::ranges;
+	//	namespace v = std::views;
 
-		using Size = r::range_size_t<Rng>;
+	//	using Size = r::range_size_t<Rng>;
 
-		return v::iota(Size(), std::ranges::size(rng)) | v::transform([&rng] (Size index) -> r::range_reference_t<Rng> { return rng[index]; });
-	}
+	//	auto const get = [&rng](Size index) -> r::range_reference_t<Rng>
+	//	{
+	//		return rng[index];
+	//	};
+
+	//	return v::iota(Size(), size(rng)) | v::transform(get);
+	//}
 
 }
 
@@ -60,5 +65,5 @@ namespace tei::external::utility
 	using tei::internal::utility::RangePerIndex;
 	using tei::internal::utility::SubrangeFromPair;
 	using tei::internal::utility::IteratorBase;
-	using tei::internal::utility::SubrangeViewInvalidationSafe;
+	//using tei::internal::utility::SubrangeViewInvalidationSafe;
 }

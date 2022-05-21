@@ -80,6 +80,9 @@ namespace tei::internal::ecs
 		// Remove a child object
 		void RemoveChild(Object const& child);
 
+		// Clear children and components
+		void Clear();
+
 		// Guaranteed, except for root (scene). Null reference for root. 
 		Object& GetParent();
 		Object const& GetParent() const;
@@ -102,6 +105,7 @@ namespace tei::internal::ecs
 		void Do(Message::Update);
 		void Do(Message::FixedUpdate);
 		void Do(Message::Render);
+
 	private:
 
 
@@ -120,6 +124,7 @@ namespace tei::internal::ecs
 		bool m_Active;
 		bool m_State;
 		bool m_Initialised;
+		bool m_Clear;
 
 		void AddComponent(std::type_info const&, ComponentBase*);
 		ComponentBase* GetComponent(std::type_info const&) const;
@@ -181,7 +186,15 @@ namespace tei::internal::ecs
 	template<detail::ComponentKind ... Data> requires (std::movable<Data> && ...)
 	inline std::tuple<Data&...> Object::AddComponents(Data ... data)
 	{
-		return std::forward_as_tuple(AddComponent<Data, Data>(std::move(data)) ...);
+		auto flatten = [&] (auto& self, auto first, auto ... rest)
+		{
+			auto out{ std::forward_as_tuple(this->Object::AddComponent<decltype(first), decltype(first)>(std::move(first))) };
+			if constexpr (sizeof...(rest) == 0)
+				return std::move(out);
+			else
+				return std::tuple_cat(std::move(out), self(self, std::move(rest)...));
+		};
+		return flatten(flatten, std::move(data)...);
 	}
 
 	template<detail::ComponentKind Data>

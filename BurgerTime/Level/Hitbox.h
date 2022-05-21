@@ -26,6 +26,8 @@
 
 		void OnUpdate();
 
+		void ReEnter();
+
 		bool CollidesWith(Hitbox const& other) const;
 
 		//auto OverlappingObjects() const;

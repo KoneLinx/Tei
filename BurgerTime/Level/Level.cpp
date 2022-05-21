@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Level.h"
 #include "Hitbox.h"
+#include "Score.h"
 
 using namespace tei;
 using namespace components;
@@ -13,17 +14,18 @@ tei::ecs::Object& Level::Create(tei::ecs::Object& parent, LevelData const& data)
 	object.AddComponent<ObjectTransform>();
 	auto& level = object.AddComponent<Level>();
 	level.m_pData = &data;
-	level.CreateLayout(object, 2);
+	level.CreateLayout(object, 0);
 	
 	object.AddComponent<Hitbox::List>();
+	object.AddComponent<ScoreManager>(data);
+	object.AddComponent<Score>();
 
 	return object;
 }
 
 void Level::CreateLayout(tei::ecs::Object& object, int id)
 {
-	for (auto& child : object.GetAllChildren())
-		object.RemoveChild(child);
+	object.Clear();
 
 	m_ID = id;
 
@@ -43,14 +45,15 @@ void Level::CreateLayout(tei::ecs::Object& object, int id)
 
 	auto add = [this, &layoutObject](StaticEntityData::Type type, ObjectTransform tf)
 	{
-		auto& data = *std::ranges::find(
-			m_pData->other,
-			type,
-			[](StaticEntityData const& data) -> auto const&
-			{
-				return data.type;
-			}
-		);
+		//auto& data = *std::ranges::find(
+		//	m_pData->other,
+		//	type,
+		//	[](StaticEntityData const& data) -> auto const&
+		//	{
+		//		return data.type;
+		//	}
+		//);
+		auto& data = m_pData->statics.at(type);
 		auto& tile = layoutObject.AddChild();
 		tile.AddComponent(std::move(tf));
 		StaticEntity::Create(tile, data);

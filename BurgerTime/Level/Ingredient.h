@@ -4,6 +4,9 @@
 
 #include <bitset>
 
+#include "Hitbox.h"
+#include "Score.h"
+
 struct IngredientData
 {
 	using Type = std::string_view;
@@ -25,13 +28,13 @@ struct IngredientData
 	int position{};
 };
 
-class IngredientEnity : public tei::components::RefComponent<tei::components::ObjectTransform> 
+class IngredientEnity : public tei::components::RefComponent<tei::components::ObjectTransform, Hitbox, Score> 
 {
 public:
 
 	static tei::ecs::Object& Create(tei::ecs::Object& parent, IngredientData const& data);
 
-	void OnUpdate();
+	void OnUpdate(tei::ecs::Object&);
 
 	bool IsFalling() const { return m_Falling; };
 
@@ -42,6 +45,8 @@ private:
 	tei::components::ObjectTransform* m_pVisualTransform{};
 
 	tei::time::TimeOnce m_Timer{};
+
+	int m_Enemies{};
 
 	std::bitset<3> m_Pressed{};
 	bool m_IsOnPlate : 1 { false };

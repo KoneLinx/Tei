@@ -2,9 +2,12 @@
 
 #include <tei.h>
 
-#include "../Level/Anima.h"
-#include "../Level/StaticEntity.h"
-#include "../Level/Ingredient.h"
+#include <map>
+
+#include "Anima.h"
+#include "StaticEntity.h"
+#include "Ingredient.h"
+#include "Particle.h"
 
 struct LevelLayoutData
 {
@@ -28,7 +31,8 @@ struct LevelData
 
 	std::vector<AnimaData> anima;
 	std::vector<IngredientData> ingrendients;
-	std::vector<StaticEntityData> other;
+	std::map<StaticEntityData::Type, StaticEntityData> statics;
+	std::map<ParticleData::Type, ParticleData> particles;
 	std::vector<LevelLayoutData> levels;
 };
 

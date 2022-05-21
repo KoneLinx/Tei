@@ -5,6 +5,7 @@
 #include "StaticEntity.h"
 #include "Ingredient.h"
 #include "Player.h"
+#include "Particle.h"
 #include "Enemy.h"
 
 #include <memory>
@@ -31,6 +32,11 @@ tei::ecs::Object& Anima::Create(tei::ecs::Object& object, AnimaData const& data)
 		object.AddComponent<PlayerController>(data);
 	else
 		object.AddComponent<EnemyController>(data);
+	
+	if (data.hostile)
+		object.AddComponent<EnemyEffects>();
+	else
+		object.AddComponent<PlayerEffects>();
 
 	return object;
 }
@@ -111,26 +117,40 @@ void Anima::OnDisable()
 
 void Anima::DoAttack()
 {
-	m_State = ATTACKING;
-	m_pData->state.sprites[size_t(ATTACKING)]->origintime = Time->frame.now;
-	m_Timer = .5_s;
+	if (!any(m_State, HIT, DYING))
+	{
+		m_State = ATTACKING;
+		m_pData->state.sprites[size_t(ATTACKING)]->origintime = Time->frame.now;
+		m_Timer = .5_s;
+	}
 }
 
 void Anima::DoDeath()
 {
-	m_State = DYING;
-	m_pData->state.sprites[size_t(DYING)]->origintime = Time->frame.now;
-	m_Timer = 3_s;
+	if (m_State != DYING)
+	{
+		m_State = DYING;
+		m_pData->state.sprites[size_t(DYING)]->origintime = Time->frame.now;
+		m_Timer = 3_s;
+	}
 }
 
 void Anima::DoHit()
 {
-	m_State = HIT;
-	m_Timer = 3_s;
+	if (m_State != DYING)
+	{
+		m_State = HIT;
+		m_Timer = 3_s;
+	}
 }
 
 bool Anima::IsActive()
 {
 	return !any(m_State, DYING, HIT);
+}
+
+bool Anima::IsAlive()
+{
+	return m_State != DYING;
 }
 

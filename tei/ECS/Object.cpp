@@ -17,6 +17,7 @@ Object::Object(Object* pParent, bool active)
 	, m_Active{ false }
 	, m_State{ active }
 	, m_Initialised{}
+	, m_Clear{}
 {}
 
 Object::~Object()
@@ -33,8 +34,8 @@ Object& Object::AddChild(bool active)
 {
 	METRICS_TIMEBLOCK;
 
-	if (m_Active)
-		throw utility::TeiRuntimeError{ "Cannot modify object list while active" };
+	//if (m_Active)
+	//	throw utility::TeiRuntimeError{ "Cannot modify object list while active" };
 
 	return *m_Children.emplace_back(new Object{ this, active });
 }
@@ -46,6 +47,14 @@ void Object::RemoveChild(Object const& child)
 
 	auto it{ std::ranges::find(m_Children, &child, utility::projectors::to_address{})};
 	m_Children.erase(it);
+}
+
+void tei::internal::ecs::Object::Clear()
+{
+	if (m_Active)
+		throw utility::TeiRuntimeError{ "Cannot modify object list while active" };
+
+	m_Clear = true;
 }
 
 void Object::AddComponent(std::type_info const& type, ComponentBase* pComp)
@@ -91,12 +100,12 @@ std::unique_ptr<Object::ComponentBase> tei::internal::ecs::Object::ExtractCompon
 template <typename Message>
 void DoCall(Object& self, auto& components, auto& children, bool force = false)
 {
-	for (auto& [type, pComp] : utility::RangePerIndex(components))
-		pComp->Do(Message{}, self);
-
 	for (auto& child : utility::RangePerIndex(children))
 		if (force || child->IsActive())
 			child->Do(Message{});
+
+	for (auto& [type, pComp] : utility::RangePerIndex(components))
+		pComp->Do(Message{}, self);
 }
 
 void Object::Do(Message::Init)
@@ -122,6 +131,7 @@ void Object::Do(Message::Cleanup)
 	m_Active = false;
 	m_State = false;
 	m_Initialised = false;
+	m_Clear = false;
 	m_Children.clear();
 	m_Components.clear();
 }
@@ -141,13 +151,16 @@ void Object::Do(Message::Enable)
 
 void Object::Do(Message::Disable)
 {
-	DoCall<Message::Disable>(*this, m_Components, m_Children);
-	
 	m_Active = false;
+
+	DoCall<Message::Disable>(*this, m_Components, m_Children);
 }
 
 void Object::Do(Message::Update)
 {
+	if (m_Clear)
+		return Do(Message::CLEANUP);
+
 	if (m_Active != m_State)
 		if (m_State)
 			Do(Message::ENABLE);

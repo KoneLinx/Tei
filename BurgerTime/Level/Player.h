@@ -10,7 +10,7 @@ public:
 
 	PlayerController(AnimaData const& data);
 
-	void OnEnable(tei::ecs::Object&);
+	void OnEnable();
 	void OnDisable();
 
 private:
@@ -23,3 +23,15 @@ private:
 
 };
 
+class PlayerEffects : public tei::components::RefComponent<Anima>
+{
+public:
+
+	void OnEnable(tei::ecs::Object&);
+	void OnDisable();
+
+private:
+
+	std::any m_Handles;
+
+};

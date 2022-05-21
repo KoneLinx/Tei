@@ -20,7 +20,8 @@
         "type": "player",
         "name": "Mr. Pepper",
         "src": "Peter",
-        "id": 0
+        "id": 0,
+        "hostile": false
       },
       {
         "mode": "single",
@@ -61,7 +62,8 @@
         "type": "player",
         "name": "Mr. Evil hot dog",
         "src": "Hotdog",
-        "id": 1
+        "id": 1,
+        "hostile": true
       }
     ],
 
@@ -148,7 +150,7 @@
 
   },
 
-  "other": {
+  "static": {
 
     "entities": {
       "plate": {
@@ -170,26 +172,90 @@
         "name": "Shelf",
         "src": "Shelf",
         "box": [ 3, 0 ]
-      },
+      }
+
+    }
+  },
+
+
+  "particles": {
+
+    "entities": {
       "heart": {
         "name": "Life",
-        "src": "Heart",
-        "box": [ 0, 0 ]
+        "src": "Heart"
       },
       "level_1": {
         "name": "Level 1",
-        "src": "Level_1",
-        "box": [ 0, 0 ]
+        "src": "Level_1"
       },
       "level_5": {
         "name": "Level 5",
-        "src": "Level_5",
-        "box": [ 0, 0 ]
+        "src": "Level_5"
       },
       "level_10": {
         "name": "Level 10",
-        "src": "Level_10",
-        "box": [ 0, 0 ]
+        "src": "Level_10"
+      },
+      "cloud": {
+        "name": "Cloud",
+        "src": "Cloud"
+      },
+      "score_0": {
+        "name": "0",
+        "src": "Score_0"
+      },
+      "score_50": {
+        "name": "50",
+        "src": "Score_50"
+      },
+      "score_100": {
+        "name": "100",
+        "src": "Score_100"
+      },
+      "score_200": {
+        "name": "200",
+        "src": "Score_200"
+      },
+      "score_300": {
+        "name": "300",
+        "src": "Score_300"
+      },
+      "score_500": {
+        "name": "500",
+        "src": "Score_500"
+      },
+      "score_600": {
+        "name": "600",
+        "src": "Score_600"
+      },
+      "score_900": {
+        "name": "900",
+        "src": "Score_900"
+      },
+      "score_1000": {
+        "name": "1000",
+        "src": "Score_1000"
+      },
+      "score_2000": {
+        "name": "2000",
+        "src": "Score_2000"
+      },
+      "score_4000": {
+        "name": "4000",
+        "src": "Score_4000"
+      },
+      "score_8000": {
+        "name": "8000",
+        "src": "Score_8000"
+      },
+      "score_16000": {
+        "name": "16000",
+        "src": "Score_16000"
+      },
+      "score_plus": {
+        "name": "16000+",
+        "src": "Score_Plus"
       }
     }
 

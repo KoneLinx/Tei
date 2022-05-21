@@ -62,9 +62,11 @@ public:
 	{ return { m_AllowX > 0, m_AllowY > 0 }; }
 
 	bool IsActive();
+	bool IsAlive();
 
 private:
 
+	tei::ecs::Object* m_pParent{};
 	AnimaData const* m_pData{};
 
 	AnimaData::State::ID m_State{};

@@ -27,9 +27,11 @@
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Level\Hitbox.h" />
     <ClInclude Include="Loader\LevelLoader.h" />
+    <ClInclude Include="Level\Particle.h" />
     <ClInclude Include="pch\pch.h" />
     <ClInclude Include="Level\StaticEntity.h" />
     <ClInclude Include="Level\Player.h" />
+    <ClInclude Include="Level\Score.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application\main.cpp" />
@@ -41,6 +43,7 @@
     <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="Level\Hitbox.cpp" />
     <ClCompile Include="Loader\LevelLoader.cpp" />
+    <ClCompile Include="Level\Particle.cpp" />
     <ClCompile Include="pch\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -49,6 +52,7 @@
     </ClCompile>
     <ClCompile Include="Level\StaticEntity.cpp" />
     <ClCompile Include="Level\Player.cpp" />
+    <ClCompile Include="Level\Score.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\EntityData.json" />

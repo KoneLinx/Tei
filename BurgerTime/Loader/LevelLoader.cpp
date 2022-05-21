@@ -9,9 +9,6 @@
 
 #include <tei.h>
 
-#include "../Level/Ingredient.h"
-#include "../Level/StaticEntity.h"
-#include "../Level/Anima.h"
 #include "../Level/Level.h"
 
 using namespace std::literals;
@@ -48,9 +45,6 @@ std::vector<AnimaData> LoadAnima(LevelData const& level, nlohmann::json const& a
 
 	auto& animadata = allentitydata["anima"];
 
-	std::vector<AnimaData> anima{};
-	std::vector<AnimaData::State> states{};
-
 	unit::Dimentions box{};
 	box.x = animadata["box"][0];
 	box.y = animadata["box"][1];
@@ -63,6 +57,8 @@ std::vector<AnimaData> LoadAnima(LevelData const& level, nlohmann::json const& a
 		AnimaData::PLAYER,
 		AnimaData::ENEMY,
 	};
+	
+	std::vector<AnimaData> anima{};
 
 	for (auto& entitydata : animadata["entities"])
 	{
@@ -78,6 +74,11 @@ std::vector<AnimaData> LoadAnima(LevelData const& level, nlohmann::json const& a
 			{
 				entity.score = entitydata["score"];
 				entity.flips = entitydata["flips"];
+				entity.hostile = true;
+			}
+			if (resembles(entitydata["mode"], "versus") && resembles(entitydata["type"], AnimaData::PLAYER))
+			{
+				entity.hostile = entitydata["hostile"];
 			}
 			
 			std::string_view animasrc = entitydata["src"];
@@ -94,7 +95,7 @@ std::vector<AnimaData> LoadAnima(LevelData const& level, nlohmann::json const& a
 								Resources->LoadShared<resource::Sprite>(
 									std::string{ resourcedir }.append(animasrc).append(spritesep).append<std::string_view>(statedata["src"]).append(spritesep).append<std::string_view>(substate).append(spriteext),
 									spritedur, statedata["frames"], 1, statedata["loop"]
-									)
+								)
 							);
 					}
 					else
@@ -120,9 +121,6 @@ std::vector<AnimaData> LoadAnima(LevelData const& level, nlohmann::json const& a
 std::vector<IngredientData> LoadIngredients(nlohmann::json const& allentitydata)
 {
 	auto const& ingredientsdata = allentitydata["ingredients"];
-	
-	std::vector<IngredientData> ingredients{};
-	ingredients.reserve(6);
 
 	std::string_view spritesep{ allentitydata["spriteseparator"] };
 	std::string_view spriteext{ allentitydata["spriteextention"] };
@@ -139,6 +137,9 @@ std::vector<IngredientData> LoadIngredients(nlohmann::json const& allentitydata)
 		IngredientData::CHEESE,
 		IngredientData::TOMATO
 	};
+	
+	std::vector<IngredientData> ingredients{};
+	ingredients.reserve(types.size());
 
 	for (auto& entitydata : ingredientsdata["entities"].items())
 	{
@@ -160,12 +161,9 @@ std::vector<IngredientData> LoadIngredients(nlohmann::json const& allentitydata)
 	return ingredients;
 }
 
-std::vector<StaticEntityData> LoadOther(nlohmann::json const& allentitydata)
+std::map<StaticEntityData::Type, StaticEntityData> LoadStatic(nlohmann::json const& allentitydata)
 {
-	auto const& otherdata = allentitydata["other"];
-	
-	std::vector<StaticEntityData> other{};
-	other.reserve(4);
+	auto const& staticdata = allentitydata["static"];
 	
 	std::string_view spritesep{ allentitydata["spriteseparator"] };
 	std::string_view spriteext{ allentitydata["spriteextention"] };
@@ -174,31 +172,83 @@ std::vector<StaticEntityData> LoadOther(nlohmann::json const& allentitydata)
 		StaticEntityData::PLATE,
 		StaticEntityData::LADDER,
 		StaticEntityData::PLATFORM,
-		StaticEntityData::SHELF,
-		StaticEntityData::HEARTH,
-		StaticEntityData::LEVEL_1,
-		StaticEntityData::LEVEL_5,
-		StaticEntityData::LEVEL_10,
+		StaticEntityData::SHELF
 	};
 
-	for (auto& entitydata : otherdata["entities"].items())
+	std::map<StaticEntityData::Type, StaticEntityData> statics{};
+	//statics.reserve(types.size());
+
+	for (auto& entitydata : staticdata["entities"].items())
 	{
 		
 		unit::Dimentions box{};
 		box.x = entitydata.value()["box"][0];
 		box.y = entitydata.value()["box"][1];
 
-		other.push_back(StaticEntityData{
-			.type = *types.find(entitydata.key()),
-			.box = box,
-			.name = entitydata.value()["name"],
-			.texture = Resources->LoadShared<resource::Texture>(
-				std::string{ resourcedir }.append<std::string_view>(entitydata.value()["src"]).append(spriteext)
-			)
-		});
+		auto const type = *types.find(entitydata.key());
+
+		statics.emplace( type,
+			StaticEntityData{
+				.type = type,
+				.box = box,
+				.name = entitydata.value()["name"],
+				.texture = Resources->LoadShared<resource::Texture>(
+					std::string{ resourcedir }.append<std::string_view>(entitydata.value()["src"]).append(spriteext)
+				)
+			}
+		);
 	}
 
-	return other;
+	return statics;
+}
+
+std::map<ParticleData::Type, ParticleData> LoadParticles(nlohmann::json const& allentitydata)
+{
+	std::set const types{
+		ParticleData::HEARTH,
+		ParticleData::LEVEL_1,
+		ParticleData::LEVEL_5,
+		ParticleData::LEVEL_10,
+		ParticleData::CLOUD,
+		ParticleData::SCORE_0,
+		ParticleData::SCORE_50,
+		ParticleData::SCORE_100,
+		ParticleData::SCORE_200,
+		ParticleData::SCORE_300,
+		ParticleData::SCORE_500,
+		ParticleData::SCORE_600,
+		ParticleData::SCORE_900,
+		ParticleData::SCORE_1000,
+		ParticleData::SCORE_2000,
+		ParticleData::SCORE_4000,
+		ParticleData::SCORE_8000,
+		ParticleData::SCORE_16000,
+		ParticleData::SCORE_PLUS
+	};
+
+	auto const& particledata = allentitydata["particles"];
+	
+	std::map<ParticleData::Type, ParticleData> particles{};
+	//particles.reserve(types.size());
+	
+	std::string_view spritesep{ allentitydata["spriteseparator"] };
+	std::string_view spriteext{ allentitydata["spriteextention"] };
+
+	for (auto& entitydata : particledata["entities"].items())
+	{
+		auto const type = *types.find(entitydata.key());
+		particles.emplace( type,
+			ParticleData{
+				.type = type,
+				.name = entitydata.value()["name"],
+				.texture = Resources->LoadShared<resource::Texture>(
+					std::string{ resourcedir }.append<std::string_view>(entitydata.value()["src"]).append(spriteext)
+				)
+			}
+		);
+	}
+
+	return particles;
 }
 
 std::vector<LevelLayoutData> LoadLevelLayout()
@@ -256,7 +306,8 @@ LevelData LoadLevel(std::string_view mode)
 
 		level.anima = LoadAnima(level, entitydata);
 		level.ingrendients = LoadIngredients(entitydata);
-		level.other = LoadOther(entitydata);
+		level.statics = LoadStatic(entitydata);
+		level.particles = LoadParticles(entitydata);
 		level.levels = LoadLevelLayout();
 
 		return level;

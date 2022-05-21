@@ -5,6 +5,8 @@
 #include "Hitbox.h"
 #include "Player.h"
 #include "StaticEntity.h"
+#include "Score.h"
+#include "Enemy.h"
 
 #include <numbers>
 
@@ -41,7 +43,7 @@ tei::ecs::Object& IngredientEnity::Create(tei::ecs::Object& parent, IngredientDa
 				{
 					if (hit.state == hit.ENTER)
 					{
-						if (hit.object.HasComponent<PlayerController>())
+						if (hit.object.HasComponent<PlayerEffects>())
 						{
 							self.Pressed(i);
 						}
@@ -56,50 +58,60 @@ tei::ecs::Object& IngredientEnity::Create(tei::ecs::Object& parent, IngredientDa
 		auto& hitbox = object.AddComponent<Hitbox>();
 		object.AddComponent(
 			hitbox.AddObserver(
-				[&self, &box] (Hitbox::Hit const& hit)
+				[&self, &box, &object] (Hitbox::Hit const& hit)
 				{
 					if (hit.state != hit.ENTER || self.m_IsOnPlate || !self.m_Falling)
 						return;
 
+					auto& transform = self.Refs().get<ObjectTransform>();
+
 					if (auto pEntity{ hit.object.HasComponent<StaticEntity>() })
 					{
-						auto& [transform] = self.Refs();
-
-						if (pEntity->Type() == StaticEntityData::PLATE)
+						if (!self.m_Timer)
 						{
-							self.m_Timer = 0_s;
-							self.m_IsOnPlate = true;
-							transform.get().position = hit.object.GetComponent<ObjectTransform>()->position;
-							transform.get().position.y += 0.4f;
+							if (pEntity->Type() == StaticEntityData::PLATE)
+							{
+								self.m_Timer = 0_s;
+								self.m_IsOnPlate = true;
+								transform.get().position = hit.object.GetComponent<ObjectTransform>()->position;
+								transform.get().position.y += 0.4f;
+							}
+							if (pEntity->Type() == StaticEntityData::SHELF)
+							{
+								self.m_Timer = 0_s;
+								transform.get().position = hit.object.GetComponent<ObjectTransform>()->position;
+							}
 						}
-						if (pEntity->Type() == StaticEntityData::SHELF)
-						{
-							self.m_Timer = 0_s;
-							transform.get().position = hit.object.GetComponent<ObjectTransform>()->position;
-						}
-
 					}
 
 					if (auto pIngredient{ hit.object.HasComponent<IngredientEnity>() })
-					{
-						auto& [transform] = self.Refs();
-						
-						self.m_Timer = 0_s;
-						if (pIngredient->m_IsOnPlate)
+					{		
+						if (!pIngredient->m_Timer)
 						{
-							self.m_IsOnPlate = true;
-							transform.get().position = hit.object.GetComponent<ObjectTransform>()->position;
-							transform.get().position.y += 0.65f;
+							self.m_Timer = 0_s;
+							if (pIngredient->m_IsOnPlate)
+							{
+								self.m_IsOnPlate = true;
+								transform.get().position = hit.object.GetComponent<ObjectTransform>()->position;
+								transform.get().position.y += 0.65f;
+							}
+							else
+							{
+								auto& otherTransform = pIngredient->Refs().get<ObjectTransform>();
+								transform.get().position = otherTransform->position;
+								otherTransform.get().position.y -= box.y * 1.1f;
+								pIngredient->Pressed(-1);
+								(*pIngredient->m_pVisualTransform).get().position.y = (*self.m_pVisualTransform).get().position.y += box.y * 1.f;
+							}
 						}
-						else
-						{
-							auto& [otherTransform] = pIngredient->Refs();
-							transform.get().position = otherTransform->position;
-							otherTransform.get().position.y -= box.y * 1.1f;
-							pIngredient->Pressed(-1);
-							(*pIngredient->m_pVisualTransform).get().position.y = (*self.m_pVisualTransform).get().position.y += box.y * 1.f;
-						}
+					}
 
+					if (auto pEnemy{ hit.object.HasComponent<EnemyEffects>() })
+					{
+						if (self.m_Timer /* && pEnemy->Refs().get<Anima>().IsAlive()*/)
+						{
+							++self.m_Enemies;
+						}
 					}
 				}
 			)
@@ -109,14 +121,23 @@ tei::ecs::Object& IngredientEnity::Create(tei::ecs::Object& parent, IngredientDa
 	return object;
 }
 
-void IngredientEnity::OnUpdate()
+void IngredientEnity::OnUpdate(tei::ecs::Object& object)
 {
 	if (m_Timer)
+	{
 		m_Falling ^= true;
+		if (m_Falling)
+		{
+			m_Enemies = {};
+			Refs().get<Hitbox>().ReEnter();
+			auto score = m_Enemies == 0 ? 50 : ScoreManager::ScoreType{ 250 } << m_Enemies;
+			Refs().get<Score>()->Notify(Score::Event{ object, score });
+		}
+	}
 
 	if (m_Falling)
 	{
-		auto& [transform] = Refs();
+		auto& transform = Refs().get<ObjectTransform>();
 		transform.get().position.y -= 2.f * Time->frame.delta.count();
 	}
 
@@ -136,24 +157,30 @@ void IngredientEnity::Pressed(int index)
 		m_Pressed.set(index);
 	}
 
+	float y{ visualOffset };
+	float r{};
+
 	if (m_Pressed.all() || index < 0)
 	{
 		m_Timer = 0_s;
 		m_Pressed = {};
+		
+		m_pVisualTransform->get().rotation.r = r;
+		m_pVisualTransform->get().position.y = y;
 	}
+	else
+	{
+		float const rinc{ std::numbers::pi_v<float> / 24.f };
+		float const yinc{ -.25f };
 
-	float r{};
-	float y{ visualOffset };
-	float const rinc{ std::numbers::pi_v<float> / 24.f };
-	float const yinc{ -.25f };
+		if (m_Pressed.test(0))
+			r -= rinc, y += yinc;
+		if (m_Pressed.test(2))
+			r += rinc, y += yinc;
+		if (m_Pressed.test(1))
+			r += r, y += yinc;
 
-	if (m_Pressed.test(0))
-		r -= rinc, y += yinc;
-	if (m_Pressed.test(2))
-		r += rinc, y += yinc;
-	if (m_Pressed.test(1))
-		r += r, y += yinc;
-
-	m_pVisualTransform->get().rotation.r = r;
-	m_pVisualTransform->get().position.y = y;
+		m_pVisualTransform->get().rotation.r = r;
+		m_pVisualTransform->get().position.y = y;
+	}
 }

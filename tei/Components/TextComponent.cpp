@@ -16,8 +16,13 @@ void OnUpdate(std::nullptr_t, TextRenderComponent const& comp)
 {
 	if (auto& [text, font, texture, colour, transform] = comp.Refs(); text.checkout() | colour.checkout()) // Non short-circuiting!
 	{
+		unit::Scale scale{ 1 };
+
 		if (auto data = std::exchange(texture->pData, {}))
+		{
+			scale = texture->size;
 			SDL_DestroyTexture(static_cast<SDL_Texture*>(data));
+		}
 
 		if (!text->empty())
 		{
@@ -43,6 +48,10 @@ void OnUpdate(std::nullptr_t, TextRenderComponent const& comp)
 
 			texture->pData = pTexture;
 			texture->size = { w, h };
+
+			scale = texture->size / scale;
+
+			transform.get().scale *= scale.x / scale.y;
 		}
 	}
 }

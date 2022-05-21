@@ -14,9 +14,9 @@ PlayerController::PlayerController(AnimaData const& data)
 	: m_playerID{ data.id }
 {}
 
-void PlayerController::OnEnable(tei::ecs::Object& object)
+void PlayerController::OnEnable()
 {
-	auto& anima = object.GetComponent<Anima>();
+	auto& [anima] = Refs();
 
 	auto updateMovementKeyboard = [this, &anima] (float factor, int dim)
 	{
@@ -43,19 +43,6 @@ void PlayerController::OnEnable(tei::ecs::Object& object)
 
 	auto doAttack = [&] { anima.DoAttack(); };
 
-	auto onHit = [&] (Hitbox::Hit const& hit)
-	{
-		if (hit.state != hit.ENTER)
-			return;
-
-		if (auto pEnemy{ hit.object.HasComponent<EnemyController>() })
-		{
-			if (pEnemy->Refs().get<Anima>().IsActive())
-				anima.DoDeath();
-		}
-	};
-	auto& hitbox = object.GetComponent<Hitbox>();
-
 	auto makeHandles = [&]
 	{
 		int id = m_playerID;
@@ -70,8 +57,7 @@ void PlayerController::OnEnable(tei::ecs::Object& object)
 			Input->AddCommand( std::array{ KeyboardInput::Main::D.WithState(movestate)                    , KeyboardInput::Arrow::RIGHT.WithState(movestate)                }[id], updateMovementKeyboard( 1.f, 0) ),
 			Input->AddCommand( std::array{ KeyboardInput::Main::F.WithState(actstate)                     , KeyboardInput::Mod::LCTRL  .WithState(actstate)                 }[id], doAttack                        ),
 			Input->AddCommand( std::array{ ControllerInput::Stick::LEFT.WithIndex(0).WithState(stickstate), ControllerInput::Stick::LEFT.WithIndex(1).WithState(stickstate) }[id], updateMovementController        ),
-			Input->AddCommand( std::array{ ControllerInput::Button::X.WithIndex(0).WithState(actstate)    , ControllerInput::Button::X.WithIndex(1).WithState(actstate)     }[id], doAttack                        ),
-			hitbox.AddObserver(onHit)
+			Input->AddCommand( std::array{ ControllerInput::Button::X.WithIndex(0).WithState(actstate)    , ControllerInput::Button::X.WithIndex(1).WithState(actstate)     }[id], doAttack                        )
 		};
 	};
 
@@ -82,6 +68,32 @@ void PlayerController::OnEnable(tei::ecs::Object& object)
 }
 
 void PlayerController::OnDisable()
+{
+	m_Handles = {};
+}
+
+void PlayerEffects::OnEnable(tei::ecs::Object& object)
+{
+	auto makeHandles = [&]
+	{
+		return object.GetComponent<Hitbox>().AddObserver(
+			[&](Hitbox::Hit const& hit)
+			{
+				if (hit.state != hit.ENTER)
+					return;
+
+				if (auto pEnemy{ hit.object.HasComponent<EnemyEffects>() })
+				{
+					if (pEnemy->Refs().get<Anima>().IsActive())
+						Refs().get<Anima>().DoDeath();
+				}
+			}
+		);
+	};
+	m_Handles = std::make_shared<decltype(makeHandles())>(makeHandles());
+}
+
+void PlayerEffects::OnDisable()
 {
 	m_Handles = {};
 }

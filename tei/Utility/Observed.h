@@ -81,6 +81,11 @@ namespace tei::internal::utility
 			m_Updated = true;
 			return m_Data;
 		}
+		
+		constexpr Data const& get() const noexcept
+		{
+			return m_Data;
+		}
 
 		constexpr bool check() const noexcept
 		{

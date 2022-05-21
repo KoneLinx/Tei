@@ -3,29 +3,48 @@
 #include "Player.h"
 #include "Hitbox.h"
 #include "Ingredient.h"
+#include "Score.h"
 
 EnemyController::EnemyController(AnimaData const& data)
 	: m_pData{ &data }
 {}
 
-void EnemyController::OnEnable(tei::ecs::Object& object)
+void EnemyController::OnEnable()
+{}
+
+void EnemyController::OnUpdate()
+{}
+
+void EnemyController::OnDisable()
 {
-	auto& [anima] = Refs();
-	auto& hitbox = object.GetComponent<Hitbox>();
+	m_Handles = {};
+}
+
+void EnemyEffects::OnEnable(tei::ecs::Object& object)
+{
+	auto& [anima, score] = Refs();
 
 	auto makeHandle = [&]
 	{
-		return hitbox.AddObserver(
+		return object.GetComponent<Hitbox>().AddObserver(
 			[&](Hitbox::Hit const& hit)
 			{
+				
 				if (hit.state != hit.ENTER)
 					return;
 
 				if (auto pIngr{ hit.object.HasComponent<IngredientEnity>() })
 				{
-					if (pIngr->IsFalling() && anima.Refs().get<components::ObjectTransform>()->position.y < pIngr->Refs().get<components::ObjectTransform>()->position.y)
-						anima.DoDeath();
+					if (pIngr->IsFalling())
+					{
+						if (anima.IsAlive())
+						{
+							anima.DoDeath();
+							score->Notify(Score::Event{ object, 100 });
+						}
+					}
 				}
+				
 				else if (hit.object.HasComponent<int/*attack cloud*/>())
 				{
 					anima.DoHit();
@@ -37,11 +56,7 @@ void EnemyController::OnEnable(tei::ecs::Object& object)
 	m_Handles = std::make_shared<decltype(makeHandle())>(makeHandle());
 }
 
-void EnemyController::OnUpdate()
-{
-}
-
-void EnemyController::OnDisable()
+void EnemyEffects::OnDisable()
 {
 	m_Handles = {};
 }
