@@ -108,9 +108,13 @@ tei::ecs::Object& IngredientEnity::Create(tei::ecs::Object& parent, IngredientDa
 
 					if (auto pEnemy{ hit.object.HasComponent<EnemyEffects>() })
 					{
-						if (self.m_Timer /* && pEnemy->Refs().get<Anima>().IsAlive()*/)
+						if (auto& anima = pEnemy->Refs().get<Anima>(); anima.IsAlive())
 						{
-							++self.m_Enemies;
+							anima.DoDeath();
+							if (self.m_Timer)
+								++self.m_Enemies;
+							else
+								pEnemy->Refs().get<Score>()->Notify(Score::Event{ hit.object, Score::ENEMY_KILLED });
 						}
 					}
 				}
@@ -130,7 +134,7 @@ void IngredientEnity::OnUpdate(tei::ecs::Object& object)
 		{
 			m_Enemies = {};
 			Refs().get<Hitbox>().ReEnter();
-			auto score = m_Enemies == 0 ? 50 : ScoreManager::ScoreType{ 250 } << m_Enemies;
+			auto score = m_Enemies == 0 ? Score::INGREDIENT_DROPPED : Score::ENEMY_DROPPED * ScoreManager::ScoreType(std::pow(Score::ENEMY_DROPPED_MULTIPLIER, m_Enemies));
 			Refs().get<Score>()->Notify(Score::Event{ object, score });
 		}
 	}
@@ -138,7 +142,7 @@ void IngredientEnity::OnUpdate(tei::ecs::Object& object)
 	if (m_Falling)
 	{
 		auto& transform = Refs().get<ObjectTransform>();
-		transform.get().position.y -= 2.f * Time->frame.delta.count();
+		transform.get().position.y -= 2.5f * Time->frame.delta.count();
 	}
 
 	if (auto& t{ *m_pVisualTransform }; t->position.y > visualOffset)

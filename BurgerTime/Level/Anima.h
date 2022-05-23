@@ -43,7 +43,7 @@ class Anima : public tei::components::RefComponent<tei::components::ObjectTransf
 {
 public:
 
-	static tei::ecs::Object& Create(tei::ecs::Object& object, AnimaData const& data);
+	static tei::ecs::Object& Create(tei::ecs::Object& object, AnimaData const& data, tei::unit::Position spawnPoint);
 
 	void OnEnable(tei::ecs::Object const&);
 	void OnUpdate();
@@ -58,8 +58,8 @@ public:
 	void SetInput(tei::unit::Vec2 movement)
 	{ m_Movement = movement; }
 
-	std::pair<bool, bool> GetAllowedAxis() const
-	{ return { m_AllowX > 0, m_AllowY > 0 }; }
+	//std::pair<bool, bool> GetAllowedAxis() const
+	//{ return { m_AllowX > 0, m_AllowY > 0 }; }
 
 	bool IsActive();
 	bool IsAlive();
@@ -71,10 +71,14 @@ private:
 
 	AnimaData::State::ID m_State{};
 
+	tei::unit::Position m_SpawnPoint{};
+
 	tei::unit::Vec2 m_Movement{};
 
-	int m_AllowX{};
-	int m_AllowY{};
+	int m_AllowL{};
+	int m_AllowR{};
+	int m_AllowU{};
+	int m_AllowD{};
 
 	tei::time::TimeOnce m_Timer{};
 

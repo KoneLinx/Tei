@@ -17,9 +17,14 @@ public:
 
 	struct Event
 	{
-		tei::ecs::Object& object;
+		tei::ecs::Object const& object;
 		long const score;
 	};
+
+	static const long ENEMY_KILLED;
+	static const long INGREDIENT_DROPPED;
+	static const long ENEMY_DROPPED;
+	static const long ENEMY_DROPPED_MULTIPLIER;
 
 private:
 

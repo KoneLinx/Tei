@@ -3,6 +3,8 @@
 #include "FPS.h"
 
 #include "../Loader/LevelLoader.h"
+#include "../Level/HUD.h"
+#include "../Level/Player.h"
 
 void TeiClientInit()
 {
@@ -42,19 +44,24 @@ void TeiClientInit()
 		{
 			auto& gameObject = viewport.AddChild();
 		
-			auto& levelData = gameObject.AddComponent(tei::Resources->LoadUnique<LevelData>("", "versus"));
+			auto& levelData = gameObject.AddComponent(tei::Resources->LoadUnique<LevelData>("", "co-op"));
 			auto& level = Level::Create(gameObject, levelData);
 
-			Anima::Create(level.AddChild(), levelData->anima[0]).AddComponent<ObjectTransform>(unit::Position{ -.5f,  3.f });
-			Anima::Create(level.AddChild(), levelData->anima[1]).AddComponent<ObjectTransform>(unit::Position{  1.f, -2.f });
-			Anima::Create(level.AddChild(), levelData->anima.back()).AddComponent<ObjectTransform>(unit::Position{  1.f, 2.f });
+			// UI
+			{
+				IconbarDisplay::CreateLevelDisplay(level, levelData).AddComponent(ObjectTransform{ { unit::Position{ .65f, -.45f }, unit::Scale{ .05f } } });
+				IconbarDisplay::CreateHealthDisplay(level, levelData).AddComponent(ObjectTransform{ { unit::Position{ -.65f, -.45f }, unit::Scale{ .05f } } });
 
-			[[maybe_unused]] auto& score = ScoreDisplay::Create(level);
-
-			auto offset = level.GetComponent<ObjectTransform>()->scale;
-			score.AddComponent(ObjectTransform{ { unit::Position{ -.55f / offset.x, .45f / offset.y }, unit::Scale{.5f} } });
-
-			score.AddComponent<Observed<unit::Colour>>(unit::Colour{ 1, 0, 0, 1 });
+				auto& score = ScoreDisplay::Create(level);
+				score.AddComponent(ObjectTransform{ { unit::Position{ -.60f, .45f }, unit::Scale{ .05f } } });
+				score.AddComponent<Observed<unit::Colour>>(unit::Colour{ 1, 0, 0, 1 });
+				
+				auto& attacks = PlayerAttackCount::Create(level);
+				attacks.AddComponent(ObjectTransform{ { unit::Position{ .60f, .45f }, unit::Scale{ .05f } } });
+				attacks.AddComponent<Observed<unit::Colour>>(unit::Colour{ 0, 1, 0, 1 });
+			}
+			
+			level.GetComponent<Level>().CreateLayout(1);
 		}
 
 		// Controls

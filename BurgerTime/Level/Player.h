@@ -10,7 +10,7 @@ public:
 
 	PlayerController(AnimaData const& data);
 
-	void OnEnable();
+	void OnEnable(tei::ecs::Object const& object);
 	void OnDisable();
 
 private:
@@ -23,6 +23,12 @@ private:
 
 };
 
+enum struct PlayerEvent
+{
+	DEATH,
+	ATTACK
+};
+
 class PlayerEffects : public tei::components::RefComponent<Anima>
 {
 public:
@@ -33,5 +39,13 @@ public:
 private:
 
 	std::any m_Handles;
+
+};
+
+class PlayerAttackCount : public tei::components::RefComponent<tei::components::Observed<std::string>>
+{
+public:
+
+	static tei::ecs::Object& Create(tei::ecs::Object& parent);
 
 };

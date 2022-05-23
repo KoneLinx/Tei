@@ -41,7 +41,7 @@ void Hitbox::OnUpdate()
 	if (!m_pObjects)
 		return;
 
-	if (std::ranges::subrange matches{ std::ranges::next(std::ranges::find(*m_pObjects, this)), std::ranges::end(*m_pObjects) }; matches.size() > 1)
+	if (std::ranges::subrange matches{ std::ranges::next(std::ranges::find(*m_pObjects, this)), std::ranges::end(*m_pObjects) }; !matches.empty())
 	{
 		for (auto& pMatch : m_Overlaps)
 		{

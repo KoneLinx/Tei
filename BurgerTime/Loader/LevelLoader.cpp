@@ -158,6 +158,14 @@ std::vector<IngredientData> LoadIngredients(nlohmann::json const& allentitydata)
 		ingredients.push_back(std::move(ingredient));
 	}
 
+	for (size_t i{}; i < ingredients.size();)
+	{
+		if (auto& el = ingredients[i]; el.unique && el.position != i)
+			std::swap(ingredients[el.position], el);
+		else
+			++i;
+	}
+
 	return ingredients;
 }
 

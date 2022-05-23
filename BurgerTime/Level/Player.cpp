@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Hitbox.h"
 #include "Enemy.h"
+#include "Level.h"
 
 #include <array>
 #include <tuple>
@@ -14,8 +15,19 @@ PlayerController::PlayerController(AnimaData const& data)
 	: m_playerID{ data.id }
 {}
 
-void PlayerController::OnEnable()
+auto& GetLevel(tei::ecs::Object const& object)
 {
+	auto* pParent = &object;
+	Level* pLevel{};
+	while ((pLevel = pParent->HasComponent<Level>()) == nullptr)
+		pParent = &pParent->GetParent();
+	return *pLevel;
+};
+
+void PlayerController::OnEnable(tei::ecs::Object const& object)
+{
+	auto& level = GetLevel(object);
+
 	auto& [anima] = Refs();
 
 	auto updateMovementKeyboard = [this, &anima] (float factor, int dim)
@@ -41,7 +53,11 @@ void PlayerController::OnEnable()
 		anima.SetInput(m_Movement);
 	};
 
-	auto doAttack = [&] { anima.DoAttack(); };
+	auto doAttack = [&]
+	{
+		if (object.HasComponent<PlayerEffects>() != nullptr && level.DoPlayerAttack())
+			anima.DoAttack(); 
+	};
 
 	auto makeHandles = [&]
 	{
@@ -55,7 +71,7 @@ void PlayerController::OnEnable()
 			Input->AddCommand( std::array{ KeyboardInput::Main::A.WithState(movestate)                    , KeyboardInput::Arrow::LEFT .WithState(movestate)                }[id], updateMovementKeyboard(-1.f, 0) ),
 			Input->AddCommand( std::array{ KeyboardInput::Main::S.WithState(movestate)                    , KeyboardInput::Arrow::DOWN .WithState(movestate)                }[id], updateMovementKeyboard(-1.f, 1) ),
 			Input->AddCommand( std::array{ KeyboardInput::Main::D.WithState(movestate)                    , KeyboardInput::Arrow::RIGHT.WithState(movestate)                }[id], updateMovementKeyboard( 1.f, 0) ),
-			Input->AddCommand( std::array{ KeyboardInput::Main::F.WithState(actstate)                     , KeyboardInput::Mod::LCTRL  .WithState(actstate)                 }[id], doAttack                        ),
+			Input->AddCommand( std::array{ KeyboardInput::Main::F.WithState(actstate)                     , KeyboardInput::Mod::RCTRL  .WithState(actstate)                 }[id], doAttack                        ),
 			Input->AddCommand( std::array{ ControllerInput::Stick::LEFT.WithIndex(0).WithState(stickstate), ControllerInput::Stick::LEFT.WithIndex(1).WithState(stickstate) }[id], updateMovementController        ),
 			Input->AddCommand( std::array{ ControllerInput::Button::X.WithIndex(0).WithState(actstate)    , ControllerInput::Button::X.WithIndex(1).WithState(actstate)     }[id], doAttack                        )
 		};
@@ -74,6 +90,8 @@ void PlayerController::OnDisable()
 
 void PlayerEffects::OnEnable(tei::ecs::Object& object)
 {
+	auto& level = GetLevel(object);
+
 	auto makeHandles = [&]
 	{
 		return object.GetComponent<Hitbox>().AddObserver(
@@ -85,7 +103,10 @@ void PlayerEffects::OnEnable(tei::ecs::Object& object)
 				if (auto pEnemy{ hit.object.HasComponent<EnemyEffects>() })
 				{
 					if (pEnemy->Refs().get<Anima>().IsActive())
+					{
 						Refs().get<Anima>().DoDeath();
+						level.DoPlayerDeath();
+					}
 				}
 			}
 		);
@@ -97,3 +118,29 @@ void PlayerEffects::OnDisable()
 {
 	m_Handles = {};
 }
+
+tei::ecs::Object& PlayerAttackCount::Create(tei::ecs::Object& parent)
+{
+	auto& object = parent.AddChild();
+	auto [self, text] = object.AddComponents(
+		PlayerAttackCount{},
+		tei::components::Observed<std::string>{}
+	);
+	object.AddComponents(
+		tei::components::TextRenderComponent{},
+		Resources->LoadShared<tei::resource::Font>("resources/FalconPatrol.ttf", 26)
+	);
+
+	parent.GetComponent<Level>().AddObserver(
+		[&] (Level::LevelDataEvent const& event)
+		{
+			if (event.data.index() == event.ATTACKCOUNT)
+			{
+				text = std::to_string(std::get<event.ATTACKCOUNT>(event.data));
+			}
+		}
+	).Detach();
+
+	return object;
+}
+

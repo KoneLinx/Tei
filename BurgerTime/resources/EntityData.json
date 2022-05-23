@@ -24,7 +24,7 @@
         "hostile": false
       },
       {
-        "mode": "single",
+        "mode": [ "single", "co-op" ],
         "type": "enemy",
         "name": "Mr. Hot dog",
         "score": 100,
@@ -118,13 +118,13 @@
         "name": "Top bun",
         "src": "Bun_Top",
         "unique": true,
-        "position": -1
+        "position": 0
       },
       "bun_bottom": {
         "name": "Bottom bun",
         "src": "Bun_Bottom",
         "unique": true,
-        "position": 0
+        "position": 1
       },
       "patty": {
         "name": "Patty",
@@ -166,7 +166,7 @@
       "platform": {
         "name": "Platform",
         "src": "Platform",
-        "box": [ 1, 0 ]
+        "box": [ 1, 0.2 ]
       },
       "shelf": {
         "name": "Shelf",

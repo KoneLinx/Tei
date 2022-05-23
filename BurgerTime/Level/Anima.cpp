@@ -9,19 +9,23 @@
 #include "Enemy.h"
 
 #include <memory>
+#include <algorithm>
 
 using namespace tei;
 using namespace components;
 
 using enum AnimaData::State::ID;
 
-tei::ecs::Object& Anima::Create(tei::ecs::Object& object, AnimaData const& data)
+tei::ecs::Object& Anima::Create(tei::ecs::Object& parent, AnimaData const& data, tei::unit::Position spawnPoint)
 {
+	auto& object = parent.AddChild();
 	auto& self = object.AddComponent<Anima>();
 
 	self.m_pData = &data;
+	self.m_SpawnPoint = spawnPoint;
 
 	object.AddComponents(
+		ObjectTransform{ spawnPoint },
 		data.box,
 		Hitbox{},
 		data.state.sprites.front(),
@@ -37,6 +41,31 @@ tei::ecs::Object& Anima::Create(tei::ecs::Object& object, AnimaData const& data)
 		object.AddComponent<EnemyEffects>();
 	else
 		object.AddComponent<PlayerEffects>();
+	
+	auto addZone = [&](unit::Position offset, auto& var, auto type) -> auto&
+	{
+		auto& child = object.AddChild();
+		child.AddComponents(
+			ObjectTransform{ offset },
+			Box{ .1f, .1f }
+		);
+		child.AddComponent<Hitbox>().AddObserver(
+			[&var, type] (Hitbox::Hit const& hit)
+			{
+				if (auto pEntity{ hit.object.HasComponent<StaticEntity>() })
+				{
+					if (pEntity->Type() == type)
+						var += bool(hit.state) ? 1 : -1;
+				}
+			}
+		).Detach();
+		return child;
+	};
+
+	[[maybe_unused]] auto& leftZone  = addZone({ -.6f, -.1f }, self.m_AllowL, StaticEntityData::PLATFORM);
+	[[maybe_unused]] auto& rightZone = addZone({  .6f, -.1f }, self.m_AllowR, StaticEntityData::PLATFORM);
+	[[maybe_unused]] auto& downZone  = addZone({    0, -.6f }, self.m_AllowD, StaticEntityData::LADDER);
+	[[maybe_unused]] auto& upZone    = addZone({    0, -.4f }, self.m_AllowU, StaticEntityData::LADDER);
 
 	return object;
 }
@@ -46,31 +75,31 @@ bool any(auto const& var, auto const& ... val)
 	return ((var == val) || ...);
 }
 
-void Anima::OnEnable(tei::ecs::Object const& object)
+void Anima::OnEnable(tei::ecs::Object const& /*object*/)
 {
-	auto& hitbox = object.GetComponent<Hitbox>();
+	//auto& hitbox = object.GetComponent<Hitbox>();
 
-	auto makeHandles = [&]
-	{
-		return hitbox.AddObserver(
-			[this](Hitbox::Hit const& hit)
-			{
-				if (auto pEntity{ hit.object.HasComponent<StaticEntity>() })
-				{
-					if (pEntity->Type() == StaticEntityData::PLATFORM || pEntity->Type() == StaticEntityData::SHELF)
-						m_AllowX = std::max(0, m_AllowX + (tei::unit::Unit(bool(hit.state)) ? 1 : -1));
+	//auto makeHandles = [&]
+	//{
+	//	return hitbox.AddObserver(
+	//		[this] (Hitbox::Hit const& hit)
+	//		{
+	//			if (auto pEntity{ hit.object.HasComponent<StaticEntity>() })
+	//			{
+	//				if (pEntity->Type() == StaticEntityData::PLATFORM || pEntity->Type() == StaticEntityData::SHELF)
+	//					m_AllowX = std::max(0, m_AllowX + (tei::unit::Unit(bool(hit.state)) ? 1 : -1));
 
-					else if (pEntity->Type() == StaticEntityData::LADDER)
-						m_AllowY = std::max(0, m_AllowY + (tei::unit::Unit(bool(hit.state)) ? 1 : -1));
-				}
-			}
-		);
-	};
+	//				else if (pEntity->Type() == StaticEntityData::LADDER)
+	//					m_AllowY = std::max(0, m_AllowY + (tei::unit::Unit(bool(hit.state)) ? 1 : -1));
+	//			}
+	//		}
+	//	);
+	//};
 
 	// Because std::any can only hold copyable types, there seem to be few options other than to wrap it in a shared_ptr
 	// And since we need the type before we know the value, it is wrapped in a lambda, then used in a decltype.
 
-	m_Handles = std::make_shared<decltype(makeHandles())>(makeHandles());
+	//m_Handles = std::make_shared<decltype(makeHandles())>(makeHandles());
 
 }
 
@@ -80,19 +109,23 @@ void Anima::OnUpdate()
 
 	if (!any(m_State, HIT, DYING, ATTACKING))
 	{
-		unit::Vec2 velocity{ (m_AllowX ? 1.f : 0.001f) * m_Movement.x, (m_AllowY ? 1.f : 0.001f) * m_Movement.y };
-		velocity *= Time->frame.delta.count() * 2.f;
+		unit::Vec2 movement{
+			std::clamp<float>(m_Movement.x, -float(m_AllowL > 0), float(m_AllowR > 0)),
+			std::clamp<float>(m_Movement.y, -float(m_AllowD > 0), float(m_AllowU > 0))
+		};
 
-		if (dot(velocity, velocity) > 0)
+		movement *= Time->frame.delta.count() * 2.5f;
+
+		if (dot(movement, movement) > 0)
 		{
-			transform.get().position += velocity;
+			transform.get().position += movement;
 
-			if (std::abs(velocity.y) > 0)
-				m_State = velocity.y > 0 
+			if (std::abs(movement.y) > 0)
+				m_State = movement.y > 0 
 					? WALKING_UP
 					: WALKING_DOWN;
 			else
-				m_State = velocity.x > 0 
+				m_State = movement.x > 0 
 					? WALKING_RIGHT 
 					: WALKING_LEFT;
 		}
@@ -103,7 +136,10 @@ void Anima::OnUpdate()
 	}
 	else if (m_Timer)
 	{
-		m_State = STATIONARY;
+		if (std::exchange(m_State, STATIONARY) == DYING)
+		{
+			transform.get().position = m_SpawnPoint;
+		}
 	}
 
 	sprite = m_pData->state.sprites[size_t(m_State)];
@@ -131,7 +167,7 @@ void Anima::DoDeath()
 	{
 		m_State = DYING;
 		m_pData->state.sprites[size_t(DYING)]->origintime = Time->frame.now;
-		m_Timer = 3_s;
+		m_Timer = 2_s;
 	}
 }
 
@@ -140,7 +176,7 @@ void Anima::DoHit()
 	if (m_State != DYING)
 	{
 		m_State = HIT;
-		m_Timer = 3_s;
+		m_Timer = 2_s;
 	}
 }
 

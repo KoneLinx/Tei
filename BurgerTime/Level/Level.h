@@ -43,13 +43,11 @@ public:
 
 	static tei::ecs::Object& Create(tei::ecs::Object& parent, LevelData const& data);
 
-	struct Event
+	struct LevelEvent
 	{
 		enum struct Type
 		{
 			LOADED,
-			PAUSED,
-			RESUMED,
 			COMPLETED,
 			FAILED
 		};
@@ -59,13 +57,37 @@ public:
 		int levelID;
 	};
 
+	struct LevelDataEvent
+	{
+		enum Type : unsigned
+		{
+			HEALTH,
+			ENEMYCOUNT,
+			ATTACKCOUNT
+		};
+		
+		std::variant<
+			int, // health
+			int, // enemycount
+			int // attackcount
+		> data;
+	};
+
+	tei::ecs::Object& CreateLayout(int id);
+
+	bool DoPlayerAttack();
+	bool DoPlayerDeath();
+
 private:
 
-	void CreateLayout(tei::ecs::Object& object, int id);
+	int m_ID{};
 
-	int m_ID;
+	tei::ecs::Object* m_pObject{};
 
-	LevelData const* m_pData;
+	LevelData const* m_pData{};
+
+	int m_PlayerHealth{};
+	int m_PlayerAttacks{};
 
 };
 

@@ -22,7 +22,7 @@
     <ClInclude Include="Level\Enemy.h" />
     <ClInclude Include="Level\Anima.h" />
     <ClInclude Include="Application\FPS.h" />
-    <ClInclude Include="HUD.h" />
+    <ClInclude Include="Level\HUD.h" />
     <ClInclude Include="Level\Ingredient.h" />
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Level\Hitbox.h" />
@@ -38,7 +38,7 @@
     <ClCompile Include="Level\Enemy.cpp" />
     <ClCompile Include="Level\Anima.cpp" />
     <ClCompile Include="Application\FPS.cpp" />
-    <ClCompile Include="HUD.cpp" />
+    <ClCompile Include="Level\HUD.cpp" />
     <ClCompile Include="Level\Ingredient.cpp" />
     <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="Level\Hitbox.cpp" />

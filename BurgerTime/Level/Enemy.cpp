@@ -32,18 +32,6 @@ void EnemyEffects::OnEnable(tei::ecs::Object& object)
 				
 				if (hit.state != hit.ENTER)
 					return;
-
-				if (auto pIngr{ hit.object.HasComponent<IngredientEnity>() })
-				{
-					if (pIngr->IsFalling())
-					{
-						if (anima.IsAlive())
-						{
-							anima.DoDeath();
-							score->Notify(Score::Event{ object, 100 });
-						}
-					}
-				}
 				
 				else if (hit.object.HasComponent<int/*attack cloud*/>())
 				{

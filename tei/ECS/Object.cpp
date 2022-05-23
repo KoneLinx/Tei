@@ -54,7 +54,7 @@ void tei::internal::ecs::Object::Clear()
 	if (m_Active)
 		throw utility::TeiRuntimeError{ "Cannot modify object list while active" };
 
-	m_Clear = true;
+	Do(Message::CLEANUP);
 }
 
 void Object::AddComponent(std::type_info const& type, ComponentBase* pComp)
@@ -104,8 +104,13 @@ void DoCall(Object& self, auto& components, auto& children, bool force = false)
 		if (force || child->IsActive())
 			child->Do(Message{});
 
-	for (auto& [type, pComp] : utility::RangePerIndex(components))
-		pComp->Do(Message{}, self);
+	//for (auto& [type, pComp] : utility::RangePerIndex(components))
+	//	pComp->Do(Message{}, self);
+
+	for (size_t i{}; i < std::ranges::size(components); ++i)
+	{
+		components[i].second->Do(Message{}, self);
+	}
 }
 
 void Object::Do(Message::Init)

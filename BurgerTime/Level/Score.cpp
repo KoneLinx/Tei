@@ -11,6 +11,11 @@ using namespace unit;
 using namespace components;
 using namespace std::literals;
 
+const long Score::ENEMY_KILLED{ 100 };
+const long Score::INGREDIENT_DROPPED{ 50 };
+const long Score::ENEMY_DROPPED{ 500 };
+const long Score::ENEMY_DROPPED_MULTIPLIER{ 2 };
+
 void Score::OnEnable(tei::ecs::Object const& object)
 {
 	ScoreManager* pManager{};
@@ -89,7 +94,9 @@ void ScoreManager::OnUpdate(tei::ecs::Object& object)
 		if (auto const* pTransform = event.object.HasComponent<ObjectTransform>())
 		{
 			Position localPos = (pTransform->world->position - transform.world->position) / transform.world->scale;
-			Particle::Create(object, { localPos, Scale{ 0.75f } }, { Position{ 0, .5 }, Scale{ 1.0025f } }, scoretex(event.score), 1_s);
+			auto& texture = scoretex(event.score);
+			auto scale = texture->size.x / texture->size.y * 0.04f;
+			Particle::Create(object, { localPos, Scale{ scale } }, { Position{ 0, .5 }, Scale{ 1.0025f } }, texture, 1_s);
 		}
 		m_Score += event.score;
 	}
