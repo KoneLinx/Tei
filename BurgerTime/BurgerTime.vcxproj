@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application\GameManager.h" />
     <ClInclude Include="Level\Enemy.h" />
     <ClInclude Include="Level\Anima.h" />
     <ClInclude Include="Application\FPS.h" />
@@ -28,6 +29,7 @@
     <ClInclude Include="Level\Hitbox.h" />
     <ClInclude Include="Loader\LevelLoader.h" />
     <ClInclude Include="Level\Particle.h" />
+    <ClInclude Include="Application\Menu.h" />
     <ClInclude Include="pch\pch.h" />
     <ClInclude Include="Level\StaticEntity.h" />
     <ClInclude Include="Level\Player.h" />
@@ -35,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application\main.cpp" />
+    <ClCompile Include="Application\GameManager.cpp" />
     <ClCompile Include="Level\Enemy.cpp" />
     <ClCompile Include="Level\Anima.cpp" />
     <ClCompile Include="Application\FPS.cpp" />
@@ -44,6 +47,7 @@
     <ClCompile Include="Level\Hitbox.cpp" />
     <ClCompile Include="Loader\LevelLoader.cpp" />
     <ClCompile Include="Level\Particle.cpp" />
+    <ClCompile Include="Application\Menu.cpp" />
     <ClCompile Include="pch\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

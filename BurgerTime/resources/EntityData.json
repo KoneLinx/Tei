@@ -104,6 +104,12 @@
         "src": "Hit",
         "loop": true,
         "frames": 2
+      },
+      {
+        "type": [ "player" ],
+        "src": "AttackParticle",
+        "loop": false,
+        "frames": 4
       }
     ]
 

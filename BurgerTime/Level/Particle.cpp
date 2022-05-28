@@ -12,7 +12,7 @@ tei::ecs::Object& Particle::Create(ecs::Object& parent, Transform start, Transfo
     auto& visualObject = rootObject.AddChild();
 
     rootObject.AddComponent<Particle>({
-        &visualObject.AddComponent<ObjectTransform>(start),
+        &rootObject.AddComponent<ObjectTransform>(start),
         std::move(increment),
         std::move(dur)
     });

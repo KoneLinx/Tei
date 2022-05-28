@@ -25,7 +25,8 @@ struct AnimaData
 			WALKING_UP,
 			ATTACKING,
 			DYING,
-			HIT
+			HIT,
+			ATTACK_PARTICLE
 		};
 		using enum ID;
 		std::vector<tei::Resource<tei::resource::Sprite>> sprites{};
@@ -39,27 +40,35 @@ struct AnimaData
 
 };
 
+struct Cloud{};
+
 class Anima : public tei::components::RefComponent<tei::components::ObjectTransform, tei::Resource<tei::resource::Sprite>>
 {
 public:
 
 	static tei::ecs::Object& Create(tei::ecs::Object& object, AnimaData const& data, tei::unit::Position spawnPoint);
 
-	void OnEnable(tei::ecs::Object const&);
+	void OnEnable(tei::ecs::Object&);
 	void OnUpdate();
 	void OnDisable();
 
 	void DoAttack();
-	void DoDeath();
+	void DoDeath(bool stayDead = false);
 	void DoHit();
-
-	//void SetState(AnimaData::State::ID state, tei::Clock::duration time);
 	
 	void SetInput(tei::unit::Vec2 movement)
 	{ m_Movement = movement; }
 
-	//std::pair<bool, bool> GetAllowedAxis() const
-	//{ return { m_AllowX > 0, m_AllowY > 0 }; }
+	struct AllowedMovement
+	{
+		char right, left, up, down;
+	};
+
+	AllowedMovement GetAllowedMovement() const
+	{ return m_AllowedMovement; }
+
+	tei::unit::Vec2 GetMovement() const
+	{ return m_Movement; }
 
 	bool IsActive();
 	bool IsAlive();
@@ -67,6 +76,7 @@ public:
 private:
 
 	tei::ecs::Object* m_pParent{};
+	tei::ecs::Object* m_pObject{};
 	AnimaData const* m_pData{};
 
 	AnimaData::State::ID m_State{};
@@ -75,10 +85,7 @@ private:
 
 	tei::unit::Vec2 m_Movement{};
 
-	int m_AllowL{};
-	int m_AllowR{};
-	int m_AllowU{};
-	int m_AllowD{};
+	AllowedMovement m_AllowedMovement;
 
 	tei::time::TimeOnce m_Timer{};
 

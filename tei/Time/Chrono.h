@@ -108,11 +108,11 @@ public:
     }
     [[nodiscard]] static constexpr duration min() noexcept
     {
-        return duration{ std::numeric_limits<rep>::min() };
+        return duration{ std::numeric_limits<rep::Rep>::min() };
     }
     [[nodiscard]] static constexpr duration max() noexcept
     {
-        return duration{ std::numeric_limits<rep>::max() };
+        return duration{ std::numeric_limits<rep::Rep>::max() };
     }
 
     // Extra

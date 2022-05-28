@@ -57,6 +57,14 @@ void tei::internal::ecs::Object::Clear()
 	Do(Message::CLEANUP);
 }
 
+void tei::internal::ecs::Object::ClearChildren()
+{
+	if (m_Active)
+		throw utility::TeiRuntimeError{ "Cannot modify object list while active" };
+
+	m_Children.clear();
+}
+
 void Object::AddComponent(std::type_info const& type, ComponentBase* pComp)
 {	
 	METRICS_TIMEBLOCK;
@@ -100,17 +108,16 @@ std::unique_ptr<Object::ComponentBase> tei::internal::ecs::Object::ExtractCompon
 template <typename Message>
 void DoCall(Object& self, auto& components, auto& children, bool force = false)
 {
-	for (auto& child : utility::RangePerIndex(children))
-		if (force || child->IsActive())
-			child->Do(Message{});
-
 	//for (auto& [type, pComp] : utility::RangePerIndex(components))
 	//	pComp->Do(Message{}, self);
-
 	for (size_t i{}; i < std::ranges::size(components); ++i)
 	{
 		components[i].second->Do(Message{}, self);
 	}
+
+	for (auto& child : utility::RangePerIndex(children))
+		if (force || child->IsActive())
+			child->Do(Message{});
 }
 
 void Object::Do(Message::Init)

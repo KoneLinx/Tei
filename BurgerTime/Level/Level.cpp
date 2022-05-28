@@ -2,6 +2,10 @@
 #include "Level.h"
 #include "Hitbox.h"
 #include "Score.h"
+#include "HUD.h"
+#include "Particle.h"
+#include "Player.h"
+#include "../Loader/LevelLoader.h"
 
 using namespace tei;
 using namespace components;
@@ -30,13 +34,25 @@ Level::LevelDataEvent MakeDataEvent(T&& value)
 
 tei::ecs::Object& Level::CreateLayout(int id)
 {
-	m_pObject->Clear();
+	if (m_pLayout)
+		m_pObject->RemoveChild(*m_pLayout);
 
 	m_ID = id;
 
-	auto& layout = m_pData->levels[id];
+	if (id >= size(m_pData->levels))
+	{
+		Notify(LevelEvent{ LevelEvent::ALL_COMPLETED, id });
+		return *m_pObject;
+	}
 
+	auto& layout = m_pData->levels[id];
+	
 	auto& layoutObject = m_pObject->AddChild();
+	m_pLayout = &layoutObject;
+
+	m_pObject->SetState(true);
+
+
 
 	Position tileRoot{ layout.width / -2.f, layout.height / 2.f + 1 };
 	Vec2 tileDiff{ 1, -1 };
@@ -62,7 +78,7 @@ tei::ecs::Object& Level::CreateLayout(int id)
 	{
 		if (index == 0)
 			return 0;
-		if (index == 2)
+		if (index == 3)
 			return 1;
 		else
 			return rng() % (count - 2) + 2;
@@ -70,10 +86,30 @@ tei::ecs::Object& Level::CreateLayout(int id)
 
 	auto addIngredient = [this, &layoutObject, &rng] (ObjectTransform tf, size_t id) mutable
 	{
-		IngredientEnity::Create(layoutObject, m_pData->ingrendients[id]).AddComponent(std::move(tf));
+		auto& ingredient = IngredientEnity::Create(layoutObject, m_pData->ingrendients[id]);
+		ingredient.AddComponent(std::move(tf));
+		ingredient.GetComponent<IngredientEnity>().AddObserver(
+			[this, state = true] (IngredientEnity::IsOnPlate) mutable
+			{
+				if (state)
+				{
+					state = false;
+					++m_PlayerAttacks;
+					Notify(MakeDataEvent<LevelDataEvent::ATTACKCOUNT>(m_PlayerAttacks));
+					if (--m_IngredientsLeft == 0)
+					{
+						m_Timer = 2_s;
+						m_PendingEvent = { LevelEvent::COMPLETED, m_ID };
+					}
+				}
+			}
+		).Detach();
+		++m_IngredientsLeft;
 	};
 
 	using enum LevelLayoutData::TileType;
+
+	std::vector<std::vector<tei::unit::Position>> ingredientPoints(layout.width / 4);
 
 	std::vector<tei::unit::Position> enemyPoints{};
 	tei::unit::Position playerPoint{};
@@ -83,7 +119,7 @@ tei::ecs::Object& Level::CreateLayout(int id)
 	{
 		for (int x{}; x < layout.width; ++x)
 		{
-			int ingredientID{};
+			//int ingredientID{};
 			for (int y{}; y < layout.height; ++y)
 			{
 				auto type = at(x, y);
@@ -118,12 +154,20 @@ tei::ecs::Object& Level::CreateLayout(int id)
 					case SHELF:
 						add(StaticEntityData::PLATFORM, { pos });
 						add(StaticEntityData::SHELF, { pos });
-						addIngredient({ pos }, getIngredientID(ingredientID++) );
+						ingredientPoints[x / 4].push_back(pos);
+						//addIngredient({ pos }, getIngredientID(ingredientID++) );
 						break;
 					}
 				}
 			}
 		}
+	}
+
+	for (auto& points : ingredientPoints)
+	{
+		std::ranges::sort(points, std::greater{}, [](auto p) { return p.y; });
+		for (int ingrId{}; auto const& point : points)
+			addIngredient({ point }, getIngredientID(ingrId++));
 	}
 
 	std::ranges::shuffle(enemyPoints, rng);
@@ -135,7 +179,8 @@ tei::ecs::Object& Level::CreateLayout(int id)
 
 	// Enemies (tmp)
 	{
-		Anima::Create(layoutObject, m_pData->anima[0], playerPoint);
+		m_Players.clear();
+		m_Players.push_back(Anima::Create(layoutObject, m_pData->anima[0], playerPoint).GetComponent<Anima>());
 
 		auto pointIt{ enemyPoints.begin() };
 		for ([[maybe_unused]] auto i : {1, 2, 3})
@@ -144,15 +189,17 @@ tei::ecs::Object& Level::CreateLayout(int id)
 		for ([[maybe_unused]] auto i : {1, 2})
 			Anima::Create(layoutObject, m_pData->anima[2], *pointIt++);
 		
-		if (m_pData->anima.size() > 3)
+		if (m_pData->anima.size() > 4)
 		for ([[maybe_unused]] auto i : {1})
 			Anima::Create(layoutObject, m_pData->anima[3], *pointIt++);
 
-		Anima::Create(layoutObject, m_pData->anima.back(), player2Point);
+		auto& last = Anima::Create(layoutObject, m_pData->anima.back(), m_pData->mode == "co-op" ? player2Point : *pointIt++);
+		if (last.HasComponent<PlayerEffects>())
+			m_Players.push_back(last.GetComponent<Anima>());
 	}
 
-	m_PlayerHealth = 3;
-	m_PlayerAttacks = 4;
+	m_PlayerHealth = 5;
+	m_PlayerAttacks = 8;
 
 	Notify(LevelEvent{ .type = LevelEvent::LOADED, .levelID = m_ID });
 	Notify(MakeDataEvent<LevelDataEvent::HEALTH>(m_PlayerHealth));
@@ -172,8 +219,73 @@ bool Level::DoPlayerAttack()
 bool Level::DoPlayerDeath()
 {
 	bool allowed{ m_PlayerHealth > 0 };
-	m_PlayerHealth = std::max<int>(m_PlayerHealth - 1, 0);
-	Notify(MakeDataEvent<LevelDataEvent::HEALTH>(m_PlayerHealth));
+	if (!m_Timer.IsPending())
+	{
+		m_PendingEvent = {};
+		m_Timer = 2_s;
+		m_PlayerHealth = std::max<int>(m_PlayerHealth - 1, 0);
+		Notify(MakeDataEvent<LevelDataEvent::HEALTH>(m_PlayerHealth));
+		if (!allowed)
+			m_PendingEvent = { LevelEvent::FAILED, m_ID };
+		return allowed;
+	}
 	return allowed;
 }
 
+void Level::OnUpdate()
+{
+	if (m_Timer && m_PendingEvent.type != LevelEvent::NONE)
+	{
+		if (m_PendingEvent.type == LevelEvent::COMPLETED || m_PendingEvent.type == LevelEvent::FAILED)
+		{
+			m_pObject->SetState(false);
+		}
+		else
+		{
+			Notify(m_PendingEvent);
+		}
+	}
+}
+
+void Level::OnDisable()
+{
+	if (m_PendingEvent.type == LevelEvent::COMPLETED || m_PendingEvent.type == LevelEvent::FAILED)
+		Notify(m_PendingEvent);
+}
+
+tei::ecs::Object& CreateGame(tei::ecs::Object& parent, std::string_view mode)
+{
+	//auto& gameObject = parent.AddChild();
+
+	Resource<LevelData> levelData{ tei::Resources->LoadUnique<LevelData>("", mode) };
+	auto& level = Level::Create(parent, levelData);
+
+	// UI
+	{
+		IconbarDisplay::CreateLevelDisplay(level, levelData).AddComponent(ObjectTransform{ { unit::Position{ .65f, -.45f }, unit::Scale{ .05f } } });
+		IconbarDisplay::CreateHealthDisplay(level, levelData).AddComponent(ObjectTransform{ { unit::Position{ -.65f, -.45f }, unit::Scale{ .05f } } });
+
+		auto& score = ScoreDisplay::Create(level);
+		score.AddComponent(ObjectTransform{ { unit::Position{ -.60f, .45f }, unit::Scale{ .05f } } });
+		score.AddComponent<Observed<unit::Colour>>(unit::Colour{ 1, 0, 0, 1 });
+		
+		auto& attacks = PlayerAttackCount::Create(level);
+		attacks.AddComponent(ObjectTransform{ { unit::Position{ .60f, .45f }, unit::Scale{ .05f } } });
+		attacks.AddComponent<Observed<unit::Colour>>(unit::Colour{ 0, 1, 0, 1 });
+	}
+
+	level.AddComponent(std::move(levelData));
+
+	auto& levelComp = level.GetComponent<Level>();
+	levelComp.AddObserver(
+		[&, levelID = int()](Level::LevelEvent const& event) mutable
+		{
+			if (event.type == event.COMPLETED && event.levelID == levelID)
+				levelComp.CreateLayout(++levelID);
+		}
+	).Detach();
+
+	levelComp.CreateLayout(0);
+
+	return level;
+}

@@ -47,14 +47,16 @@ public:
 	{
 		enum struct Type
 		{
+			NONE,
 			LOADED,
 			COMPLETED,
+			ALL_COMPLETED,
 			FAILED
 		};
 		using enum Type;
 
 		Type type;
-		int levelID;
+		int levelID{};
 	};
 
 	struct LevelDataEvent
@@ -78,16 +80,30 @@ public:
 	bool DoPlayerAttack();
 	bool DoPlayerDeath();
 
+	std::span<std::reference_wrapper<Anima const> const> GetPlayers() const
+	{ return m_Players; }
+
+	void OnUpdate();
+	void OnDisable();
+
 private:
 
 	int m_ID{};
 
 	tei::ecs::Object* m_pObject{};
+	tei::ecs::Object* m_pLayout{};
 
 	LevelData const* m_pData{};
 
 	int m_PlayerHealth{};
 	int m_PlayerAttacks{};
+	int m_IngredientsLeft{};
+
+	std::vector<std::reference_wrapper<Anima const>> m_Players{};
+
+	tei::time::TimeOnce m_Timer{};
+	LevelEvent m_PendingEvent{ LevelEvent::NONE };
 
 };
 
+tei::ecs::Object& CreateGame(tei::ecs::Object& parent, std::string_view mode);

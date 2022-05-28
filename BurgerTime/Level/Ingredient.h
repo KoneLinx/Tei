@@ -28,7 +28,7 @@ struct IngredientData
 	int position{};
 };
 
-class IngredientEnity : public tei::components::RefComponent<tei::components::ObjectTransform, Hitbox, Score> 
+class IngredientEnity : public tei::components::RefComponent<tei::components::ObjectTransform, Hitbox, Score>, public tei::components::Subject
 {
 public:
 
@@ -37,6 +37,8 @@ public:
 	void OnUpdate(tei::ecs::Object&);
 
 	bool IsFalling() const { return m_Falling; };
+
+	struct IsOnPlate {};
 
 private:
 

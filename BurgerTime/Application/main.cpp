@@ -2,9 +2,8 @@
 
 #include "FPS.h"
 
-#include "../Loader/LevelLoader.h"
-#include "../Level/HUD.h"
-#include "../Level/Player.h"
+#include "Menu.h"
+#include "GameManager.h"
 
 void TeiClientInit()
 {
@@ -42,50 +41,20 @@ void TeiClientInit()
 
 		// Game
 		{
-			auto& gameObject = viewport.AddChild();
-		
-			auto& levelData = gameObject.AddComponent(tei::Resources->LoadUnique<LevelData>("", "co-op"));
-			auto& level = Level::Create(gameObject, levelData);
-
-			// UI
-			{
-				IconbarDisplay::CreateLevelDisplay(level, levelData).AddComponent(ObjectTransform{ { unit::Position{ .65f, -.45f }, unit::Scale{ .05f } } });
-				IconbarDisplay::CreateHealthDisplay(level, levelData).AddComponent(ObjectTransform{ { unit::Position{ -.65f, -.45f }, unit::Scale{ .05f } } });
-
-				auto& score = ScoreDisplay::Create(level);
-				score.AddComponent(ObjectTransform{ { unit::Position{ -.60f, .45f }, unit::Scale{ .05f } } });
-				score.AddComponent<Observed<unit::Colour>>(unit::Colour{ 1, 0, 0, 1 });
-				
-				auto& attacks = PlayerAttackCount::Create(level);
-				attacks.AddComponent(ObjectTransform{ { unit::Position{ .60f, .45f }, unit::Scale{ .05f } } });
-				attacks.AddComponent<Observed<unit::Colour>>(unit::Colour{ 0, 1, 0, 1 });
-			}
-			
-			level.GetComponent<Level>().CreateLayout(1);
+			viewport.AddComponent<GameManager>();
 		}
 
-		// Controls
+		// Application controls
 		{
-			viewport.AddComponent(
-				std::tuple{
-					tei::Input->AddCommand(
-						tei::input::KeyboardInput::Main::ESCAPE,
-						[](auto) mutable
-						{
-							tei::Application->Quit();
-						}
-					),
-					tei::Input->AddCommand(
-						tei::input::KeyboardInput::F::F11,
-						[state = false](auto) mutable
-						{
-							using enum tei::application::WindowProperty;
-							state ^= true;
-							tei::Application->SetWindowProperty(state ? FULLSCREEN_FAKE : RESTORED);
-						}
-					)
+			tei::Input->AddCommand(
+				tei::input::KeyboardInput::F::F11,
+				[state = false](auto) mutable
+				{
+					using enum tei::application::WindowProperty;
+					state ^= true;
+					tei::Application->SetWindowProperty(state ? FULLSCREEN_FAKE : RESTORED);
 				}
-			);
+			).Detach();
 		}
 	}
 

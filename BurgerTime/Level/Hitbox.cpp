@@ -41,7 +41,7 @@ void Hitbox::OnUpdate()
 	if (!m_pObjects)
 		return;
 
-	if (std::ranges::subrange matches{ std::ranges::next(std::ranges::find(*m_pObjects, this)), std::ranges::end(*m_pObjects) }; !matches.empty())
+	if (!m_Overlaps.empty())
 	{
 		for (auto& pMatch : m_Overlaps)
 		{
@@ -52,18 +52,19 @@ void Hitbox::OnUpdate()
 				pMatch = {};
 			}
 		}
-		auto [from, to] = std::ranges::remove(m_Overlaps, nullptr);
-		m_Overlaps.erase(from, to);
-		auto overlaps{ tei::utility::RangePerIndex(m_Overlaps) };
+		std::erase(m_Overlaps, nullptr);
+	}
 
-		for (auto pMatch : matches)
+	auto overlaps{ tei::utility::RangePerIndex(m_Overlaps) };
+	std::ranges::subrange matches{ std::ranges::next(std::ranges::find(*m_pObjects, this)), std::ranges::end(*m_pObjects) };
+
+	for (auto pMatch : matches)
+	{
+		if (CollidesWith(*pMatch) && std::ranges::find(overlaps, pMatch) == overlaps.end())
 		{
-			if (CollidesWith(*pMatch) && std::ranges::find(overlaps, pMatch) == overlaps.end())
-			{
-				m_Overlaps.push_back(pMatch);
-				pMatch->Notify(Hit{ *m_pParent, Hit::ENTER });
-				this->Notify(Hit{ *pMatch->m_pParent, Hit::ENTER });
-			}
+			m_Overlaps.push_back(pMatch);
+			pMatch->Notify(Hit{ *m_pParent, Hit::ENTER });
+			this->Notify(Hit{ *pMatch->m_pParent, Hit::ENTER });
 		}
 	}
 }

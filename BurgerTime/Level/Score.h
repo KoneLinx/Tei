@@ -46,6 +46,9 @@ public:
 
 	using ScoreType = long;
 
+	ScoreType GetScore() const
+	{ return m_Score; }
+
 private:
 
 	long m_Score;

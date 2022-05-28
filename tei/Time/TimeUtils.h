@@ -70,6 +70,11 @@ namespace tei::internal::time
 			else return false;
 		}
 
+		bool IsPending() const
+		{
+			return m_Active <= 1;
+		}
+
 	private:
 
 		time::Clock::time_point m_Current{};

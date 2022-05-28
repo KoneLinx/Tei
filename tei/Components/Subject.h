@@ -115,7 +115,7 @@ namespace tei::internal::components
 	{
 		return AddObserver({
 			typeid(Event),
-			[observer = std::move(observer)] (utility::AnyReference event)
+			[observer = std::move(observer)] (utility::AnyReference event) mutable
 			{
 				observer(event);
 			}

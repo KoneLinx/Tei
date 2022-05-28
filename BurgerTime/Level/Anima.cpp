@@ -21,6 +21,8 @@ tei::ecs::Object& Anima::Create(tei::ecs::Object& parent, AnimaData const& data,
 	auto& object = parent.AddChild();
 	auto& self = object.AddComponent<Anima>();
 
+	self.m_pParent = &parent;
+	self.m_pObject = &object;
 	self.m_pData = &data;
 	self.m_SpawnPoint = spawnPoint;
 
@@ -47,7 +49,7 @@ tei::ecs::Object& Anima::Create(tei::ecs::Object& parent, AnimaData const& data,
 		auto& child = object.AddChild();
 		child.AddComponents(
 			ObjectTransform{ offset },
-			Box{ .1f, .1f }
+			Box{ .2f, .2f }
 		);
 		child.AddComponent<Hitbox>().AddObserver(
 			[&var, type] (Hitbox::Hit const& hit)
@@ -62,10 +64,10 @@ tei::ecs::Object& Anima::Create(tei::ecs::Object& parent, AnimaData const& data,
 		return child;
 	};
 
-	[[maybe_unused]] auto& leftZone  = addZone({ -.6f, -.1f }, self.m_AllowL, StaticEntityData::PLATFORM);
-	[[maybe_unused]] auto& rightZone = addZone({  .6f, -.1f }, self.m_AllowR, StaticEntityData::PLATFORM);
-	[[maybe_unused]] auto& downZone  = addZone({    0, -.6f }, self.m_AllowD, StaticEntityData::LADDER);
-	[[maybe_unused]] auto& upZone    = addZone({    0, -.4f }, self.m_AllowU, StaticEntityData::LADDER);
+	[[maybe_unused]] auto& leftZone  = addZone({ -.4f, -.1f }, self.m_AllowedMovement.left , StaticEntityData::PLATFORM);
+	[[maybe_unused]] auto& rightZone = addZone({  .4f, -.1f }, self.m_AllowedMovement.right, StaticEntityData::PLATFORM);
+	[[maybe_unused]] auto& downZone  = addZone({    0, -.6f }, self.m_AllowedMovement.down , StaticEntityData::LADDER);
+	[[maybe_unused]] auto& upZone    = addZone({    0, -.4f }, self.m_AllowedMovement.up   , StaticEntityData::LADDER);
 
 	return object;
 }
@@ -75,33 +77,8 @@ bool any(auto const& var, auto const& ... val)
 	return ((var == val) || ...);
 }
 
-void Anima::OnEnable(tei::ecs::Object const& /*object*/)
-{
-	//auto& hitbox = object.GetComponent<Hitbox>();
-
-	//auto makeHandles = [&]
-	//{
-	//	return hitbox.AddObserver(
-	//		[this] (Hitbox::Hit const& hit)
-	//		{
-	//			if (auto pEntity{ hit.object.HasComponent<StaticEntity>() })
-	//			{
-	//				if (pEntity->Type() == StaticEntityData::PLATFORM || pEntity->Type() == StaticEntityData::SHELF)
-	//					m_AllowX = std::max(0, m_AllowX + (tei::unit::Unit(bool(hit.state)) ? 1 : -1));
-
-	//				else if (pEntity->Type() == StaticEntityData::LADDER)
-	//					m_AllowY = std::max(0, m_AllowY + (tei::unit::Unit(bool(hit.state)) ? 1 : -1));
-	//			}
-	//		}
-	//	);
-	//};
-
-	// Because std::any can only hold copyable types, there seem to be few options other than to wrap it in a shared_ptr
-	// And since we need the type before we know the value, it is wrapped in a lambda, then used in a decltype.
-
-	//m_Handles = std::make_shared<decltype(makeHandles())>(makeHandles());
-
-}
+void Anima::OnEnable(tei::ecs::Object& /*object*/)
+{}
 
 void Anima::OnUpdate()
 {
@@ -109,9 +86,12 @@ void Anima::OnUpdate()
 
 	if (!any(m_State, HIT, DYING, ATTACKING))
 	{
+		if (m_AllowedMovement.down == 0 && m_AllowedMovement.up == 0 && m_AllowedMovement.left == 0 && m_AllowedMovement.right == 0)
+			DoDeath();
+
 		unit::Vec2 movement{
-			std::clamp<float>(m_Movement.x, -float(m_AllowL > 0), float(m_AllowR > 0)),
-			std::clamp<float>(m_Movement.y, -float(m_AllowD > 0), float(m_AllowU > 0))
+			std::clamp<float>(m_Movement.x, -float(m_AllowedMovement.left > 0), float(m_AllowedMovement.right > 0)),
+			std::clamp<float>(m_Movement.y, -float(m_AllowedMovement.down > 0), float(m_AllowedMovement.up > 0))
 		};
 
 		movement *= Time->frame.delta.count() * 2.5f;
@@ -157,17 +137,34 @@ void Anima::DoAttack()
 	{
 		m_State = ATTACKING;
 		m_pData->state.sprites[size_t(ATTACKING)]->origintime = Time->frame.now;
+		m_pData->state.sprites[size_t(ATTACK_PARTICLE)]->origintime = Time->frame.now;
 		m_Timer = .5_s;
+
+		Particle::Create(
+			*m_pObject, 
+			unit::Position{ m_Movement / 2.f },
+			unit::Position{ m_Movement / 1.5f },
+			m_pData->state.sprites[size_t(ATTACK_PARTICLE)],
+			.5_s
+		).AddComponents(
+			Cloud{},
+			Box{ 1, 1 },
+			Hitbox{}
+		);
+
 	}
 }
 
-void Anima::DoDeath()
+void Anima::DoDeath(bool stayDead)
 {
 	if (m_State != DYING)
 	{
 		m_State = DYING;
 		m_pData->state.sprites[size_t(DYING)]->origintime = Time->frame.now;
-		m_Timer = 2_s;
+		if (stayDead)
+			m_Timer = Clock::time_point::max();
+		else 
+			m_Timer = 2_s;
 	}
 }
 

@@ -75,6 +75,7 @@ tei::ecs::Object& IngredientEnity::Create(tei::ecs::Object& parent, IngredientDa
 								self.m_IsOnPlate = true;
 								transform.get().position = hit.object.GetComponent<ObjectTransform>()->position;
 								transform.get().position.y += 0.4f;
+								self.Notify(IsOnPlate{});
 							}
 							if (pEntity->Type() == StaticEntityData::SHELF)
 							{
@@ -94,6 +95,7 @@ tei::ecs::Object& IngredientEnity::Create(tei::ecs::Object& parent, IngredientDa
 								self.m_IsOnPlate = true;
 								transform.get().position = hit.object.GetComponent<ObjectTransform>()->position;
 								transform.get().position.y += 0.65f;
+								self.Notify(IsOnPlate{});
 							}
 							else
 							{

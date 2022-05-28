@@ -8,7 +8,7 @@
 namespace tei::internal::components
 {
 
-	struct TextRenderComponent : RefComponent< 
+	struct TextRenderComponent : public RefComponent< 
 		utility::Observed<std::string>,
 		resource::Resource<resource::Font>,
 		resource::Resource<resource::Texture>,

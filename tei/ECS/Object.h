@@ -82,6 +82,8 @@ namespace tei::internal::ecs
 
 		// Clear children and components
 		void Clear();
+		// Clear children only
+		void ClearChildren();
 
 		// Guaranteed, except for root (scene). Null reference for root. 
 		Object& GetParent();

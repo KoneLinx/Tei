@@ -5,13 +5,13 @@
 #include "Anima.h"
 #include "Score.h"
 
-class EnemyController : public tei::components::RefComponent<Anima>
+class EnemyController : public tei::components::RefComponent<Anima, tei::components::ObjectTransform>
 {
 public:
 
 	EnemyController(AnimaData const& data);
 
-	void OnEnable();
+	void OnEnable(tei::ecs::Object& object);
 	void OnUpdate();
 	void OnDisable();
 
@@ -19,7 +19,9 @@ private:
 
 	AnimaData const* m_pData;
 
-	std::any m_Handles;
+	Anima::AllowedMovement m_OldMovement;
+
+	class Level const* m_Level;
 
 };
 

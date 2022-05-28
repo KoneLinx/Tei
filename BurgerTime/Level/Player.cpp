@@ -71,7 +71,7 @@ void PlayerController::OnEnable(tei::ecs::Object const& object)
 			Input->AddCommand( std::array{ KeyboardInput::Main::A.WithState(movestate)                    , KeyboardInput::Arrow::LEFT .WithState(movestate)                }[id], updateMovementKeyboard(-1.f, 0) ),
 			Input->AddCommand( std::array{ KeyboardInput::Main::S.WithState(movestate)                    , KeyboardInput::Arrow::DOWN .WithState(movestate)                }[id], updateMovementKeyboard(-1.f, 1) ),
 			Input->AddCommand( std::array{ KeyboardInput::Main::D.WithState(movestate)                    , KeyboardInput::Arrow::RIGHT.WithState(movestate)                }[id], updateMovementKeyboard( 1.f, 0) ),
-			Input->AddCommand( std::array{ KeyboardInput::Main::F.WithState(actstate)                     , KeyboardInput::Mod::RCTRL  .WithState(actstate)                 }[id], doAttack                        ),
+			Input->AddCommand( std::array{ KeyboardInput::Main::SPACE.WithState(actstate)                 , KeyboardInput::Mod::RCTRL  .WithState(actstate)                 }[id], doAttack                        ),
 			Input->AddCommand( std::array{ ControllerInput::Stick::LEFT.WithIndex(0).WithState(stickstate), ControllerInput::Stick::LEFT.WithIndex(1).WithState(stickstate) }[id], updateMovementController        ),
 			Input->AddCommand( std::array{ ControllerInput::Button::X.WithIndex(0).WithState(actstate)    , ControllerInput::Button::X.WithIndex(1).WithState(actstate)     }[id], doAttack                        )
 		};
@@ -104,8 +104,7 @@ void PlayerEffects::OnEnable(tei::ecs::Object& object)
 				{
 					if (pEnemy->Refs().get<Anima>().IsActive())
 					{
-						Refs().get<Anima>().DoDeath();
-						level.DoPlayerDeath();
+						Refs().get<Anima>().DoDeath(!level.DoPlayerDeath());
 					}
 				}
 			}
