@@ -46,7 +46,7 @@ class Anima : public tei::components::RefComponent<tei::components::ObjectTransf
 {
 public:
 
-	static tei::ecs::Object& Create(tei::ecs::Object& object, AnimaData const& data, tei::unit::Position spawnPoint);
+	static tei::ecs::Object& Create(tei::ecs::Object& object, AnimaData const& data, tei::unit::Position spawnPoint, struct LevelData const&);
 
 	void OnEnable(tei::ecs::Object&);
 	void OnUpdate();
@@ -78,6 +78,7 @@ private:
 	tei::ecs::Object* m_pParent{};
 	tei::ecs::Object* m_pObject{};
 	AnimaData const* m_pData{};
+	struct LevelData const* m_pLevelData{};
 
 	AnimaData::State::ID m_State{};
 

@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Particle.h"
 #include "Enemy.h"
+#include "Level.h"
 
 #include <memory>
 #include <algorithm>
@@ -16,7 +17,7 @@ using namespace components;
 
 using enum AnimaData::State::ID;
 
-tei::ecs::Object& Anima::Create(tei::ecs::Object& parent, AnimaData const& data, tei::unit::Position spawnPoint)
+tei::ecs::Object& Anima::Create(tei::ecs::Object& parent, AnimaData const& data, tei::unit::Position spawnPoint, LevelData const& level)
 {
 	auto& object = parent.AddChild();
 	auto& self = object.AddComponent<Anima>();
@@ -25,6 +26,7 @@ tei::ecs::Object& Anima::Create(tei::ecs::Object& parent, AnimaData const& data,
 	self.m_pObject = &object;
 	self.m_pData = &data;
 	self.m_SpawnPoint = spawnPoint;
+	self.m_pLevelData = &level;
 
 	object.AddComponents(
 		ObjectTransform{ spawnPoint },
@@ -152,10 +154,7 @@ void Anima::DoAttack()
 			Hitbox{}
 		);
 		
-		{
-			static auto s = Resources->LoadShared<resource::Sound>("resources/attack.wav");
-			Audio->Play(s);
-		}
+		Audio->Play(m_pLevelData->sounds.at(Sound::ATTACK).sound);
 	}
 }
 
@@ -173,13 +172,11 @@ void Anima::DoDeath(bool stayDead)
 
 		if (!m_pData->hostile)
 		{
-			static auto s = Resources->LoadShared<resource::Sound>("resources/death.wav");
-			Audio->Play(s);
+			Audio->Play(m_pLevelData->sounds.at(Sound::DEATH).sound);
 		}
 		else
 		{
-			static auto s = Resources->LoadShared<resource::Sound>("resources/crush.wav");
-			Audio->Play(s);
+			Audio->Play(m_pLevelData->sounds.at(Sound::CRUSH).sound);
 		}
 	}
 }
@@ -191,10 +188,7 @@ void Anima::DoHit()
 		m_State = HIT;
 		m_Timer = 2_s;
 
-		{
-			static auto s = Resources->LoadShared<resource::Sound>("resources/hit.wav");
-			Audio->Play(s);
-		}
+		Audio->Play(m_pLevelData->sounds.at(Sound::HIT).sound);
 	}
 }
 

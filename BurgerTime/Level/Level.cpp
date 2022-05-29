@@ -39,7 +39,7 @@ tei::ecs::Object& Level::CreateLayout(int id)
 
 	m_ID = id;
 
-	if (id >= size(m_pData->levels))
+	if (size_t(id) >= size(m_pData->levels))
 	{
 		Notify(LevelEvent{ LevelEvent::ALL_COMPLETED, id });
 		return *m_pObject;
@@ -86,7 +86,7 @@ tei::ecs::Object& Level::CreateLayout(int id)
 
 	auto addIngredient = [this, &layoutObject, &rng] (ObjectTransform tf, size_t id) mutable
 	{
-		auto& ingredient = IngredientEnity::Create(layoutObject, m_pData->ingrendients[id]);
+		auto& ingredient = IngredientEnity::Create(layoutObject, m_pData->ingrendients[id], *m_pData);
 		ingredient.AddComponent(std::move(tf));
 		ingredient.GetComponent<IngredientEnity>().AddObserver(
 			[this, state = true] (IngredientEnity::IsOnPlate) mutable
@@ -101,8 +101,7 @@ tei::ecs::Object& Level::CreateLayout(int id)
 						m_Timer = 2_s;
 						m_PendingEvent = { LevelEvent::COMPLETED, m_ID };
 						{
-							static auto s = Resources->LoadShared<resource::Sound>("resources/complete.wav");
-							Audio->Play(s);
+							Audio->Play(m_pData->sounds.at(Sound::COMPLETED).sound);
 						}
 					}
 				}
@@ -184,20 +183,20 @@ tei::ecs::Object& Level::CreateLayout(int id)
 	// Enemies (tmp)
 	{
 		m_Players.clear();
-		m_Players.push_back(Anima::Create(layoutObject, m_pData->anima[0], playerPoint).GetComponent<Anima>());
+		m_Players.push_back(Anima::Create(layoutObject, m_pData->anima[0], playerPoint, *m_pData).GetComponent<Anima>());
 
 		auto pointIt{ enemyPoints.begin() };
 		for ([[maybe_unused]] auto i : {1, 2, 3})
-			Anima::Create(layoutObject, m_pData->anima[1], *pointIt++);
+			Anima::Create(layoutObject, m_pData->anima[1], *pointIt++, *m_pData);
 
 		for ([[maybe_unused]] auto i : {1, 2})
-			Anima::Create(layoutObject, m_pData->anima[2], *pointIt++);
+			Anima::Create(layoutObject, m_pData->anima[2], *pointIt++, *m_pData);
 		
 		if (m_pData->anima.size() > 4)
 		for ([[maybe_unused]] auto i : {1})
-			Anima::Create(layoutObject, m_pData->anima[3], *pointIt++);
+			Anima::Create(layoutObject, m_pData->anima[3], *pointIt++, *m_pData);
 
-		auto& last = Anima::Create(layoutObject, m_pData->anima.back(), m_pData->mode == "co-op" ? player2Point : *pointIt++);
+		auto& last = Anima::Create(layoutObject, m_pData->anima.back(), m_pData->mode == "co-op" ? player2Point : *pointIt++, *m_pData);
 		if (last.HasComponent<PlayerEffects>())
 			m_Players.push_back(last.GetComponent<Anima>());
 	}

@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 	{
 		{
 
-			//METRICS_INITLOG("_metrics.json");
+			METRICS_INITLOG("_metrics.json");
 			METRICS_TIMEBLOCK;
 
 			//puts("Tei engine - starting");

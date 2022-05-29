@@ -173,5 +173,7 @@ void CoreFunction::Run()
 
 void CoreFunction::Stop()
 {
+	METRICS_TIMEBLOCK;
+
 	*m_IsRunning = false;
 }

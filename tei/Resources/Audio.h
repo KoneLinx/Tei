@@ -16,14 +16,6 @@ namespace tei::internal::resource
 		audio::Chunk* pData;
 		float volume{};
 		bool loop{};
-#if defined(DEBUG) || defined(_DEBUG)
-		std::string _name{};
-#endif
-
-		//constexpr operator bool() const noexcept
-		//{
-		//	return this != nullptr && pData != nullptr;
-		//}
 	};
 
 }
@@ -37,8 +29,7 @@ void Load(
 	std::shared_ptr<tei::external::resource::Sound>&,
 	std::filesystem::path const&,
 	bool loop = false,
-	float volume = .1f,
-	std::string_view name = {}
+	float volume = .1f
 );
 
 void Load(

@@ -2,6 +2,8 @@
 
 #include <tei.h>
 
+#include <tei/metrics.h>
+
 namespace burger {};
 
 using namespace burger;

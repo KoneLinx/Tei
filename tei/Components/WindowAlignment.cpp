@@ -11,6 +11,8 @@ tei::internal::components::WindowAlignment::WindowAlignment(unit::Position offse
 
 void tei::internal::components::WindowAlignment::OnEnable()
 {
+	METRICS_TIMEBLOCK;
+
 	auto& [transform] = Refs();
 	
 	auto update = [&] (application::WindowPropertyChangedEvent)
@@ -24,5 +26,7 @@ void tei::internal::components::WindowAlignment::OnEnable()
 
 void tei::internal::components::WindowAlignment::OnDisable()
 {
+	METRICS_TIMEBLOCK;
+
 	m_Handle.Clear();
 }

@@ -63,12 +63,11 @@ void Menu::OnInitialize(tei::ecs::Object& object)
 		addButton
 	);
 
-	m_Updater = [&, updaters = std::move(updaters), index = int()] (int change) mutable
+	auto clickSound = Resources->LoadShared<resource::Sound>("resources/click.wav");
+
+	m_Updater = [&, clickSound, updaters = std::move(updaters), index = int()] (int change) mutable
 	{
-		{
-			static auto s = Resources->LoadShared<resource::Sound>("resources/click.wav");
-			Audio->Play(s);
-		}
+		Audio->Play(clickSound);
 		if (change == 0)
 		{
 			object.SetState(false);
@@ -99,6 +98,22 @@ void Menu::OnEnable()
 			Input->AddCommand(
 				KeyboardInput::Arrow::UP,
 				[this] { m_Updater(-1); }
+			),
+			Input->AddCommand(
+				KeyboardInput::Main::S,
+				[this] { m_Updater(1); }
+			),
+			Input->AddCommand(
+				KeyboardInput::Main::W,
+				[this] { m_Updater(-1); }
+			),
+			Input->AddCommand(
+				KeyboardInput::Main::SPACE,
+				[this] { m_Updater(0); }
+			),
+			Input->AddCommand(
+				KeyboardInput::Main::F,
+				[this] { m_Updater(0); }
 			),
 			Input->AddCommand(
 				KeyboardInput::Main::RETURN,

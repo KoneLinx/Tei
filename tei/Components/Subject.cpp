@@ -9,6 +9,8 @@ components::Subject::ObserverHandle::ObserverHandle(std::weak_ptr<ObserverContai
 
 tei::internal::components::Subject::ObserverHandle& tei::internal::components::Subject::ObserverHandle::operator=(ObserverHandle&& other)
 {
+	METRICS_TIMEBLOCK;
+
 	if (auto ptr{ std::exchange(m_Container, std::move(other.m_Container)).lock() })
 		ptr->erase(m_Position);
 	m_Position = std::move(other.m_Position);
@@ -33,13 +35,17 @@ void tei::internal::components::Subject::ObserverHandle::Detach()
 
 components::Subject::ObserverHandle::~ObserverHandle()
 {
+	METRICS_TIMEBLOCK;
+
 	if (auto ptr{ m_Container.lock() })
 		ptr->erase(m_Position);
 }
 
 components::Subject::Subject()
 	: m_Observers{ std::make_shared<ObserverContainer>() }
-{}
+{
+	METRICS_TIMEBLOCK;
+}
 
 void components::Subject::RemoveObserver(ObserverHandle& handle)
 {
@@ -48,6 +54,8 @@ void components::Subject::RemoveObserver(ObserverHandle& handle)
 
 components::Subject::ObserverHandle components::Subject::AddObserver(ObserverContainer::value_type value)
 {
+	METRICS_TIMEBLOCK;
+
 	return { m_Observers, m_Observers->insert(std::move(value)) };
 }
 

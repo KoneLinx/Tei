@@ -8,6 +8,7 @@
 #include "StaticEntity.h"
 #include "Ingredient.h"
 #include "Particle.h"
+#include "Sounds.h"
 
 struct LevelLayoutData
 {
@@ -34,6 +35,7 @@ struct LevelData
 	std::map<StaticEntityData::Type, StaticEntityData> statics;
 	std::map<ParticleData::Type, ParticleData> particles;
 	std::vector<LevelLayoutData> levels;
+	std::map<Sound::Type, Sound> sounds;
 };
 
 class Level : public tei::components::Subject

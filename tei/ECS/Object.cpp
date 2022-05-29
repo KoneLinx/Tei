@@ -22,6 +22,8 @@ Object::Object(Object* pParent, bool active)
 
 Object::~Object()
 {
+	METRICS_TIMEBLOCK;
+
 	Do(Message::CLEANUP);
 }
 
@@ -42,6 +44,8 @@ Object& Object::AddChild(bool active)
 
 void Object::RemoveChild(Object const& child)
 {
+	METRICS_TIMEBLOCK;
+
 	if (m_Active)
 		throw utility::TeiRuntimeError{ "Cannot modify object list while active" };
 
@@ -51,6 +55,8 @@ void Object::RemoveChild(Object const& child)
 
 void tei::internal::ecs::Object::Clear()
 {
+	METRICS_TIMEBLOCK;
+
 	if (m_Active)
 		throw utility::TeiRuntimeError{ "Cannot modify object list while active" };
 
@@ -59,6 +65,8 @@ void tei::internal::ecs::Object::Clear()
 
 void tei::internal::ecs::Object::ClearChildren()
 {
+	METRICS_TIMEBLOCK;
+
 	if (m_Active)
 		throw utility::TeiRuntimeError{ "Cannot modify object list while active" };
 
@@ -89,6 +97,8 @@ Object::ComponentBase* Object::GetComponentImpl(std::type_info const& type) cons
 
 std::unique_ptr<Object::ComponentBase> tei::internal::ecs::Object::ExtractComponentImpl(std::type_info const& type)
 {
+	METRICS_TIMEBLOCK;
+
 	if (m_Active)
 		throw utility::TeiRuntimeError{ "Cannot modify object list while active" };
 
@@ -122,6 +132,8 @@ void DoCall(Object& self, auto& components, auto& children, bool force = false)
 
 void Object::Do(Message::Init)
 {
+	METRICS_TIMEBLOCK;
+
 	if (m_Initialised)
 		return;
 
@@ -132,6 +144,8 @@ void Object::Do(Message::Init)
 
 void Object::Do(Message::Cleanup)
 {
+	METRICS_TIMEBLOCK;
+
 	if (!m_Initialised)
 		return;
 
@@ -150,6 +164,8 @@ void Object::Do(Message::Cleanup)
 
 void Object::Do(Message::Enable)
 {
+	METRICS_TIMEBLOCK;
+
 	if (!m_State)
 		return;
 
@@ -163,6 +179,8 @@ void Object::Do(Message::Enable)
 
 void Object::Do(Message::Disable)
 {
+	METRICS_TIMEBLOCK;
+
 	m_Active = false;
 
 	DoCall<Message::Disable>(*this, m_Components, m_Children);
@@ -170,6 +188,8 @@ void Object::Do(Message::Disable)
 
 void Object::Do(Message::Update)
 {
+	METRICS_TIMEBLOCK;
+
 	if (m_Clear)
 		return Do(Message::CLEANUP);
 
@@ -187,15 +207,19 @@ void Object::Do(Message::Update)
 
 void Object::Do(Message::FixedUpdate)
 {
+	METRICS_TIMEBLOCK;
+
 	DoCall<Message::FixedUpdate>(*this, m_Components, m_Children);
 }
 
 void Object::Do(Message::Render)
 {
+	METRICS_TIMEBLOCK;
+
 	DoCall<Message::Render>(*this, m_Components, m_Children);
 }
 
-void Object::ExceptComponentNotFound(std::type_info const& type)
+void* Object::ExceptComponentNotFound(std::type_info const& type)
 {
 	throw utility::TeiRuntimeError{ "No such component found in object", type.name() };
 }

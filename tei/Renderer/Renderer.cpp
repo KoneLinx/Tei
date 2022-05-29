@@ -39,6 +39,7 @@ RendererClass::RendererClass(application::Application::Window const& window)
 RendererClass::~RendererClass()
 {
 	METRICS_TIMEBLOCK;
+
 	if (m_SDLRenderer != nullptr)
 		SDL_DestroyRenderer(m_SDLRenderer);
 }
@@ -46,6 +47,7 @@ RendererClass::~RendererClass()
 void RendererClass::Clear()
 {
 	METRICS_TIMEBLOCK;
+
 	SDL_RenderClear(m_SDLRenderer);
 
 	ImGui_ImplSDLRenderer_NewFrame();
@@ -81,12 +83,15 @@ void RendererClass::Present()
 void RendererClass::SetVSync(bool synced) const
 {
 	METRICS_TIMEBLOCK;
+
 	if (SDL_RenderSetVSync(m_SDLRenderer, int(synced)) != 0)
 		throw utility::TeiRuntimeError{ "Could not alter vsync status", !synced };
 }
 
 void RendererClass::DrawTexture(resource::Texture const& texture, unit::Transform const& transform, std::optional<unit::Rectangle> source) const
 {
+	METRICS_TIMEBLOCK;
+
 	if (texture.pData == nullptr)
 		return;
 
@@ -139,6 +144,9 @@ void RendererClass::DrawTexture(resource::Texture const& texture, unit::Transfor
 void RendererClass::DrawSprite(resource::Sprite const& sprite, unit::Transform const& transform) const
 {
 	METRICS_TIMEBLOCK;
+
+	if (sprite.pData == nullptr)
+		return;
 
 	auto frame = unsigned((m_Time - sprite.origintime) / sprite.frameduration);
 

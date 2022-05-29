@@ -160,7 +160,7 @@ std::vector<IngredientData> LoadIngredients(nlohmann::json const& allentitydata)
 
 	for (size_t i{}; i < ingredients.size();)
 	{
-		if (auto& el = ingredients[i]; el.unique && el.position != i)
+		if (auto& el = ingredients[i]; el.unique && size_t(el.position) != i)
 			std::swap(ingredients[el.position], el);
 		else
 			++i;
@@ -297,6 +297,37 @@ std::vector<LevelLayoutData> LoadLevelLayout()
 	return levels;
 }
 
+std::map<Sound::Type, Sound> LoadSounds(nlohmann::json const& allentitydata)
+{
+	auto const& sounds = allentitydata["sounds"];
+
+	std::string_view audioext{ allentitydata["audioextention"] };
+
+	std::set const types{
+		Sound::DEATH,
+		Sound::HIT,
+		Sound::ATTACK,
+		Sound::DROP,
+		Sound::PRESS,
+		Sound::COMPLETED,
+		Sound::CRUSH,
+		Sound::CLICK,
+	};
+
+	std::map<Sound::Type, Sound> out{};
+
+	for (auto& entry : sounds.items())
+	{
+		auto type = *types.find(entry.key());
+		out.insert({
+			type,
+			{ type, tei::Resources->LoadShared<resource::Sound>(std::string{ resourcedir }.append(entry.value()).append(audioext)) }
+		});
+	}
+
+	return out;
+}
+
 LevelData LoadLevel(std::string_view mode)
 {
 	try
@@ -317,6 +348,7 @@ LevelData LoadLevel(std::string_view mode)
 		level.statics = LoadStatic(entitydata);
 		level.particles = LoadParticles(entitydata);
 		level.levels = LoadLevelLayout();
+		level.sounds = LoadSounds(entitydata);
 
 		return level;
 	}

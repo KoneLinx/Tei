@@ -12,17 +12,6 @@ using namespace tei::internal;
 
 Texture LoadTexture(std::filesystem::path const& path)
 {
-	//static std::once_flag once{};
-	//std::call_once(
-	//	once,
-	//	[]
-	//	{
-	//		bool(IMG_Init(IMG_INIT_JPG) & IMG_INIT_JPG) &&
-	//		bool(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) ||
-	//		(throw utility::TeiRuntimeError{ "Could not properly initialize SDL_image", SDL_GetError() }, false);
-	//	}
-	//);
-
 	Texture texture{};
 
 	if (!path.empty())
@@ -59,15 +48,21 @@ static constexpr auto  DELETER = [] (auto* pTexture) // Texture or Sprite
 
 void Load(std::shared_ptr<Texture>& ref, std::filesystem::path const& path)
 {
+    METRICS_TIMEBLOCK;
+
 	ref = { std::shared_ptr<Texture>{ new Texture{ LoadTexture(path)}, DELETER } };
 }
 void Load(std::shared_ptr<Texture>& ref)
 {
+    METRICS_TIMEBLOCK;
+
 	ref = { std::shared_ptr<Texture>{ new Texture{ LoadTexture({}) }, DELETER } };
 }
 
 void Load(std::shared_ptr<Sprite>& ref, std::filesystem::path const& path, time::Clock::duration frameduration, int cols, int rows, bool loop, time::Clock::time_point origin)
 {
+    METRICS_TIMEBLOCK;
+
 	ref = { std::shared_ptr<Sprite>{ new Sprite{ LoadTexture(path), frameduration, cols, rows, loop, origin}, DELETER } };
 }
 

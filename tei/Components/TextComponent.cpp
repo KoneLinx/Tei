@@ -14,6 +14,8 @@ using namespace tei::internal::utility;
 
 void OnUpdate(std::nullptr_t, TextRenderComponent const& comp)
 {
+	METRICS_TIMEBLOCK;
+
 	if (auto& [text, font, texture, colour, transform] = comp.Refs(); text.checkout() | colour.checkout()) // Non short-circuiting!
 	{
 		unit::Scale scale{ 1 };
@@ -58,12 +60,16 @@ void OnUpdate(std::nullptr_t, TextRenderComponent const& comp)
 
 void OnRender(std::nullptr_t, TextRenderComponent const& comp)
 {
+	METRICS_TIMEBLOCK;
+
 	auto& [text, font, texture, colour, transform] = comp.Refs();
 	Renderer->DrawTexture(*texture, transform.world);
 }
 
 void OnInitialize(std::nullptr_t, tei::internal::components::TextRenderComponent const&, tei::internal::ecs::Object& object)
 {
+	METRICS_TIMEBLOCK;
+
 	if (object.HasComponent<Observed<unit::Colour>>() == nullptr) 
 		object.AddComponent(Observed{ unit::Colour{ 1, 1, 1, 1 } });
 }

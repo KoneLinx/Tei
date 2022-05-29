@@ -4,7 +4,6 @@
 #define METRICS 0
 #endif
 
-
 #ifndef METRICS
 #if (defined(__cpp_lib_source_location)) && (defined(DEBUG) || defined(_DEBUG))
 #define METRICS
@@ -20,7 +19,7 @@
 #include <variant>
 #include <list>
 
-#ifdef METRICS
+#if METRICS
 
 #include <fstream>
 #include <mutex>
@@ -32,7 +31,6 @@ namespace metrics
 
 	using Clock = std::chrono::steady_clock;
 
-	template <typename = void>
 	class MetricLog
 	{
 
@@ -48,7 +46,7 @@ namespace metrics
 		~MetricLog();
 		
 		static void Register(source_location src);
-		static BlockTimer TimeBlock (source_location src, std::string_view pretty_fn);
+		static BlockTimer TimeBlock(source_location src, std::string_view pretty_fn);
 
 	private:
 
@@ -104,15 +102,15 @@ namespace metrics
 
 	};
 
-#define METRICS_REGISTER     metrics::MetricLog<>::Register(METRICS_SOURCE_LOCATION);
-#define METRICS_TIMEBLOCK    auto _blocktimer = metrics::MetricLog<>::TimeBlock(std::source_location::current(), __FUNCSIG__);
-#define METRICS_INITLOG(...) metrics::MetricLog<> _metriclog{ new std::ofstream{ __VA_ARGS__ } };
+//#define METRICS_REGISTER     metrics::MetricLog<>::Register(METRICS_SOURCE_LOCATION);
+#define METRICS_TIMEBLOCK    auto _blocktimer = metrics::MetricLog::TimeBlock(std::source_location::current(), __FUNCSIG__);
+#define METRICS_INITLOG(...) metrics::MetricLog _metriclog{ new std::ofstream{ __VA_ARGS__ } };
 
 }
 
 #else
 
-#define METRICS_REGISTER    
+//#define METRICS_REGISTER    
 #define METRICS_TIMEBLOCK   
 #define METRICS_INITLOG(...)
 

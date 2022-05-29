@@ -11,12 +11,16 @@ struct tei::internal::components::TransformAccess
 {
 	static void Enable(ObjectTransform& transform, Object const& object)
 	{
+		METRICS_TIMEBLOCK;
+
 		transform.parent = FindParentComponent<ObjectTransform>(object);
 		Update(transform);
 	}
 
 	static void Update(ObjectTransform& transform)
 	{
+		METRICS_TIMEBLOCK;
+
 		transform.world.checkout();
 		if (transform.parent)
 		{

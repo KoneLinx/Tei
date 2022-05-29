@@ -136,7 +136,7 @@ namespace tei::internal::ecs
 		ComponentBase* GetComponentImpl(std::type_info const&) const;
 		std::unique_ptr<ComponentBase> ExtractComponentImpl(std::type_info const&);
 
-		static void ExceptComponentNotFound(std::type_info const&);
+		static void* ExceptComponentNotFound(std::type_info const&);
 
 	};
 
@@ -218,7 +218,7 @@ namespace tei::internal::ecs
 		if (auto p{ HasComponent<Data>() })
 			return *p;
 		else
-			return ExceptComponentNotFound(typeid(Data)), *p;
+			return *static_cast<Data*>(ExceptComponentNotFound(typeid(Data)));
 	}
 
 	template<detail::ComponentKind Data>

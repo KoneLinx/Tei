@@ -97,7 +97,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);METRICS_TIMEBLOCK</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
@@ -133,7 +133,7 @@
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);METRICS_TIMEBLOCK</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
@@ -169,7 +169,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);METRICS_TIMEBLOCK</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
@@ -204,7 +204,7 @@
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);METRICS_TIMEBLOCK</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <SDLCheck>true</SDLCheck>
@@ -273,6 +273,7 @@
     <ClCompile Include="Time\Time.cpp" />
     <ClCompile Include="Components\Transform.cpp" />
     <ClCompile Include="Components\WindowAlignment.cpp" />
+    <ClCompile Include="Utility\Metrics\Metrics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Application.h" />
@@ -299,6 +300,7 @@
     <ClInclude Include="include\tei\internal\Utility\Service.h" />
     <ClInclude Include="include\tei\internal\Utility\Static.h" />
     <ClInclude Include="include\tei\internal\Utility\SubrangeHelper.h" />
+    <ClInclude Include="include\tei\metrics.h" />
     <ClInclude Include="include\tei\utility.h" />
     <ClInclude Include="pch\teipch.h" />
     <ClInclude Include="Time\TimeUtils.h" />
@@ -345,6 +347,7 @@
     <ClInclude Include="Units\Units.h" />
     <ClInclude Include="Utility\AnyReference.h" />
     <ClInclude Include="Utility\Error.h" />
+    <ClInclude Include="Utility\Metrics\Metrics.h" />
     <ClInclude Include="Utility\Observed.h" />
     <ClInclude Include="Utility\Projector_addressof.h" />
     <ClInclude Include="Utility\Projector_as_const.h" />

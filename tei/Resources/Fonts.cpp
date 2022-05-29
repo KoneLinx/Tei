@@ -9,6 +9,8 @@ using namespace std::literals;
 
 void Load(std::shared_ptr<Font>& out, std::filesystem::path const& path, int ptSize)
 {
+    METRICS_TIMEBLOCK;
+
     static bool init{
         TTF_Init() == 0 ||
         (throw std::runtime_error{ "Failed to load SDL_ttf: "s + SDL_GetError() }, false)

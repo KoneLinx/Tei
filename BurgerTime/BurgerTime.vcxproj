@@ -34,6 +34,7 @@
     <ClInclude Include="Level\StaticEntity.h" />
     <ClInclude Include="Level\Player.h" />
     <ClInclude Include="Level\Score.h" />
+    <ClInclude Include="Level\Sounds.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application\main.cpp" />
@@ -57,6 +58,7 @@
     <ClCompile Include="Level\StaticEntity.cpp" />
     <ClCompile Include="Level\Player.cpp" />
     <ClCompile Include="Level\Score.cpp" />
+    <ClCompile Include="Level\Sounds.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\EntityData.json" />

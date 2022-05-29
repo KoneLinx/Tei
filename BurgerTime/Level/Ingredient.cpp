@@ -11,18 +11,18 @@
 #include <numbers>
 
 using namespace tei;
-using namespace tei::resource;
 using namespace tei::components;
 
 constexpr inline float visualOffset = -.2f;
 
-tei::ecs::Object& IngredientEnity::Create(tei::ecs::Object& parent, IngredientData const& data)
+tei::ecs::Object& IngredientEnity::Create(tei::ecs::Object& parent, IngredientData const& data, LevelData const& level)
 {
 	auto& object = parent.AddChild();
 
 	auto& self = object.AddComponent<IngredientEnity>();
 
 	self.m_pData = &data;
+	self.m_pLevelData = &level;
 
 	{
 		auto& visualObject = object.AddChild();
@@ -45,10 +45,7 @@ tei::ecs::Object& IngredientEnity::Create(tei::ecs::Object& parent, IngredientDa
 					{
 						if (hit.object.HasComponent<PlayerEffects>())
 						{
-							{
-								static auto s = Resources->LoadShared<resource::Sound>("resources/stroke.wav");
-								Audio->Play(s);
-							}
+							Audio->Play(self.m_pLevelData->sounds.at(Sound::PRESS).sound);
 							self.Pressed(i);
 						}
 					}
@@ -178,10 +175,7 @@ void IngredientEnity::Pressed(int index)
 		m_pVisualTransform->get().rotation.r = r;
 		m_pVisualTransform->get().position.y = y;
 
-		{
-			static auto s = Resources->LoadShared<resource::Sound>("resources/drop.wav");
-			Audio->Play(s);
-		}
+		Audio->Play(m_pLevelData->sounds.at(Sound::DROP).sound);
 	}
 	else
 	{

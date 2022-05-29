@@ -11,6 +11,8 @@
 
 tei::internal::resource::Texture tei::internal::extra::resources::EngineLoaderBackground()
 {
+	METRICS_TIMEBLOCK;
+
 	static int w{}, h{};
 	static std::unique_ptr<SDL_Texture, decltype(
 		[] (SDL_Texture* p) 
@@ -21,9 +23,12 @@ tei::internal::resource::Texture tei::internal::extra::resources::EngineLoaderBa
 	if (!texture)
 	{
 		//auto buf = SDL_RWFromConstMem(std::data(data), int(std::size(data)));
-		auto surface = IMG_Load("../tewi_w.png");
-		texture.reset(SDL_CreateTextureFromSurface(static_cast<SDL_Renderer*>(render::Renderer->GetRenderTraget().pData), surface));
-		SDL_QueryTexture(texture.get(), nullptr, nullptr, &w, &h);
+		if (std::filesystem::exists("../tewi_w.png"))
+		{
+			auto surface = IMG_Load("../tewi_w.png");
+			texture.reset(SDL_CreateTextureFromSurface(static_cast<SDL_Renderer*>(render::Renderer->GetRenderTraget().pData), surface));
+			SDL_QueryTexture(texture.get(), nullptr, nullptr, &w, &h);
+		}
 	}
 	return resource::Texture{ texture.get(), { w, h }  };
 }

@@ -2,6 +2,7 @@
 
   "spriteseparator": "_",
   "spriteextention": ".png",
+  "audioextention": ".wav",
   "spritefrequency": 10,
 
   "modes": [
@@ -267,25 +268,15 @@
 
   },
 
-  "UI": [
-
-    {
-      "text": "Score",
-      "colour": [ 255, 0, 0 ]
-    },
-    {
-      "text": "Hi-score",
-      "colour": [ 255, 0, 0 ]
-    },
-    {
-      "text": "Pepper",
-      "colour": [ 0, 255, 255 ]
-    },
-    {
-      "text": "Pepper",
-      "colour": [ 0, 255, 255 ]
-    }
-
-  ]
+  "sounds": {
+    "death": "death",
+    "hit": "hit",
+    "click": "click",
+    "attack": "attack",
+    "completed": "complete",
+    "crush": "crush",
+    "drop": "drop",
+    "press": "stroke"
+  }
 
 }

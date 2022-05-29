@@ -32,7 +32,7 @@ class IngredientEnity : public tei::components::RefComponent<tei::components::Ob
 {
 public:
 
-	static tei::ecs::Object& Create(tei::ecs::Object& parent, IngredientData const& data);
+	static tei::ecs::Object& Create(tei::ecs::Object& parent, IngredientData const& data, struct LevelData const&);
 
 	void OnUpdate(tei::ecs::Object&);
 
@@ -43,6 +43,7 @@ public:
 private:
 
 	IngredientData const* m_pData{};
+	struct LevelData const* m_pLevelData{};
 
 	tei::components::ObjectTransform* m_pVisualTransform{};
 

@@ -46,3 +46,5 @@ using namespace tei::internal;
 // glm.hpp included by tei/unit.h
 
 #endif
+
+#include <tei/metrics.h>

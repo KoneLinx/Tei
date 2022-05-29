@@ -65,6 +65,8 @@ Application::~Application()
 
 void Application::UpdateProps(bool changed)
 {
+	METRICS_TIMEBLOCK;
+
 	int x{}, y{};
 	SDL_GetWindowSize(m_SDLWindow, &x, &y);
 	changed |= m_Window.transform.scale.x != float(x) && m_Window.transform.scale.y != float(y);
@@ -83,11 +85,15 @@ void Application::UpdateProps(bool changed)
 
 void Application::SetWindowTitle(std::string const& title)
 {
+	METRICS_TIMEBLOCK;
+
 	SDL_SetWindowTitle(m_SDLWindow, std::data(title));
 }
 
 void Application::SetWindowProperty(unit::Scale size)
 {
+	METRICS_TIMEBLOCK;
+
 	auto old{ m_Window.transform };
 	int x{}, y{};
 	SDL_SetWindowSize(m_SDLWindow, int(size.x), int(size.y));
@@ -99,12 +105,16 @@ void Application::SetWindowProperty(unit::Scale size)
 
 void Application::SetWindowProperty(unit::Position pos)
 {
+	METRICS_TIMEBLOCK;
+
 	SDL_SetWindowPosition(m_SDLWindow, int(pos.x), int(pos.y));
 	UpdateProps(true);
 }
 
 void Application::SetWindowProperty(unit::Transform transform)
 {
+	METRICS_TIMEBLOCK;
+
 	SDL_SetWindowSize(m_SDLWindow, int(transform.scale.x), int(transform.scale.y));
 	SDL_SetWindowPosition(m_SDLWindow, int(transform.position.x), int(transform.position.y));
 	UpdateProps(true);
@@ -112,6 +122,8 @@ void Application::SetWindowProperty(unit::Transform transform)
 
 void Application::SetWindowProperty(WindowProperty property)
 {
+	METRICS_TIMEBLOCK;
+
 	switch (property)
 	{
 	case tei::internal::application::WindowProperty::BORDERED:
@@ -159,11 +171,12 @@ void Application::Quit() const
 
 void Application::OpenWindow()
 {
+	METRICS_TIMEBLOCK;
+
 	SDL_Rect display{};
 	if (SDL_GetDisplayBounds(0, &display) == 0)
 		display.w = (display.h = 1080) * 18 / 9;
 
-	METRICS_TIMEBLOCK;
 	m_SDLWindow = SDL_CreateWindow(
 		"Tei engine",
 		SDL_WINDOWPOS_CENTERED,
@@ -210,6 +223,8 @@ void Application::CloseWindow()
 
 void Application::Update()
 {
+	METRICS_TIMEBLOCK;
+
 	for (SDL_Event event{}; SDL_PollEvent(&event);)
 	{
 		switch (event.type)

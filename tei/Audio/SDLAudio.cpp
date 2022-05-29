@@ -56,17 +56,23 @@ namespace tei::internal::audio
     SDLAudioService::SDLAudioService()
         : m_pImpl{ std::make_unique<Impl>() }
     {
+        METRICS_TIMEBLOCK;
+
         if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0)
             throw utility::TeiRuntimeError{ "Could not open audio", SDL_GetError() };
     }
 
     SDLAudioService::~SDLAudioService()
     {
+	    METRICS_TIMEBLOCK;
+
         Mix_CloseAudio();
     }
 
     void SDLAudioService::Play(resource::Resource<resource::Sound> const& sound) const
     {
+	    METRICS_TIMEBLOCK;
+
         if (m_pImpl->muted)
             return;
 
@@ -76,6 +82,8 @@ namespace tei::internal::audio
 
     void SDLAudioService::Mute(bool state) const
     {
+	    METRICS_TIMEBLOCK;
+
         if (m_pImpl->muted != state)
         {
             m_pImpl->muted = state;
@@ -93,6 +101,8 @@ namespace tei::internal::audio
 
     void SDLAudioService::Update()
     {
+	    METRICS_TIMEBLOCK;
+
         if (m_pImpl->muted)
             return;
 
@@ -107,6 +117,8 @@ namespace tei::internal::audio
 
     std::shared_ptr<resource::Sound> SDLAudioService::Load(std::filesystem::path const& path)
     {
+	    METRICS_TIMEBLOCK;
+
         auto chunk = Mix_LoadWAV(path.string().c_str());
 
         if (chunk == nullptr)
