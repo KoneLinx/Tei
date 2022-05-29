@@ -2,32 +2,36 @@
 
   "spriteseparator": "_",
   "spriteextention": ".png",
+  "audioextention": ".wav",
   "spritefrequency": 10,
 
   "modes": [
-    "Single player",
-    "Co-op",
-    "Versus"
+    "single",
+    "co-op",
+    "versus"
   ],
 
   "anima": {
 
-    "box": [ 1, 2 ],
+    "box": [ 0.75, 0.75 ],
 
     "entities": [
       {
         "mode": null,
         "type": "player",
         "name": "Mr. Pepper",
-        "src": "Peter"
+        "src": "Peter",
+        "id": 0,
+        "hostile": false
       },
       {
-        "mode": null,
+        "mode": [ "single", "co-op" ],
         "type": "enemy",
         "name": "Mr. Hot dog",
         "score": 100,
         "flips": false,
-        "src": "Hotdog"
+        "src": "Hotdog",
+        "id": 1
       },
       {
         "mode": null,
@@ -35,7 +39,8 @@
         "name": "Mr. Egg",
         "score": 300,
         "flips": false,
-        "src": "Egg"
+        "src": "Egg",
+        "id": 2
       },
       {
         "mode": null,
@@ -43,19 +48,23 @@
         "name": "Mr. Pickle's",
         "score": 200,
         "flips": true,
-        "src": "Pickle"
+        "src": "Pickle",
+        "id": 3
       },
       {
-        "mode": "Co-op",
+        "mode": "co-op",
         "type": "player",
         "name": "Mrs. Salt",
-        "src": "Salt"
+        "src": "Salt",
+        "id": 1
       },
       {
-        "mode": "Versus",
+        "mode": "versus",
         "type": "player",
         "name": "Mr. Evil hot dog",
-        "src": "Hotdog"
+        "src": "Hotdog",
+        "id": 1,
+        "hostile": true
       }
     ],
 
@@ -96,6 +105,12 @@
         "src": "Hit",
         "loop": true,
         "frames": 2
+      },
+      {
+        "type": [ "player" ],
+        "src": "AttackParticle",
+        "loop": false,
+        "frames": 4
       }
     ]
 
@@ -110,13 +125,13 @@
         "name": "Top bun",
         "src": "Bun_Top",
         "unique": true,
-        "position": -1
+        "position": 0
       },
       "bun_bottom": {
         "name": "Bottom bun",
         "src": "Bun_Bottom",
         "unique": true,
-        "position": 0
+        "position": 1
       },
       "patty": {
         "name": "Patty",
@@ -142,7 +157,7 @@
 
   },
 
-  "other": {
+  "static": {
 
     "entities": {
       "plate": {
@@ -158,56 +173,110 @@
       "platform": {
         "name": "Platform",
         "src": "Platform",
-        "box": [ 1, 0 ]
+        "box": [ 1, 0.2 ]
       },
       "shelf": {
         "name": "Shelf",
         "src": "Shelf",
         "box": [ 3, 0 ]
-      },
+      }
+
+    }
+  },
+
+
+  "particles": {
+
+    "entities": {
       "heart": {
         "name": "Life",
-        "src": "Heart",
-        "box": [ 0, 0 ]
+        "src": "Heart"
       },
       "level_1": {
         "name": "Level 1",
-        "src": "Level_1",
-        "box": [ 0, 0 ]
+        "src": "Level_1"
       },
       "level_5": {
         "name": "Level 5",
-        "src": "Level_5",
-        "box": [ 0, 0 ]
+        "src": "Level_5"
       },
       "level_10": {
         "name": "Level 10",
-        "src": "Level_10",
-        "box": [ 0, 0 ]
+        "src": "Level_10"
+      },
+      "cloud": {
+        "name": "Cloud",
+        "src": "Cloud"
+      },
+      "score_0": {
+        "name": "0",
+        "src": "Score_0"
+      },
+      "score_50": {
+        "name": "50",
+        "src": "Score_50"
+      },
+      "score_100": {
+        "name": "100",
+        "src": "Score_100"
+      },
+      "score_200": {
+        "name": "200",
+        "src": "Score_200"
+      },
+      "score_300": {
+        "name": "300",
+        "src": "Score_300"
+      },
+      "score_500": {
+        "name": "500",
+        "src": "Score_500"
+      },
+      "score_600": {
+        "name": "600",
+        "src": "Score_600"
+      },
+      "score_900": {
+        "name": "900",
+        "src": "Score_900"
+      },
+      "score_1000": {
+        "name": "1000",
+        "src": "Score_1000"
+      },
+      "score_2000": {
+        "name": "2000",
+        "src": "Score_2000"
+      },
+      "score_4000": {
+        "name": "4000",
+        "src": "Score_4000"
+      },
+      "score_8000": {
+        "name": "8000",
+        "src": "Score_8000"
+      },
+      "score_16000": {
+        "name": "16000",
+        "src": "Score_16000"
+      },
+      "score_plus": {
+        "name": "16000+",
+        "src": "Score_Plus"
       }
     }
 
   },
 
-  "UI": [
-
-    {
-      "text": "Score",
-      "colour": [ 255, 0, 0 ]
-    },
-    {
-      "text": "Hi-score",
-      "colour": [ 255, 0, 0 ]
-    },
-    {
-      "text": "Pepper",
-      "colour": [ 0, 255, 255 ]
-    },
-    {
-      "text": "Pepper",
-      "colour": [ 0, 255, 255 ]
-    }
-
-  ]
+  "sounds": {
+    "death": "death",
+    "hit": "hit",
+    "click": "click",
+    "attack": "attack",
+    "completed": "complete",
+    "crush": "crush",
+    "drop": "drop",
+    "press": "stroke"
+  }
 
 }
