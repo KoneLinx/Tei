@@ -19,7 +19,7 @@ namespace tei::internal::resource
 	
 	template <typename Data, typename ... Args>
 	concept LoadableResource = 	
-#if defined(__INTELLISENSE__) // It really doesn't like this requires clause but the compiler does get it right.
+#if defined(__INTELLISENSE__) // Intellisense really doesn't like this requires clause but the compiler does get it right.
 		true
 #else
 		requires (std::shared_ptr<Data>& d, std::filesystem::path const& path, Args ... args)
@@ -31,14 +31,14 @@ namespace tei::internal::resource
 	
 	template <typename Data>
 	concept DefaultResource =
-#if defined(__INTELLISENSE__)
+#if defined(__INTELLISENSE__) // Same here
 		true
 #else
 		requires (std::shared_ptr<Data>& d)
 		{
 			::Load(d);
 		}
-#endif // _MSC_VER
+#endif
 		;
 
 	class ResourceManager
@@ -87,15 +87,17 @@ namespace tei::internal::resource
 
 		friend ResourceManager;
 
+		explicit Resource(std::shared_ptr<Data> ptr)
+			: m_Data{ std::move(ptr) }
+		{}
+	
 	public:
 		
 		Resource() requires DefaultResource<Data>
 			: Resource{ Resources->LoadUnique<Data>() }
 		{}
 
-		Resource(std::shared_ptr<Data> ptr)
-			: m_Data{ std::move(ptr) }
-		{}
+		~Resource() = default;
 
 		Resource(Resource const&) = default;
 		Resource(Resource &&) = default;
@@ -117,9 +119,51 @@ namespace tei::internal::resource
 		operator Data& () const
 		{ return this->operator*(); }
 
+		operator bool() const
+		{
+			return m_Data.operator bool();
+		}
+		
 	private:
 
 		std::shared_ptr<Data> m_Data{};
+
+	public:
+
+		class Weak
+		{
+		public:
+
+			Weak(Resource const& data)
+				: m_Data{ data.m_Data }
+			{}
+			
+			Weak() = default;
+			~Weak() = default;
+
+			Weak(Weak const&) = default;
+			Weak(Weak &&) = default;
+			Weak& operator = (Weak const&) = default;
+			Weak& operator = (Weak &&) = default;
+
+			Resource Lock() const
+			{
+				return Resource{ m_Data.lock() };
+			}
+
+			operator Resource() const
+			{
+				return Lock();
+			}
+
+		private:
+
+			std::weak_ptr<Data> m_Data;
+
+		};
+
+		friend class Weak;
+
 	};
 
 	template<typename Data, typename ...Args> requires LoadableResource<Data, Args...>
@@ -151,16 +195,16 @@ namespace tei::internal::resource
 	inline Resource<Data> ResourceManager::LoadUnique(std::filesystem::path const& filepath, Args && ... args)
 	{
 		auto abs = std::filesystem::absolute(filepath);
-		std::shared_ptr<Data> out{};
-		::Load(out, abs, std::forward<Args>(args)...);
+		Resource<Data> out{ {} };
+		::Load(out.m_Data, abs, std::forward<Args>(args)...);
 		return out;
 	}
 
 	template<typename Data> requires DefaultResource<Data>
 	inline Resource<Data> ResourceManager::LoadUnique()
 	{
-		std::shared_ptr<Data> out{};
-		::Load(out);
+		Resource<Data> out{ {} };
+		::Load(out.m_Data);
 		return out;
 	}
 

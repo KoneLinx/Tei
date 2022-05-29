@@ -14,16 +14,16 @@ namespace tei::internal::resource
 	struct Sound
 	{
 		audio::Chunk* pData;
-		float volume;
-		bool loop;
+		float volume{};
+		bool loop{};
 #if defined(DEBUG) || defined(_DEBUG)
-		std::string _name;
+		std::string _name{};
 #endif
 
-		constexpr operator bool() const noexcept
-		{
-			return this != nullptr && pData != nullptr;
-		}
+		//constexpr operator bool() const noexcept
+		//{
+		//	return this != nullptr && pData != nullptr;
+		//}
 	};
 
 }

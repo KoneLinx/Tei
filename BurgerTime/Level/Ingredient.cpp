@@ -45,6 +45,10 @@ tei::ecs::Object& IngredientEnity::Create(tei::ecs::Object& parent, IngredientDa
 					{
 						if (hit.object.HasComponent<PlayerEffects>())
 						{
+							{
+								static auto s = Resources->LoadShared<resource::Sound>("resources/stroke.wav");
+								Audio->Play(s);
+							}
 							self.Pressed(i);
 						}
 					}
@@ -173,6 +177,11 @@ void IngredientEnity::Pressed(int index)
 		
 		m_pVisualTransform->get().rotation.r = r;
 		m_pVisualTransform->get().position.y = y;
+
+		{
+			static auto s = Resources->LoadShared<resource::Sound>("resources/drop.wav");
+			Audio->Play(s);
+		}
 	}
 	else
 	{

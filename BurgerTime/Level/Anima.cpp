@@ -151,7 +151,11 @@ void Anima::DoAttack()
 			Box{ 1, 1 },
 			Hitbox{}
 		);
-
+		
+		{
+			static auto s = Resources->LoadShared<resource::Sound>("resources/attack.wav");
+			Audio->Play(s);
+		}
 	}
 }
 
@@ -165,6 +169,18 @@ void Anima::DoDeath(bool stayDead)
 			m_Timer = Clock::time_point::max();
 		else 
 			m_Timer = 2_s;
+	
+
+		if (!m_pData->hostile)
+		{
+			static auto s = Resources->LoadShared<resource::Sound>("resources/death.wav");
+			Audio->Play(s);
+		}
+		else
+		{
+			static auto s = Resources->LoadShared<resource::Sound>("resources/crush.wav");
+			Audio->Play(s);
+		}
 	}
 }
 
@@ -174,6 +190,11 @@ void Anima::DoHit()
 	{
 		m_State = HIT;
 		m_Timer = 2_s;
+
+		{
+			static auto s = Resources->LoadShared<resource::Sound>("resources/hit.wav");
+			Audio->Play(s);
+		}
 	}
 }
 

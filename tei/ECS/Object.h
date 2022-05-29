@@ -45,13 +45,21 @@ namespace tei::internal::ecs
 
 		~Object();
 
+	private:
+
 		Object(Object&& other) = default;
 		Object& operator = (Object&& other) = default;
 
-		bool IsRoot() const noexcept;
-		bool IsActive() const noexcept;
+		Object(const Object& other) = delete;
+		Object& operator = (const Object& other) = delete;
 
-		// IsActive
+	public:
+
+		// Has no parrent
+		bool IsRoot() const noexcept;
+
+		// Is active
+		bool IsActive() const noexcept;
 		operator bool() const noexcept;
 
 		// Set update state
@@ -110,10 +118,6 @@ namespace tei::internal::ecs
 
 	private:
 
-
-		Object(const Object& other) = delete;
-		Object& operator = (const Object& other) = delete;
-
 		class ComponentBase;
 
 		template <typename Data>
@@ -128,9 +132,9 @@ namespace tei::internal::ecs
 		bool m_Initialised;
 		bool m_Clear;
 
-		void AddComponent(std::type_info const&, ComponentBase*);
-		ComponentBase* GetComponent(std::type_info const&) const;
-		std::unique_ptr<ComponentBase> ExtractComponent(std::type_info const&);
+		void AddComponentImpl(std::type_info const&, ComponentBase*);
+		ComponentBase* GetComponentImpl(std::type_info const&) const;
+		std::unique_ptr<ComponentBase> ExtractComponentImpl(std::type_info const&);
 
 		static void ExceptComponentNotFound(std::type_info const&);
 
@@ -181,7 +185,7 @@ namespace tei::internal::ecs
 	inline Data& ecs::Object::AddComponent(Arg&& ... arg)
 	{
 		Component<Data>* pComponent{ new Component<Data>{ std::forward<Arg>(arg)... } };
-		this->AddComponent(typeid(Data), pComponent);
+		this->AddComponentImpl(typeid(Data), pComponent);
 		return *pComponent;
 	}
 
@@ -202,7 +206,7 @@ namespace tei::internal::ecs
 	template<detail::ComponentKind Data>
 	inline Data* Object::HasComponent() const noexcept
 	{
-		if (auto pBase{ GetComponent(typeid(Data)) })
+		if (auto pBase{ GetComponentImpl(typeid(Data)) })
 			return std::addressof(static_cast<Data&>(*static_cast<Component<Data>*>(pBase)));
 		else
 			return nullptr;
@@ -220,7 +224,7 @@ namespace tei::internal::ecs
 	template<detail::ComponentKind Data>
 	inline auto Object::RemoveComponent()
 	{
-		[[maybe_unused]] auto uptr{ ExtractComponent(typeid(Data)) };
+		[[maybe_unused]] auto uptr{ ExtractComponentImpl(typeid(Data)) };
 		if constexpr (std::movable<Data>)
 			return std::move(static_cast<Component<Data>&>(*uptr));
 		else

@@ -8,7 +8,6 @@
 #include <tei/event.h>
 
 #include <SDL.h>
-#include <SDL_mixer.h>
 #include <SDL_image.h>
 #include <ImGui.h>
 
@@ -207,17 +206,6 @@ void Application::CloseWindow()
 
 	if (m_SDLWindow != nullptr)
 		SDL_DestroyWindow(std::exchange(m_SDLWindow, nullptr));
-}
-
-void Application::InitAudio()
-{
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0)
-		throw utility::TeiRuntimeError{ "Could not open audio", SDL_GetError() };
-}
-
-void Application::ExitAudio()
-{
-	Mix_CloseAudio();
 }
 
 void Application::Update()

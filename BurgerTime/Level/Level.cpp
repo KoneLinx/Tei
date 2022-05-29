@@ -100,6 +100,10 @@ tei::ecs::Object& Level::CreateLayout(int id)
 					{
 						m_Timer = 2_s;
 						m_PendingEvent = { LevelEvent::COMPLETED, m_ID };
+						{
+							static auto s = Resources->LoadShared<resource::Sound>("resources/complete.wav");
+							Audio->Play(s);
+						}
 					}
 				}
 			}
@@ -281,7 +285,9 @@ tei::ecs::Object& CreateGame(tei::ecs::Object& parent, std::string_view mode)
 		[&, levelID = int()](Level::LevelEvent const& event) mutable
 		{
 			if (event.type == event.COMPLETED && event.levelID == levelID)
+			{
 				levelComp.CreateLayout(++levelID);
+			}
 		}
 	).Detach();
 

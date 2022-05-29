@@ -5,6 +5,8 @@
 #include <array>
 #include <filesystem>
 
+#include "../Resources/ResourceManager.h"
+
 namespace tei::internal::resource
 {
 	struct Sound;
@@ -13,47 +15,28 @@ namespace tei::internal::resource
 namespace tei::internal::audio
 {
 
-	class AudioHandler
+	class AudioService
 	{
+	protected:
+
+		AudioService() = default;
+	
 	public:
 
-		AudioHandler();
-		virtual ~AudioHandler();
+		virtual ~AudioService() = default;
 
-		virtual void Play(resource::Sound const& sound) const final; //const
+		virtual void Play(resource::Resource<resource::Sound> const& sound) const = 0;
+		virtual void Mute(bool state) const = 0;
+		virtual bool IsMuted() const = 0;
 
-		virtual void Mute(bool mute) const final;
-		virtual bool IsMuted() const noexcept final;
+		virtual void Update() = 0;
+		virtual std::shared_ptr<resource::Sound> Load(std::filesystem::path const& path) = 0;
 
-		virtual void Enable() final;
-		virtual void Disable() final;
-		virtual void Update() final;
-
-		virtual struct Chunk* Load(std::filesystem::path const& path) = 0;
-		virtual void Free(struct Chunk*) = 0;
-
-	private:
-
-		virtual void OnEnable() {}
-		virtual void OnDisable() {}
-		virtual void OnMute(bool mute) { (void)mute; }
-
-		virtual void OnPlay(resource::Sound const& sound) = 0;
-
-		std::unique_ptr<struct Queue> m_Queue{};
-
-		struct ServiceRegisterer
-		{
-			void operator () (AudioHandler* old, AudioHandler* young) const;
-		};
-
-	public:
-
-		using Service = tei::internal::utility::Service<AudioHandler, ServiceRegisterer>;
+		using Service = utility::Service<AudioService const>;
 
 	};
 
-	extern AudioHandler::Service Audio;
+	extern AudioService::Service Audio;
 
 }
 

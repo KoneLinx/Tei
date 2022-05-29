@@ -65,7 +65,7 @@ void tei::internal::ecs::Object::ClearChildren()
 	m_Children.clear();
 }
 
-void Object::AddComponent(std::type_info const& type, ComponentBase* pComp)
+void Object::AddComponentImpl(std::type_info const& type, ComponentBase* pComp)
 {	
 	METRICS_TIMEBLOCK;
 
@@ -77,7 +77,7 @@ void Object::AddComponent(std::type_info const& type, ComponentBase* pComp)
 		pComp->Do(Message::INIT, *this);
 }
 
-Object::ComponentBase* Object::GetComponent(std::type_info const& type) const
+Object::ComponentBase* Object::GetComponentImpl(std::type_info const& type) const
 {
 	METRICS_TIMEBLOCK;
 	auto it{ r::find(m_Components | v::keys, type).base() };
@@ -87,7 +87,7 @@ Object::ComponentBase* Object::GetComponent(std::type_info const& type) const
 		return std::to_address(it->second);
 }
 
-std::unique_ptr<Object::ComponentBase> tei::internal::ecs::Object::ExtractComponent(std::type_info const& type)
+std::unique_ptr<Object::ComponentBase> tei::internal::ecs::Object::ExtractComponentImpl(std::type_info const& type)
 {
 	if (m_Active)
 		throw utility::TeiRuntimeError{ "Cannot modify object list while active" };
@@ -108,7 +108,7 @@ std::unique_ptr<Object::ComponentBase> tei::internal::ecs::Object::ExtractCompon
 template <typename Message>
 void DoCall(Object& self, auto& components, auto& children, bool force = false)
 {
-	//for (auto& [type, pComp] : utility::RangePerIndex(components))
+	//for (auto& [type, pComp] : utility::RangePerIndex(components)) // occasional crash, not figured out yet. May be due to internal transform_view caching
 	//	pComp->Do(Message{}, self);
 	for (size_t i{}; i < std::ranges::size(components); ++i)
 	{
@@ -116,7 +116,7 @@ void DoCall(Object& self, auto& components, auto& children, bool force = false)
 	}
 
 	for (auto& child : utility::RangePerIndex(children))
-		if (force || child->IsActive())
+		if (child && (force || child->IsActive()))
 			child->Do(Message{});
 }
 
@@ -194,35 +194,6 @@ void Object::Do(Message::Render)
 {
 	DoCall<Message::Render>(*this, m_Components, m_Children);
 }
-
-//Object::Object(Object const& other)
-//	: Object{ nullptr, other.m_State }
-//{	
-//	m_Initialised = other.m_Initialised;
-//
-//	m_Components.reserve(std::ranges::size(other.m_Components));
-//	using cref_type = std::ranges::range_reference_t<decltype(std::as_const(m_Components))>;
-//	using value_type = std::ranges::range_value_t<decltype(m_Components)>;
-//	std::ranges::transform(
-//		other.m_Components,
-//		std::back_inserter(m_Components),
-//		[] (cref_type val) -> value_type
-//		{
-//			auto const& [type, pValue] = val;
-//			return { type, pValue->Clone() };
-//		}
-//	);
-//
-//	std::ranges::transform(
-//		other.m_Children,
-//		std::back_inserter(m_Children),
-//		[] (Object const& obj) -> std::unique_ptr<Object>
-//		{
-//			return std::unique_ptr<Object>{ new Object{ obj } };
-//		},
-//		utility::projectors::to_address<true>{}
-//	);
-//}
 
 void Object::ExceptComponentNotFound(std::type_info const& type)
 {

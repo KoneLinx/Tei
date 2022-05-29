@@ -112,12 +112,11 @@ void CoreFunction::Run()
 
 	// Services
 	resource::Resources.Register(new resource::ResourceManager{});
-	audio::Audio.Register(new audio::SDLAudio{});
+	audio::Audio.Register(new audio::SDLAudioService{});
 	input::Input.Register(new input::InputManager{});
 	events::Event.Register(new components::Subject{});
 	scene::Scenes.Register(new scene::SceneManager{});
 
-	//std::this_thread::sleep_for(1.5_s);
 	application::ApplicationService->SetWindowProperty(application::WindowProperty::BORDERED);
 
 	// Client init

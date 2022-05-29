@@ -12,44 +12,117 @@ namespace tei::internal::audio
     struct Chunk : Mix_Chunk
     {};
 
-    void SDLAudio::OnEnable()
+    struct Impl
     {
-        // Mix_Init() ?
+        using Item = resource::Resource<resource::Sound>::Weak;
+
+        constexpr static size_t QUEUE_SIZE = 8;
+
+        bool Enqueue(Item chunk)
+        {
+            std::scoped_lock scope{ m_Lock };
+
+            size_t pos = head;
+            if (pos + 1 == tail)
+                return false; // Queue full
+
+            queue[pos] = std::move(chunk);
+            head = (pos + 1) % QUEUE_SIZE;
+            return true;
+        }
+
+        std::optional<Item> Dequeue()
+        {
+            std::scoped_lock scope{ m_Lock };
+
+            size_t pos = tail;
+            if (pos == head)
+                return std::nullopt; // No queued item
+
+            std::optional chunk{ std::move(queue[pos]) };
+            tail = (pos + 1) % QUEUE_SIZE;
+            return chunk;
+        }
+
+        std::array<Item, QUEUE_SIZE> queue{};
+
+        std::mutex m_Lock{};
+        size_t head{}, tail{};
+
+        bool muted{ false };
+        int volume;
+    };
+    
+    SDLAudioService::SDLAudioService()
+        : m_pImpl{ std::make_unique<Impl>() }
+    {
         if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0)
             throw utility::TeiRuntimeError{ "Could not open audio", SDL_GetError() };
     }
 
-    void SDLAudio::OnDisable()
+    SDLAudioService::~SDLAudioService()
     {
-        // Mix_Quit();
         Mix_CloseAudio();
     }
 
-    void SDLAudio::OnMute(bool mute)
+    void SDLAudioService::Play(resource::Resource<resource::Sound> const& sound) const
     {
-        if (mute)
-            Mix_HaltChannel(-1);
+        if (m_pImpl->muted)
+            return;
+
+        if (m_pImpl->Enqueue(sound) == false)
+            std::cerr << "[WARNING] Playing too many audio chunks, skipping current call\n";
     }
 
-    void SDLAudio::OnPlay(resource::Sound const& sound)
+    void SDLAudioService::Mute(bool state) const
     {
-        auto chunk = static_cast<Mix_Chunk*>(sound.pData);
-        Mix_VolumeChunk(chunk, int(sound.volume * MIX_MAX_VOLUME));
-        if (Mix_PlayChannel(-1, chunk, sound.loop) == -1)
-            puts("[WARNING] playing too many audio chunks, skipping current call"); //throw utility::TeiRuntimeError{ "Sound could not be played on any channel", SDL_GetError() };
+        if (m_pImpl->muted != state)
+        {
+            m_pImpl->muted = state;
+            if (state)
+                m_pImpl->volume = Mix_Volume(-1, 0);
+            else
+                Mix_Volume(-1, m_pImpl->volume);
+        }
     }
 
-    Chunk* SDLAudio::Load(std::filesystem::path const& path)
+    bool SDLAudioService::IsMuted() const
     {
-        if (Chunk* chunk = static_cast<Chunk*>(Mix_LoadWAV(path.string().c_str())))
-            return chunk;
-        else
+        return m_pImpl->muted;
+    }
+
+    void SDLAudioService::Update()
+    {
+        if (m_pImpl->muted)
+            return;
+
+        while (auto item{ m_pImpl->Dequeue() })
+        if (auto sound{ item->Lock() })
+        {
+            Mix_VolumeChunk(sound->pData, int(sound->volume * MIX_MAX_VOLUME));
+            if (Mix_PlayChannel(-1, sound->pData, sound->loop) == -1)
+                std::cerr << "[WARNING] Playing too many audio chunks, skipping current call\n";
+        }
+    }
+
+    std::shared_ptr<resource::Sound> SDLAudioService::Load(std::filesystem::path const& path)
+    {
+        auto chunk = Mix_LoadWAV(path.string().c_str());
+
+        if (chunk == nullptr)
             throw utility::TeiRuntimeError{ "Sound chunk could not be loaded", SDL_GetError() };
+        
+        auto deleter = [](resource::Sound* sound)
+        {
+            Mix_FreeChunk(sound->pData);
+            delete sound;
+        };
+        
+        return std::shared_ptr<resource::Sound>{
+            new resource::Sound{ static_cast<audio::Chunk*>(chunk) },
+            deleter
+        };
     }
 
-    void SDLAudio::Free(Chunk* chunk)
-    {
-        Mix_FreeChunk(chunk);
-    }
 
 }

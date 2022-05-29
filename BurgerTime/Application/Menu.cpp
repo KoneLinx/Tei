@@ -65,6 +65,10 @@ void Menu::OnInitialize(tei::ecs::Object& object)
 
 	m_Updater = [&, updaters = std::move(updaters), index = int()] (int change) mutable
 	{
+		{
+			static auto s = Resources->LoadShared<resource::Sound>("resources/click.wav");
+			Audio->Play(s);
+		}
 		if (change == 0)
 		{
 			object.SetState(false);

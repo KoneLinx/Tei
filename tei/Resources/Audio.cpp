@@ -30,40 +30,50 @@ void Load(std::shared_ptr<Sound>& out, std::filesystem::path const& path, bool l
     //if (!audio)
     //    s_Audio = audio = std::make_shared<Audio>();
 
-    auto const DELETER = [] (Sound* pSound)
-    {
-        audio::Audio->Free(pSound->pData);
-        delete pSound;
-    };
 
-    audio::Chunk* pChunk{};
-    if (!path.empty())
-        pChunk = audio::Audio->Load(path);
+    //auto const DELETER = [] (Sound* pSound)
+    //{
+    //    audio::Audio->Free(pSound->pData);
+    //    delete pSound;
+    //};
+
+    //audio::Chunk* pChunk{};
+    //if (!path.empty())
+    //    pChunk = audio::Audio->Load(path);
         //if (pChunk = Mix_LoadWAV(path.string().c_str()));
         //else
         //    throw utility::TeiRuntimeError{ "Sound chunk could not be loaded", SDL_GetError() };
 
+//#if defined(DEBUG) || defined(_DEBUG)
+//    std::string sname{
+//        name.empty()
+//        ? path.filename().string()
+//        : name
+//    };
+//#endif
+//
+//    out = { 
+//        std::shared_ptr<Sound>{ 
+//            new Sound{
+//                pChunk, 
+//                volume,
+//                loop
+//#if defined(DEBUG) || defined(_DEBUG)
+//                , std::move(sname) 
+//#endif
+//            },
+//            DELETER
+//        }
+//    };
+
+    out = audio::Audio->Load(path);
+
+    out->loop = loop;
+    out->volume = volume;
 #if defined(DEBUG) || defined(_DEBUG)
-    std::string sname{
-        name.empty()
-        ? path.filename().string()
-        : name
-    };
+    out->_name = name;
 #endif
 
-    out = { 
-        std::shared_ptr<Sound>{ 
-            new Sound{
-                pChunk, 
-                volume,
-                loop
-#if defined(DEBUG) || defined(_DEBUG)
-                , std::move(sname) 
-#endif
-            },
-            DELETER
-        }
-    };
 }
 
 void Load(std::shared_ptr<Sound>& out)

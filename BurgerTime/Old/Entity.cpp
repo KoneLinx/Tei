@@ -68,16 +68,6 @@ EntityPlayerController::EntityPlayerController(int id)
 	else std::cerr << "[Warning] player with (id > 1) has no keyboard bindings" << std::endl;
 }
 
-//void EntityPlayerController::AddTo(EntityController & controller, int id)
-//{
-//	controller.SetInputController(
-//		[self = EntityPlayerController{ id }] () mutable 
-//		{ 
-//			return self.QueryInput();
-//		}
-//	);
-//}
-
 tei::unit::Vec2 EntityPlayerController::QueryInput()
 {
 

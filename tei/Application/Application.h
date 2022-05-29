@@ -68,9 +68,6 @@ namespace tei::internal::application
 		void OpenWindow();
 		void CloseWindow();
 
-		void InitAudio();
-		void ExitAudio();
-
 		std::vector<std::string_view> const m_Args;
 		Window m_Window;
 
