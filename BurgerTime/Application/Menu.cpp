@@ -182,7 +182,7 @@ tei::ecs::Object& CreateMainMenu(tei::ecs::Object& parent)
 				auto& game = CreateGame(parent, std::array{ "single"sv, "co-op"sv, "versus"sv } [index] );
 				auto start = Time->frame.now;
 				game.GetComponent<Level>().AddObserver(
-					[&](Level::LevelEvent const& event)
+					[&, start](Level::LevelEvent const& event)
 					{
 						if (event.type == event.ALL_COMPLETED || event.type == event.FAILED)
 						{

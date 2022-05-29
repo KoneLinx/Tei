@@ -100,12 +100,12 @@ tei::ecs::Object& IconbarDisplay::CreateHealthDisplay(tei::ecs::Object& parent, 
 
 	auto& texture = leveldata.particles.at(StaticEntityData::HEARTH).texture;
 
-	for (size_t i{}; i < 3; ++i)
+	for (size_t i{}; i < 10; ++i)
 	{
 		auto& child = healthobject.AddChild();
 		child.AddComponent<ObjectTransform>(tei::unit::Position{ 0, /*texture->size.y **/ i * 1.1f });
 		child.AddComponent<tei::components::TextureRenderComponent>();
-		child.AddComponent(std::move(texture));
+		child.AddComponent(texture);
 	}
 
 	self.m_Update = [&](int health)
