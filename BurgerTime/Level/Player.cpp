@@ -64,16 +64,24 @@ void PlayerController::OnEnable(tei::ecs::Object const& object)
 		int id = m_playerID;
 		auto const movestate = BinaryState::ANY;
 		auto const actstate = BinaryState::PRESSED;
-		auto const stickstate = Analog2State{ { .25f, .25f }, { 1.f, 1.f } };
+		auto const stickstate = Analog2State{ { .25f, 1.f }, { .25f, 1.f } };
+		auto controllerWalk = ControllerInput::Stick::LEFT.WithState(stickstate).WithChange(false);
+		auto controllerAttack = ControllerInput::Button::A.WithState(actstate);
+
 		return std::tuple
 		{
-			Input->AddCommand( std::array{ KeyboardInput::Main::W.WithState(movestate)                    , KeyboardInput::Arrow::UP   .WithState(movestate)                }[id], updateMovementKeyboard( 1.f, 1) ),
-			Input->AddCommand( std::array{ KeyboardInput::Main::A.WithState(movestate)                    , KeyboardInput::Arrow::LEFT .WithState(movestate)                }[id], updateMovementKeyboard(-1.f, 0) ),
-			Input->AddCommand( std::array{ KeyboardInput::Main::S.WithState(movestate)                    , KeyboardInput::Arrow::DOWN .WithState(movestate)                }[id], updateMovementKeyboard(-1.f, 1) ),
-			Input->AddCommand( std::array{ KeyboardInput::Main::D.WithState(movestate)                    , KeyboardInput::Arrow::RIGHT.WithState(movestate)                }[id], updateMovementKeyboard( 1.f, 0) ),
-			Input->AddCommand( std::array{ KeyboardInput::Main::SPACE.WithState(actstate)                 , KeyboardInput::Mod::RCTRL  .WithState(actstate)                 }[id], doAttack                        ),
-			Input->AddCommand( std::array{ ControllerInput::Stick::LEFT.WithIndex(0).WithState(stickstate), ControllerInput::Stick::LEFT.WithIndex(1).WithState(stickstate) }[id], updateMovementController        ),
-			Input->AddCommand( std::array{ ControllerInput::Button::X.WithIndex(0).WithState(actstate)    , ControllerInput::Button::X.WithIndex(1).WithState(actstate)     }[id], doAttack                        )
+			Input->AddCommand( std::array{ KeyboardInput::Main::W.WithState(movestate)   , KeyboardInput::Arrow::UP   .WithState(movestate) }[id], updateMovementKeyboard( 1.f, 1) ),
+			Input->AddCommand( std::array{ KeyboardInput::Main::A.WithState(movestate)   , KeyboardInput::Arrow::LEFT .WithState(movestate) }[id], updateMovementKeyboard(-1.f, 0) ),
+			Input->AddCommand( std::array{ KeyboardInput::Main::S.WithState(movestate)   , KeyboardInput::Arrow::DOWN .WithState(movestate) }[id], updateMovementKeyboard(-1.f, 1) ),
+			Input->AddCommand( std::array{ KeyboardInput::Main::D.WithState(movestate)   , KeyboardInput::Arrow::RIGHT.WithState(movestate) }[id], updateMovementKeyboard( 1.f, 0) ),
+			Input->AddCommand( std::array{ KeyboardInput::Main::SPACE.WithState(actstate), KeyboardInput::Mod::RCTRL  .WithState(actstate)  }[id], doAttack                        ),
+			Input->AddCommand( std::array{ controllerWalk.WithIndex(0)                   , controllerWalk.WithIndex(1)                      }[id], updateMovementController),
+			Input->AddCommand( std::array{ controllerAttack.WithIndex(0)                 , controllerAttack.WithIndex(1)                    }[id], doAttack                        ),
+			
+			Input->AddCommand( std::array{ ControllerInput::Button::DPAD_UP.WithIndex(0).WithState(movestate)   , ControllerInput::Button::DPAD_UP.WithIndex(1).WithState(movestate)    }[id], updateMovementKeyboard( 1.f, 1) ),
+			Input->AddCommand( std::array{ ControllerInput::Button::DPAD_LEFT.WithIndex(0).WithState(movestate) , ControllerInput::Button::DPAD_LEFT.WithIndex(1).WithState(movestate)  }[id], updateMovementKeyboard(-1.f, 0) ),
+			Input->AddCommand( std::array{ ControllerInput::Button::DPAD_DOWN.WithIndex(0).WithState(movestate) , ControllerInput::Button::DPAD_DOWN.WithIndex(1).WithState(movestate)  }[id], updateMovementKeyboard(-1.f, 1) ),
+			Input->AddCommand( std::array{ ControllerInput::Button::DPAD_RIGHT.WithIndex(0).WithState(movestate), ControllerInput::Button::DPAD_RIGHT.WithIndex(1).WithState(movestate) }[id], updateMovementKeyboard( 1.f, 0) ),
 		};
 	};
 

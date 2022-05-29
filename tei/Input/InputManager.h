@@ -41,6 +41,8 @@ namespace tei::internal::input
 		template <typename InputType, typename Data = typename InputType::Data>
 		void InvokeInput(InputType input, Data state);
 
+		struct PollData;
+
 	private:
 
 		using CommandContainer = std::unordered_multimap<std::type_index, std::any>;
@@ -52,8 +54,6 @@ namespace tei::internal::input
 
 		std::shared_ptr<CommandContainer> m_Commands;
 
-
-		struct PollData;
 		std::unique_ptr<PollData> m_PollData;
 
 		class CommandHandle

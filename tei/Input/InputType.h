@@ -53,9 +53,9 @@ namespace tei::internal::input
 	using InputAnalog = InputType<AnalogData, AnalogState>;
 	using InputAnalog2 = InputType<Analog2Data, Analog2State>;
 
-	constexpr bool operator & (InputBinary const& input, BinaryData const& value);
-	constexpr bool operator & (InputAnalog const& input, AnalogData const& value);
-	constexpr bool operator & (InputAnalog2 const& input, Analog2Data const& value);
+	bool operator & (InputBinary const& input, BinaryData const& value);
+	bool operator & (InputAnalog const& input, AnalogData const& value);
+	bool operator & (InputAnalog2 const& input, Analog2Data const& value);
 
 	using SomeCommonInputType = std::variant<InputBinary, InputAnalog, InputAnalog2>;
 	using SomeCommonInputData = std::variant<InputBinary::Data, InputAnalog::Data, InputAnalog2::Data>;
@@ -63,34 +63,34 @@ namespace tei::internal::input
 	using SomeCommonInputTypeRef = utility::ApplyTrait_t<std::reference_wrapper, utility::ApplyTrait_t<std::add_const_t, SomeCommonInputType>>;
 	using SomeCommonInputDataRef = utility::ApplyTrait_t<std::reference_wrapper, utility::ApplyTrait_t<std::add_const_t, SomeCommonInputData>>;
 
-	constexpr bool operator & (InputBinary const& input, BinaryData const& value)
+	inline bool operator & (InputBinary const& input, BinaryData const& value)
 	{
 		return
 			input.state == BinaryState::ANY ||
 			input.state == (value ? BinaryState::PRESSED : BinaryState::RELEASED);
 	}
 
-	constexpr bool operator & (InputAnalog const& input, AnalogData const& value)
+	inline bool operator & (InputAnalog const& input, AnalogData const& value)
 	{
 		auto [low, high] = input.state;
 		return
-			low <= value &&
-			value <= high;
+			low <= std::abs(value) &&
+			std::abs(value) <= high;
 	}
 	
-	constexpr bool operator & (InputAnalog2 const& input, Analog2Data const& value)
+	inline bool operator & (InputAnalog2 const& input, Analog2Data const& value)
 	{
 		auto [low1, high1] = input.state.first;
 		auto [low2, high2] = input.state.second;
 		return
-			low1 <= value.first &&
-			value.first <= high1 &&
-			low2 <= value.second &&
-			value.second <= high2;
+			low1 <= std::abs(value.first) &&
+			std::abs(value.first) <= high1 ||
+			low2 <= std::abs(value.second) &&
+			std::abs(value.second) <= high2;
 	}
 
 	template <typename InputType, typename Data = typename InputType::Data>
-	constexpr bool operator & (Data const& value, InputType const& input)
+	inline bool operator & (Data const& value, InputType const& input)
 	{
 		return input & value;
 	}

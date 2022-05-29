@@ -128,7 +128,7 @@ void Menu::OnEnable()
 				[this] { m_Updater(-1); }
 			),
 			Input->AddCommand(
-				ControllerInput::Button::X,
+				ControllerInput::Button::A,
 				[this] { m_Updater(0); }
 			)
 		};
@@ -191,15 +191,22 @@ tei::ecs::Object& CreateMainMenu(tei::ecs::Object& parent)
 						}
 					}
 				).Detach();
-				game.AddComponent(
+				game.AddComponent(std::tuple{
 					tei::Input->AddCommand(
 						input::KeyboardInput::Main::ESCAPE,
 						[](bool)
 						{
 							tei::Event->Notify(GameReset{});
 						}
+					),
+					tei::Input->AddCommand(
+						input::ControllerInput::Button::START,
+						[](bool)
+						{
+							tei::Event->Notify(GameReset{});
+						}
 					)
-				);
+				});
 			}
 		).Detach();
 	}
@@ -254,15 +261,22 @@ tei::ecs::Object& CreateScoreMenu(tei::ecs::Object& parent, tei::ecs::Object& le
 	addText("time", { .75, .75, .75, 1 });
 	addText(std::to_string(std::chrono::duration_cast<std::chrono::seconds>(durtation).count()));
 
-	board.AddComponent(
+	board.AddComponent(std::tuple{
 		Input->AddCommand(
 			input::KeyboardInput::Main::RETURN,
 			[](bool)
 			{
 				Event->Notify(GameReset{});
 			}
+		),
+		Input->AddCommand(
+			input::ControllerInput::Button::A,
+			[](bool)
+			{
+				Event->Notify(GameReset{});
+			}
 		)
-	);
+	});
 
 	return board;
 }

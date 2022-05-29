@@ -39,11 +39,8 @@ struct Keyboard
 struct InputManager::PollData
 {
 	Keyboard keyboard;
-	Controller controller;
+	std::array<Controller, 4> controllers;
 };
-
-template <typename InputType>
-auto TestInput(InputManager::PollData const&, InputType const&);
 
 bool TestInput(XINPUT_STATE const& state, InputBinary const& input)
 {
@@ -55,10 +52,9 @@ bool TestInput(Keyboard::State const& state, InputBinary const& input)
 	return state[input.keyId] != 0;
 }
 
-template <>
-auto TestInput<InputBinary>(InputManager::PollData const& data, InputBinary const& input)
+auto TestInput(InputManager::PollData const& data, InputBinary const& input)
 {
-	using Ret = std::optional<bool>;
+	using Ret = std::optional<InputBinary::Data>;
 
 	InputBinary::Data value{};
 	bool change{ !input.onChange };
@@ -73,26 +69,29 @@ auto TestInput<InputBinary>(InputManager::PollData const& data, InputBinary cons
 	break;
 	case DeviceId::CONTROLER:
 	{
-		value  = TestInput(data.controller.currentState, input);
-		change = change || value != TestInput(data.controller.previousState, input);
+		value  = TestInput(data.controllers[input.deviceIndex].currentState, input);
+		change = change || value != TestInput(data.controllers[input.deviceIndex].previousState, input);
 	}
 	break;
 	}
 	
-	if (change && input & value)
-		return Ret{ value };
-	else
-		return Ret{};
+	if (change)
+	{
+		if (input & value)
+			return Ret{ value };
+		else
+			return input.onChange ? Ret{} : Ret{ InputBinary::Data{} };
+	} 
+	else return Ret{};
 }
 
 template <typename Decimal, typename Value>
 Decimal OverMax(Value val) noexcept
 {
-	return static_cast<Decimal>(val) / static_cast<Decimal>(std::numeric_limits<Value>::max());
+	return static_cast<Decimal>(val) / (static_cast<Decimal>(std::numeric_limits<Value>::max()) + 1);
 }
 
-template <>
-auto TestInput<InputAnalog>(InputManager::PollData const& data, InputAnalog const& input)
+auto TestInput(InputManager::PollData const& data, InputAnalog const& input)
 {
 	using Ret = std::optional<InputAnalog::Data>;
 
@@ -101,33 +100,38 @@ auto TestInput<InputAnalog>(InputManager::PollData const& data, InputAnalog cons
 
 	if (input.deviceId == DeviceId::CONTROLER)
 	{
+		auto const& state = data.controllers[input.deviceIndex];
+
 		switch (input.keyId)
 		{
 		case ControllerInput::Trigger::Index::LEFT:
 		{
-			change = change || data.controller.currentState.Gamepad.bLeftTrigger != data.controller.previousState.Gamepad.bLeftTrigger;
+			change = change || state.currentState.Gamepad.bLeftTrigger != state.previousState.Gamepad.bLeftTrigger;
 			if (change)
-				value = OverMax<InputAnalog::Data>(data.controller.currentState.Gamepad.bLeftTrigger);
+				value = OverMax<InputAnalog::Data>(state.currentState.Gamepad.bLeftTrigger);
 		}
 		break;
 		case ControllerInput::Trigger::Index::RIGHT:
 		{
-			change = change || data.controller.currentState.Gamepad.bRightTrigger != data.controller.previousState.Gamepad.bRightTrigger;
+			change = change || state.currentState.Gamepad.bRightTrigger != state.previousState.Gamepad.bRightTrigger;
 			if (change)
-				value = OverMax<InputAnalog::Data>(data.controller.currentState.Gamepad.bLeftTrigger);
+				value = OverMax<InputAnalog::Data>(state.currentState.Gamepad.bLeftTrigger);
 		}
 		break;
 		}
 	}
-
-	if (change && input & value)
-		return Ret{ std::move(value) };
-	else
-		return Ret{};
+	
+	if (change)
+	{
+		if (input & value)
+			return Ret{ std::move(value) };
+		else
+			return input.onChange ? Ret{} : Ret{ InputAnalog::Data{} };
+	} 
+	else return Ret{};
 }
 
-template <>
-auto TestInput<InputAnalog2>(InputManager::PollData const& data, InputAnalog2 const& input)
+auto TestInput(InputManager::PollData const& data, InputAnalog2 const& input)
 {
 	using Data_t = InputAnalog2::Data::first_type;
 	using Ret = std::optional<InputAnalog2::Data>;
@@ -137,39 +141,45 @@ auto TestInput<InputAnalog2>(InputManager::PollData const& data, InputAnalog2 co
 
 	if (input.deviceId == DeviceId::CONTROLER)
 	{
+		auto const& state = data.controllers[input.deviceIndex];
+
 		switch (input.keyId)
 		{
 		case ControllerInput::Stick::Index::LEFT:
 		{
 			change = change
-				|| data.controller.currentState.Gamepad.sThumbLX != data.controller.previousState.Gamepad.sThumbLX 
-				|| data.controller.currentState.Gamepad.sThumbLY != data.controller.previousState.Gamepad.sThumbLY;
+				|| state.currentState.Gamepad.sThumbLX != state.previousState.Gamepad.sThumbLX 
+				|| state.currentState.Gamepad.sThumbLY != state.previousState.Gamepad.sThumbLY;
 			if (change)
 				value = {
-					OverMax<Data_t>(data.controller.currentState.Gamepad.sThumbLX),
-					OverMax<Data_t>(data.controller.currentState.Gamepad.sThumbLY)
+					OverMax<Data_t>(state.currentState.Gamepad.sThumbLX),
+					OverMax<Data_t>(state.currentState.Gamepad.sThumbLY)
 				};
 		}
 		break;
 		case ControllerInput::Stick::Index::RIGHT:
 		{
 			change = change
-				|| data.controller.currentState.Gamepad.sThumbRX != data.controller.previousState.Gamepad.sThumbRX 
-				|| data.controller.currentState.Gamepad.sThumbRY != data.controller.previousState.Gamepad.sThumbRY;
+				|| state.currentState.Gamepad.sThumbRX != state.previousState.Gamepad.sThumbRX 
+				|| state.currentState.Gamepad.sThumbRY != state.previousState.Gamepad.sThumbRY;
 			if (change)
 				value = {
-					OverMax<Data_t>(data.controller.currentState.Gamepad.sThumbRX),
-					OverMax<Data_t>(data.controller.currentState.Gamepad.sThumbRY)
+					OverMax<Data_t>(state.currentState.Gamepad.sThumbRX),
+					OverMax<Data_t>(state.currentState.Gamepad.sThumbRY)
 				};
 		}
 		break;
 		}
 	}
-
-	if (change && input & value)
-		return Ret{ std::move(value) };
-	else
-		return Ret{};
+	
+	if (change)
+	{
+		if (input & value)
+			return Ret{ std::move(value) };
+		else
+			return input.onChange ? Ret{} : Ret{ InputAnalog2::Data{} };
+	} 
+	else return Ret{};
 }
 
 template <typename InputType>
@@ -207,8 +217,11 @@ void InputManager::ProcessInput()
 	std::ranges::copy_n(stateData, stateSize, data.keyboard.currentState->data());
 	std::ranges::fill_n(data.keyboard.currentState->data() + stateSize, data.keyboard.currentState->size() - stateSize, uint8_t{});
 
-	data.controller.previousState = std::exchange(data.controller.currentState, {});
-	XInputGetState(0, &data.controller.currentState);
+	for (int index{}; auto & state : data.controllers)
+	{
+		state.previousState = std::exchange(state.currentState, {});
+		XInputGetState(index++, &state.currentState);
+	}
 
 	auto updater = [&] <typename InputType> ()
 	{
