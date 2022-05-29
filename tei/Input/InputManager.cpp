@@ -75,14 +75,10 @@ auto TestInput(InputManager::PollData const& data, InputBinary const& input)
 	break;
 	}
 	
-	if (change)
-	{
-		if (input & value)
-			return Ret{ value };
-		else
-			return input.onChange ? Ret{} : Ret{ InputBinary::Data{} };
-	} 
-	else return Ret{};
+	if (change && input & value)
+		return Ret{ value };
+	else 
+		return Ret{};
 }
 
 template <typename Decimal, typename Value>
@@ -106,16 +102,36 @@ auto TestInput(InputManager::PollData const& data, InputAnalog const& input)
 		{
 		case ControllerInput::Trigger::Index::LEFT:
 		{
-			change = change || state.currentState.Gamepad.bLeftTrigger != state.previousState.Gamepad.bLeftTrigger;
-			if (change)
-				value = OverMax<InputAnalog::Data>(state.currentState.Gamepad.bLeftTrigger);
+			value = {
+				OverMax<InputAnalog::Data>(state.currentState.Gamepad.bLeftTrigger)
+			};
+			if (!change)
+			{
+				InputAnalog::Data prev{
+					OverMax<InputAnalog::Data>(state.previousState.Gamepad.bLeftTrigger)
+				};
+				change = (input & value) != (input & prev);
+			}
+			change = change || input & value && (
+				   state.currentState.Gamepad.bLeftTrigger != state.previousState.Gamepad.bLeftTrigger
+			);
 		}
 		break;
 		case ControllerInput::Trigger::Index::RIGHT:
 		{
-			change = change || state.currentState.Gamepad.bRightTrigger != state.previousState.Gamepad.bRightTrigger;
-			if (change)
-				value = OverMax<InputAnalog::Data>(state.currentState.Gamepad.bLeftTrigger);
+			value = {
+				OverMax<InputAnalog::Data>(state.currentState.Gamepad.bRightTrigger)
+			};
+			if (!change)
+			{
+				InputAnalog::Data prev{
+					OverMax<InputAnalog::Data>(state.previousState.Gamepad.bRightTrigger)
+				};
+				change = (input & value) != (input & prev);
+			}
+			change = change || input & value && (
+				   state.currentState.Gamepad.bRightTrigger != state.previousState.Gamepad.bRightTrigger
+			);
 		}
 		break;
 		}
@@ -123,11 +139,11 @@ auto TestInput(InputManager::PollData const& data, InputAnalog const& input)
 	
 	if (change)
 	{
-		if (input & value)
+		if (input& value)
 			return Ret{ std::move(value) };
 		else
-			return input.onChange ? Ret{} : Ret{ InputAnalog::Data{} };
-	} 
+			return Ret{ InputAnalog::Data{} };
+	}
 	else return Ret{};
 }
 
@@ -147,26 +163,42 @@ auto TestInput(InputManager::PollData const& data, InputAnalog2 const& input)
 		{
 		case ControllerInput::Stick::Index::LEFT:
 		{
-			change = change
-				|| state.currentState.Gamepad.sThumbLX != state.previousState.Gamepad.sThumbLX 
-				|| state.currentState.Gamepad.sThumbLY != state.previousState.Gamepad.sThumbLY;
-			if (change)
-				value = {
-					OverMax<Data_t>(state.currentState.Gamepad.sThumbLX),
-					OverMax<Data_t>(state.currentState.Gamepad.sThumbLY)
+			value = {
+				OverMax<Data_t>(state.currentState.Gamepad.sThumbLX),
+				OverMax<Data_t>(state.currentState.Gamepad.sThumbLY)
+			};
+			if (!change)
+			{
+				InputAnalog2::Data prev{
+					OverMax<Data_t>(state.previousState.Gamepad.sThumbLX),
+					OverMax<Data_t>(state.previousState.Gamepad.sThumbLY)
 				};
+				change = (input & value) != (input & prev);
+			}
+			change = change || input & value && (
+				   state.currentState.Gamepad.sThumbLX != state.previousState.Gamepad.sThumbLX 
+				|| state.currentState.Gamepad.sThumbLY != state.previousState.Gamepad.sThumbLY
+			);
 		}
 		break;
 		case ControllerInput::Stick::Index::RIGHT:
 		{
-			change = change
-				|| state.currentState.Gamepad.sThumbRX != state.previousState.Gamepad.sThumbRX 
-				|| state.currentState.Gamepad.sThumbRY != state.previousState.Gamepad.sThumbRY;
-			if (change)
-				value = {
-					OverMax<Data_t>(state.currentState.Gamepad.sThumbRX),
-					OverMax<Data_t>(state.currentState.Gamepad.sThumbRY)
+			value = {
+				OverMax<Data_t>(state.currentState.Gamepad.sThumbRX),
+				OverMax<Data_t>(state.currentState.Gamepad.sThumbRY)
+			};
+			if (!change)
+			{
+				InputAnalog2::Data prev{
+					OverMax<Data_t>(state.previousState.Gamepad.sThumbRX),
+					OverMax<Data_t>(state.previousState.Gamepad.sThumbRY)
 				};
+				change = (input & value) != (input & prev);
+			}
+			change = change || input & value && (
+				   state.currentState.Gamepad.sThumbRX != state.previousState.Gamepad.sThumbRX 
+				|| state.currentState.Gamepad.sThumbRY != state.previousState.Gamepad.sThumbRY
+			);
 		}
 		break;
 		}
@@ -174,11 +206,11 @@ auto TestInput(InputManager::PollData const& data, InputAnalog2 const& input)
 	
 	if (change)
 	{
-		if (input & value)
+		if (input& value)
 			return Ret{ std::move(value) };
 		else
-			return input.onChange ? Ret{} : Ret{ InputAnalog2::Data{} };
-	} 
+			return Ret{ InputAnalog2::Data{} };
+	}
 	else return Ret{};
 }
 

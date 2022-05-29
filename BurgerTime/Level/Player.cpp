@@ -64,8 +64,8 @@ void PlayerController::OnEnable(tei::ecs::Object const& object)
 		int id = m_playerID;
 		auto const movestate = BinaryState::ANY;
 		auto const actstate = BinaryState::PRESSED;
-		auto const stickstate = Analog2State{ { .25f, 1.f }, { .25f, 1.f } };
-		auto controllerWalk = ControllerInput::Stick::LEFT.WithState(stickstate).WithChange(false);
+		auto const stickstate = Analog2State{ { .05f, 1.f }, { .05f, 1.f } };
+		auto controllerWalk = ControllerInput::Stick::LEFT.WithState(stickstate);
 		auto controllerAttack = ControllerInput::Button::A.WithState(actstate);
 
 		return std::tuple
