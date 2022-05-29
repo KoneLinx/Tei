@@ -59,11 +59,10 @@ An object's children or component list cannot be modified while it is active.
 
 Components will house the bulk of your logic and are the main powerhouses of your game. They may implement `OnInitialize` and `OnCleanup`, `OnEnable` and `OnDisable`, and `OnUpdate`, `OnFixedUpdate` and `OnRender`.
 
-Through external polymorphism. Any type in C++ can be a component. None of the implmentable callbacks is required.
+Through external polymorphism any type in C++ can be a component. None of the implmentable callbacks are required.
 
-Callback may be free functions or member functions with the following syntaxes, exemplified by OnUpdate:
+Any callback may be a free function or a member function with the following syntax, exemplified by OnUpdate:
 ```c++
-// Lookup in order:
 component.OnEnable(parent);
 component.OnEnable();
 ::OnEnable(component, parent);
@@ -82,7 +81,8 @@ auto& myTimer = object.AddComponent(MyTimer{}); // Moved in
 
 There is also a way to add multiple components.
 ```c++
-auto [myTimer, myData] = object.AddComponents(MyTimer{ 27 }, MyData{ "world" }); // Both components are moved in, in order left to right.
+// Both components are moved in, in order left to right.
+auto [myTimer, myData] = object.AddComponents(MyTimer{ 27 }, MyData{ "world" });
 ```
 The return type can be destructured.
 
@@ -131,14 +131,14 @@ Literals are also provided: days `_d`, hours `_h`, minutes `_m`, seconds `_s`, m
 
 ### Resources
 
-Resources can be loaded through `tei::Resources`. Some engine loadable can be found under `tei::resources`. Custom types can also be provided.
+Resources can be loaded through `tei::Resources`. Some engine loadable resources can be found under `tei::resources`. Custom types can also be provided.
 
 To load a resource and make sure it does not get loaded twice. Use `LoadShared`.
 To force a resource to load regardles of previous copies, Use `LoadUnique`.
 
 The resource wrapper functions equivalent to shared pointers, when they are copied, their resource only exists once.
 
-Some resourced may be initialised without loading them; E.g. a default texture is an empty one with size 0x0.
+Some resources may be initialised without loading them; E.g. a default texture is an empty one with size 0x0.
 
 To load a shared resource:
 ```c++
@@ -156,7 +156,7 @@ Some rendering logic is provided by `tei::components::TextureRenderComponent`, `
 
 Global events can de dispatched through `tei::Event`.
 
-In a closed environment, `tei::componeents::Subject` is provided. To make use of this, it can be added as a component or may be inherited from to include the interface.
+In a closed environment, `tei::components::Subject` is provided. To make use of this, it can be added as a component or may be inherited from to include the interface.
 
 To dispatch an event or message:
 ```c++
@@ -175,13 +175,13 @@ subject.AddObserver(
 ```
 This example uses a lambda. Observers may also be a functor with a call operator or a function pointer. There is no support for member functions. Functors may hold state and be mutable.
 
-This returns an obseerver handle. When it is destroyed or overwritten, it will remove the observer from the subject again. So make sure to keep track of it as long as the link must be kept alive. A handle may also be detached permanently leaving it in the subject.
+This returns an observer handle. When it is destroyed or overwritten, it will remove the observer from the subject again. So make sure to keep track of it as long as the link must be kept alive. A handle may also be detached permanently leaving it in the subject.
 
 ### Input
 
 Input can be interacted with via `tei::Input`. It behaves similar to `tei::Event`, but has additional functionality.
 
-And attional parameter to AddCommand is the key or axis to listen for.
+And additional parameter to AddCommand is the key or axis to listen for.
 ```c++
 subject.AddObserver(
   tei::input::ControllerInput::Trigger::LEFT,
@@ -198,7 +198,7 @@ The application can be accessed through `tei::Application`. Commandline argument
 
 To close the application: call `tei::Application->Quit()`. This will initiate cleanup.
 
-Window propeertied can also be modified through Application.
+Window properties can also be modified through Application.
 
 ## Other
 
@@ -206,6 +206,6 @@ Window propeertied can also be modified through Application.
 
 It is not recommended to ever use `tei::internal`. It holds the internal logic.
 
-# Tei 
+# てゐ
 
-<img src="tewi_w.png" alt="てゐ" height="96px">
+<img src="tewi_w.png" alt="てゐ" >
