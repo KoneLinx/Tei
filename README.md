@@ -1,4 +1,4 @@
-The most up to date repository can be found [here](https://git.konelinx.be/tei.git).
+The most up to date repository can be found [here](https://git.konelinx.be/tei.git), including the development branch.
 
 # Tei
 
