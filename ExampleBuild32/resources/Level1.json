@@ -1,0 +1,10 @@
+{
+  "stage": 1,
+  "difficulty": 1,
+  "floors": 3,
+  "burgers": 2,
+  "ingredients": 1,
+  "enemies": 3,
+  "ladders": 3,
+  "seed": 0
+}
